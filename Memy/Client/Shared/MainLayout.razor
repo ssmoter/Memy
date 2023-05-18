@@ -1,0 +1,39 @@
+﻿@using CompomentsLibrary.Pages
+@inherits LayoutComponentBase
+@inject PopupListService _popUp
+
+<PopupList></PopupList>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <button @onclick="RedirectPage">+</button>
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code{
+    int n = 0;
+    private async Task RedirectPage()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            //_popUp.ShowToats(n.ToString());
+            n++;
+        }
+        _popUp.ShowToats("Popup body text", "None", CompomentsLibrary.Helper.PopupLevel.Level.None);
+        _popUp.ShowToats("Popup body text", "Info", CompomentsLibrary.Helper.PopupLevel.Level.Info);
+        _popUp.ShowToats("Popup body text", "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning);
+        _popUp.ShowToats("Popup body text", "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error);
+        _popUp.ShowToats("Popup body text", "Success", CompomentsLibrary.Helper.PopupLevel.Level.Success);
+    }
+}

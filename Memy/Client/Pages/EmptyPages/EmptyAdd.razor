@@ -1,0 +1,19 @@
+﻿@page "/add"
+
+<AuthorizeView>
+    <NotAuthorized>
+        <div>
+            <p>
+               Zaloguj się 
+            </p>
+            <LoginPages></LoginPages>
+        </div>
+    </NotAuthorized>
+    <Authorized>
+        <AddPages></AddPages>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+
+}

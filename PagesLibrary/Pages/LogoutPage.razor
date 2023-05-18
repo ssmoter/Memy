@@ -1,0 +1,35 @@
+﻿@page "/logout"
+@page "/logout/{tokenValue}"
+@inject ILogger<LoginPages> _ilogger
+@inject ILogInOut _logInOut
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authStateProvider
+@inject PopupListService _popUp
+
+@code {
+
+    [Parameter]
+    public string tokenValue { get; set; }
+    protected override async void OnInitialized()
+    {
+        Token token = new Token();
+        try
+        {
+            if (!string.IsNullOrWhiteSpace(tokenValue))
+            {
+                token.Value = Guid.Parse(tokenValue);
+            }
+            var result = await _logInOut.LogOut(token);
+            await _authStateProvider.GetAuthenticationStateAsync();
+            _popUp.ShowToats("Zostałeś wylogowany", "Status logowania", PopupLevel.Level.Success);
+            _ilogger.LogInformation("Logout");
+            _navigation.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            _ilogger.LogError(ex.Message);
+        }
+
+    }
+
+}

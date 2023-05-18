@@ -1,0 +1,19 @@
+﻿@page "/register"
+
+<AuthorizeView>
+    <NotAuthorized>
+        <RegisterPages></RegisterPages>
+    </NotAuthorized>
+    <Authorized>
+        <div>
+            <p>
+                Jesteś już zalogowany @context.User.Identity.Name
+            </p>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+
+}

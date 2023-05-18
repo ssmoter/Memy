@@ -1,0 +1,24 @@
+﻿@page "/"
+
+
+<PageTitle>Index</PageTitle>
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<AuthorizeView Roles="Admin">
+    <p> @context.User.Identity.AuthenticationType </p>
+    <p>AuthenticationType </p>
+</AuthorizeView>
+
+<AuthorizeView>
+    <Authorized>
+        <p class=""> @context.User.Identity.Name </p>
+    </Authorized>
+    <NotAuthorized>
+        <p>
+            Zaloguj się
+        </p>
+    </NotAuthorized>
+</AuthorizeView>
+
+<SurveyPrompt Title="How is Blazor working for you?" />

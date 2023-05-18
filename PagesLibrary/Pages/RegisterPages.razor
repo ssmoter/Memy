@@ -1,0 +1,150 @@
+﻿@implements IDisposable
+@inject ILogger<RegisterPages> _ilogger
+@inject ILogInOut _logInOut
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authStateProvider
+
+<h3>Rejestracja</h3>
+<div>
+    <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        @*        <ValidationSummary />*@
+        <div>
+            <span class="form-group">
+                <label>
+                    <InputText class="form-group" id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
+                    <ValidationMessage For="@(()=>_user.Email)" />
+                </label>
+            </span>
+            <span class="form-group">
+                <label>
+                    <InputText class="form-group" id="username" @bind-Value="@_user.Nick" placeholder="Nazwa użytkownika"></InputText>
+                    <ValidationMessage For="@(()=>_user.Nick)" />
+                </label>
+            </span>
+        </div>
+        <div>
+
+            <span class="form-group">
+                <label>
+                    <InputText class="form-group" id="password" type="password" @bind-Value="@_user.Password" placeholder="Hasło"></InputText>
+                    <ValidationMessage For="@(()=>_user.Password)" />
+                </label>
+            </span>
+            <span class="form-group">
+                <label>
+                    <InputText class="form-group" id="password" type="password" @bind-Value="@_user.PasswordConfirm" placeholder="Potwierdź"></InputText>
+                    <ValidationMessage For="@(()=>_user.PasswordConfirm)" />
+                </label>
+            </span>
+        </div>
+        <div>
+            <InputCheckbox @bind-Value="@_user.Statute"></InputCheckbox>
+            <ValidationMessage For="@(()=>_user.Statute)" />
+            Regulamin
+            <p >
+                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus
+            </p>
+        </div>
+        <div>
+            <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Zaloguj</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-danger">@error</div>
+        }
+    </EditForm>
+</div>
+
+
+
+@code {
+
+    LoginUser _user = new LoginUser();
+    EditContext? _editContext;
+    private bool? _formInvalid = false;
+    string? error = "";
+
+
+    protected override void OnInitialized()
+    {
+        _ilogger.LogInformation("Initialized page");
+        _editContext = new EditContext(_user);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+    }
+    public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        if (_editContext != null)
+        {
+            _formInvalid = !_editContext.Validate();
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        _ilogger.LogInformation("Valid Submit");
+        if (_editContext != null)
+        {
+            try
+            {
+                var result = await _logInOut.LogIn(_user.Email, _user.Password, false);
+                if (result.Item2 == System.Net.HttpStatusCode.OK)
+                {
+                    _user = new LoginUser();
+                    await _authStateProvider.GetAuthenticationStateAsync();
+                }
+                else if (result.Item2 != System.Net.HttpStatusCode.OK)
+                {
+                    _ilogger.LogError(result.Item1);
+                    _user.Password = "";
+                }
+                if (result.Item2 == System.Net.HttpStatusCode.NoContent)
+                {
+                    error = result.Item1;
+                }
+                if (result.Item2 == System.Net.HttpStatusCode.NotFound)
+                {
+                    error = result.Item1;
+                }
+                if (result.Item2 == System.Net.HttpStatusCode.BadRequest)
+                {
+                    error = "Wystąpił inny błąd";
+                }
+            }
+            catch (Exception ex)
+            {
+                _ilogger.LogError(ex.Message);
+            }
+        }
+    }
+
+    public void Dispose()
+    {
+        _ilogger.LogInformation("Dispose");
+        if (_editContext != null)
+        {
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
+
+    class LoginUser
+    {
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Nazwa użytkownika jest wymagana")]
+        public string? Nick { get; set; }
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Email jest wymagany")]
+        [System.ComponentModel.DataAnnotations.EmailAddress(ErrorMessage = "Email jest nieprawidłowy")]
+        public string? Email { get; set; }
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Hasło jest wymagane")]
+        [System.ComponentModel.DataAnnotations.StringLength(1000, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie")]
+        public string? Password { get; set; }
+        [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Hasło jest wymagane")]
+        [System.ComponentModel.DataAnnotations.StringLength(1000, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie")]
+        [System.ComponentModel.DataAnnotations.Compare(nameof(Password), ErrorMessage = "Hasła się różnią")]
+        public string? PasswordConfirm { get; set; }
+        [System.ComponentModel.DataAnnotations.Compare(nameof(TrueBool), ErrorMessage = "Wymagane jest zatwierdzenie regulaminu")]
+        public bool Statute { get; set; }
+        public bool TrueBool { get => true; }
+
+    }
+}

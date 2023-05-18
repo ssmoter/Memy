@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[UserToken]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [UserId] INT NOT NULL,
+    [Value] UNIQUEIDENTIFIER NOT NULL,
+	[ExpiryDate] DATETIMEOFFSET NOT NULL, 
+    [DoNotLogout] BIT NOT NULL, 
+)

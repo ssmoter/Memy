@@ -1,0 +1,22 @@
+﻿@if (toasts != null)
+{
+    <div class="form-popupList">
+        @for (int i = 0; i < toasts.Count; i++)
+        {
+            var showClass = toasts[i].IsVisible ? "d-block" : "d-none";
+            var index = i;
+            <div class="toast-container p-2 @toasts[i].BackgroundCssClass @showClass" data-bs-autohide="true" data-bs-delay="5000">
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">@toasts[i].HeaderText</strong>
+                        <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close(index))"></button>
+                    </div>
+
+                    <div class="toast-body">
+                        @toasts[i].BodyText
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

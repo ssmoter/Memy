@@ -1,0 +1,115 @@
+﻿@using Helper
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="toast-container p-3 @BackgroundCssClass @showClass" data-bs-autohide="true" data-bs-delay="5000">
+    <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <strong class="me-auto">@HeaderText</strong>
+            <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+        </div>
+
+        <div class="toast-body">
+            @BodyText
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public string? HeaderText { get; set; }
+
+    [Parameter]
+    public string? BodyText { get; set; }
+    [Parameter]
+    public PopupLevel.Level Level { get; set; } = PopupLevel.Level.None;
+
+    private System.Timers.Timer timer;
+
+    protected override void OnInitialized()
+    {
+        timer = new System.Timers.Timer(1000);
+        timer.Elapsed += ElapsedTimer;
+        ToatsLevel(Level);
+    }
+    private int _ms = 0;
+    private void ElapsedTimer(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        _ms++;
+        if (_ms > 5)
+        {
+            Close();
+            _ms = 0;
+        }
+    }
+    private string BackgroundCssClass;
+    private void ToatsLevel(PopupLevel.Level? level)
+    {
+        if (level == null)
+        {
+            if (Level != null)
+            {
+                level = Level;
+            }
+            else
+            {
+                level = PopupLevel.Level.None;
+            }
+        }
+        switch (level)
+        {
+            case PopupLevel.Level.None:
+                {
+                    BackgroundCssClass = $"bg-primary";
+                }
+                break;
+            case PopupLevel.Level.Info:
+                {
+                    BackgroundCssClass = $"bg-info";
+                }
+                break;
+            case PopupLevel.Level.Success:
+                {
+                    BackgroundCssClass = $"bg-success";
+                }
+                break;
+            case PopupLevel.Level.Warning:
+                {
+                    BackgroundCssClass = $"bg-warning";
+                }
+                break;
+            case PopupLevel.Level.Error:
+                {
+                    BackgroundCssClass = "bg-danger";
+                }
+                break;
+        }
+    }
+
+    public async Task Show(string bodyText, string headerText = "", PopupLevel.Level? level = null)
+    {
+        ToatsLevel(level);
+        HeaderText = headerText;
+        BodyText = bodyText;
+        IsVisible = true;
+        StateHasChanged();
+        timer.Start();
+    }
+
+    private void Close()
+    {
+        timer.Stop();
+        HeaderText = string.Empty;
+        BodyText = string.Empty;
+        IsVisible = false;
+        StateHasChanged();
+    }
+}

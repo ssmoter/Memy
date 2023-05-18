@@ -1,0 +1,10 @@
+﻿@page "/logout"
+@page "/logout/{value}"
+
+<LogoutPage tokenValue="@value"></LogoutPage>
+
+@code {
+    [Parameter]
+    public string value { get; set; }
+
+}

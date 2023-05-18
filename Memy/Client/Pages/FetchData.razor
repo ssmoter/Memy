@@ -1,0 +1,70 @@
+﻿@page "/fetchdata"
+@using Memy.Shared
+@using PagesLibrary.Data.User;
+@using PagesLibrary.Data;
+@inject HttpClient Http
+@inject BaseApi _base
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (forecasts.Length == 0)
+{
+    <p><em>Loading...</em></p>
+    <p><em>@error.Message</em></p>
+}
+else
+{
+    <table class="table form-check-label">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Temp. (C)</th>
+                <th>Temp. (F)</th>
+                <th>Summary</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var forecast in forecasts)
+            {
+                <tr>
+                    <td>@forecast.Date.ToShortDateString()</td>
+                    <td>@forecast.TemperatureC</td>
+                    <td>@forecast.TemperatureF</td>
+                    <td>@forecast.Summary</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    private WeatherForecast[]? forecasts = new WeatherForecast[0];
+    private Memy.Shared.Model.Error? error = new Memy.Shared.Model.Error();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await _base.GetUserStorage();
+        if (token != null)
+        {
+            Http.DefaultRequestHeaders.Clear();
+            Http.DefaultRequestHeaders.Add(Memy.Shared.Helper.Headers.Authorization, token.Token);
+        }
+
+        var result = await Http.GetAsync("WeatherForecast");
+        if (result.IsSuccessStatusCode)
+        {
+            forecasts = await result.Content.ReadFromJsonAsync<WeatherForecast[]>();
+        }
+        else
+        {
+            error = await result.Content.ReadFromJsonAsync<Memy.Shared.Model.Error>();
+        }
+
+        //forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+    }
+}
