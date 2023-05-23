@@ -16,9 +16,9 @@ namespace PagesLibrary.Data.File
                     using (MemoryStream ms = new MemoryStream())
                     {
                         await fileStream.CopyToAsync(ms);
+                        status.ImgUrl = $"data:image/{file.Name};base64,{Convert.ToBase64String(ms.ToArray())}";
                         status.Data = new byte[ms.Length];
                         status.Data = ms.ToArray();
-                        status.ImgUrl = $"data:image/{file.Name};base64,{Convert.ToBase64String(status.Data)}";
                     }
                 }
                 return status;
@@ -28,7 +28,6 @@ namespace PagesLibrary.Data.File
                 throw;
             }
         }
-
         public static (FileUploadStatus?, string?) GetStatus(IBrowserFile file)
         {
             try

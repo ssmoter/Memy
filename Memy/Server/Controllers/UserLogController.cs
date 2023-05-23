@@ -1,6 +1,5 @@
 ﻿using Memy.Server.Data.User;
 using Memy.Server.Filtres;
-using Memy.Server.Helper;
 using Memy.Server.Service;
 using Memy.Server.TokenAuthentication;
 using Memy.Shared.Model;
@@ -18,8 +17,8 @@ namespace Memy.Server.Controllers
         private readonly IUserData _userData;
         private readonly ITokenManager _tokenManager;
         private readonly LoginService _loginService;
-        private readonly ILogger<UserLogController> _logger;
-        public UserLogController(IUserData userData, ITokenManager tokenManager, ILogger<UserLogController> logger)
+        private readonly ILogger _logger;
+        public UserLogController(IUserData userData, ITokenManager tokenManager, ILogger logger)
         {
             this._userData = userData;
             _tokenManager = tokenManager;
@@ -70,12 +69,7 @@ namespace Memy.Server.Controllers
                 var result = await _loginService.SetToken(value);
                 if (result != null)
                 {
-                    if (string.IsNullOrWhiteSpace(result.Role))
-                    {
-                        result.Role = null;
-                    }
-                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented, JsonSettings.JsonSerializerSettings());
-                    return Ok(json);
+                    return Ok(result);
                 }
                 return NotFound("Nie znaleziono konta");
             }

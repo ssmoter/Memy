@@ -4,8 +4,6 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Logging;
-
 using System.Net;
 using System.Net.Http.Json;
 
@@ -22,8 +20,6 @@ namespace PagesLibrary.Data.User
         public LogInOut(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
         {
         }
-
-
 
         //zalogowanie użytkownia
         public async Task<(string, HttpStatusCode)> LogIn(string? email, string? password, bool doNotLogOut)
@@ -70,8 +66,10 @@ namespace PagesLibrary.Data.User
         {
             try
             {
-                var _httpClient = await base.SetAuthorizationHeader();
+                var _httpClient = GetHttpClient();
                 UserStorage? userStorage = await GetUserStorage();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token);
 
                 if (token.Value == null)
                 {

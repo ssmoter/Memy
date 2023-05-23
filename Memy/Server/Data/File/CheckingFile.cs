@@ -1,9 +1,6 @@
 ﻿using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
-using System.Buffers.Text;
-using System.Runtime.InteropServices;
-
 namespace Memy.Server.Data.File
 {
     internal static class CheckingFile
@@ -32,7 +29,7 @@ namespace Memy.Server.Data.File
                         return status;
                     }
                     //bezpieczna nazwa
-                    var trustedFileName = ToStringFromGuid(Guid.NewGuid());
+                    var trustedFileName = Guid.NewGuid().ToString();
                     //ścieżka do folderu
                     var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName);
                     //tworzenie folderu
@@ -86,48 +83,6 @@ namespace Memy.Server.Data.File
             {
                 Directory.CreateDirectory(patch);
             }
-        }
-        //usuwanie plikow
-        public static void DeleteFile(string name, string typ, IWebHostEnvironment webHost)
-        {
-            var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName, name);
-            path = Path.ChangeExtension(path, typ);
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-            }
-        }
-
-
-        private const byte SlashByte = (byte)'/';
-        private const char HyphenChar = '-';
-
-        private const char plusChar = '+';
-        private const byte plusByte = (byte)'+';
-        private const char Underscore = '_';
-
-        //parse guid to string
-        private static string ToStringFromGuid(Guid value)
-        {
-            Span<byte> idBytes = stackalloc byte[16];
-            Span<byte> base64CBytes = stackalloc byte[24];
-
-            MemoryMarshal.TryWrite(idBytes, ref value);
-            Base64.EncodeToUtf8(idBytes, base64CBytes, out _, out _);
-
-            Span<char> finalChars = stackalloc char[22];
-
-            for (int i = 0; i < 22; i++)
-            {
-                finalChars[i] = base64CBytes[i] switch
-                {
-                    SlashByte => HyphenChar,
-                    plusByte => Underscore,
-                    _ => (char)base64CBytes[i],
-                };
-            }
-
-            return new string(finalChars);
         }
 
     }

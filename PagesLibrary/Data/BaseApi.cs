@@ -4,8 +4,6 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Logging;
-
 using System.Net;
 using System.Net.Http;
 
@@ -14,7 +12,7 @@ namespace PagesLibrary.Data
     public class BaseApi
     {
         private readonly HttpClient _HttpClient;
-        protected string UrlStringName { get; set; } = "https://localhost:7241/api/";
+        private string UrlStringName { get; set; } = "https://localhost:7241/api/";
         private readonly ILocalStorageService _localStorageService;
         private readonly ISessionStorageService _sessionStorageService;
         public BaseApi(ILocalStorageService localStorageService,
