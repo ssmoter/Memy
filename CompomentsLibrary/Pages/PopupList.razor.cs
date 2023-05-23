@@ -1,10 +1,11 @@
 ﻿using CompomentsLibrary.Helper;
+using CompomentsLibrary.Service;
 
 using Microsoft.AspNetCore.Components;
 
 namespace CompomentsLibrary.Pages
 {
-    public partial class PopupList : ComponentBase
+    public partial class PopupList : ComponentBase, IDisposable
     {
         private System.Timers.Timer? timer;
         private List<Toasts>? toasts;
@@ -95,6 +96,12 @@ namespace CompomentsLibrary.Pages
             }
         }
 
+        public void Dispose()
+        {
+            toasts = null;
+            timer = null;
+        }
+
         private class Toasts
         {
             public bool IsVisible { get; set; }
@@ -102,17 +109,6 @@ namespace CompomentsLibrary.Pages
             public string? BodyText { get; set; }
             public PopupLevel.Level? Level { get; set; } = PopupLevel.Level.None;
             public string? BackgroundCssClass { get; set; }
-        }
-    }
-
-    public class PopupListService
-    {
-        public event Action<string?, string?, PopupLevel.Level?>? OnShow;
-
-        public void ShowToats(string? bodyText, string? headerText = "", PopupLevel.Level? level = null)
-        {
-            OnShow?.Invoke(bodyText, headerText, level);
-
         }
     }
 }

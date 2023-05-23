@@ -18,9 +18,5 @@
     <ProjectReference Include="..\Shared\Memy.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helper\" />
-  </ItemGroup>
-
 
 </Project>

@@ -3,9 +3,9 @@
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [UserId] INT NOT NULL, 
     [Date] DATETIMEOFFSET NOT NULL, 
-    [Title] NVARCHAR(MAX) NOT NULL, 
+    [Title] NVARCHAR(200) NOT NULL, 
     [Description] NVARCHAR(MAX) NULL, 
-    [Main] BIT NULL, 
+    [Category] NVARCHAR(200) NULL, 
     [Banned] BIT NULL
 )
 

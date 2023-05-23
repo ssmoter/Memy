@@ -1,8 +1,10 @@
 ﻿@using CompomentsLibrary.Pages
 @inherits LayoutComponentBase
-@inject PopupListService _popUp
+@inject PopupListService  _popUp
+@inject ModalPopUpService _modal
 
-<PopupList></PopupList>
+<PopupList/>
+<ModalPopUp/>
 
 <div class="page">
     <div class="sidebar">
@@ -11,7 +13,8 @@
 
     <main>
         <div class="top-row px-4">
-            <button @onclick="RedirectPage">+</button>
+            <button  @onclick="ModalTest">+</button>
+            <button @onclick="PopUpListTest">+</button>
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
 
@@ -23,17 +26,18 @@
 
 @code{
     int n = 0;
-    private async Task RedirectPage()
+    private async Task PopUpListTest()
     {
-        for (int i = 0; i < 5; i++)
-        {
-            //_popUp.ShowToats(n.ToString());
-            n++;
-        }
         _popUp.ShowToats("Popup body text", "None", CompomentsLibrary.Helper.PopupLevel.Level.None);
         _popUp.ShowToats("Popup body text", "Info", CompomentsLibrary.Helper.PopupLevel.Level.Info);
         _popUp.ShowToats("Popup body text", "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning);
         _popUp.ShowToats("Popup body text", "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error);
         _popUp.ShowToats("Popup body text", "Success", CompomentsLibrary.Helper.PopupLevel.Level.Success);
+    }
+    private async Task ModalTest()
+    {
+       var result = await _modal.ShowPopup("headre", "body", "Yes", "No");
+        _popUp.ShowToats("Popup body text", result.ToString(), CompomentsLibrary.Helper.PopupLevel.Level.None);
+
     }
 }

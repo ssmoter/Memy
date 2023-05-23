@@ -1,7 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 
-using CompomentsLibrary.Pages;
+using CompomentsLibrary.Service;
 
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +26,8 @@ namespace PagesLibrary.Service
 
             services.AddSingleton<ILogInOut, LogInOut>();
             services.AddSingleton<IFileManager, FileManager>();
-            services.AddSingleton<PopupListService>();
+
+            services.AddCompomentsService();
 
             return services;
         }
