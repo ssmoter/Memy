@@ -61,16 +61,25 @@
     <Folder Include="View" />
     <Folder Include="Procedure" />
     <Folder Include="Table\File" />
+    <Folder Include="Procedure\User" />
+    <Folder Include="Procedure\File" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Table\User\UserSimple.sql" />
     <Build Include="Table\User\UserToken.sql" />
-    <Build Include="Procedure\LoginUser.sql" />
-    <Build Include="Procedure\LogoutUser.sql" />
-    <Build Include="Procedure\CheckToken.sql" />
     <Build Include="Table\File\FileSimple.sql" />
     <Build Include="Table\File\FileData.sql" />
-    <Build Include="Procedure\RegisterUser.sql" />
+    <Build Include="Table\File\FileTagList.sql" />
+    <Build Include="Table\File\FileTagConnected.sql" />
+    <Build Include="Procedure\File\AddFileData.sql" />
+    <Build Include="Procedure\File\AddTag.sql" />
+    <Build Include="Procedure\File\CreateNewFile.sql" />
+    <Build Include="Procedure\File\GetFileByDate.sql" />
+    <Build Include="Procedure\File\InsertFullFile.sql" />
+    <Build Include="Procedure\User\RegisterUser.sql" />
+    <Build Include="Procedure\User\LogoutUser.sql" />
+    <Build Include="Procedure\User\LoginUser.sql" />
+    <Build Include="Procedure\User\CheckToken.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.refactorlog" />

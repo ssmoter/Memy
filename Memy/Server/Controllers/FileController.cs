@@ -1,6 +1,7 @@
 ﻿using Memy.Server.Data.File;
 using Memy.Server.Filtres;
 using Memy.Server.Service;
+using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +15,11 @@ namespace Memy.Server.Controllers
     public class FileController : ControllerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger _logger;
+        private readonly ILogger<FileController> _logger;
         private readonly IAddNewFileModel _fileData;
         private readonly FileService _fileService;
 
-        public FileController(IWebHostEnvironment webHostEnvironment, ILogger logger, IAddNewFileModel fileData)
+        public FileController(IWebHostEnvironment webHostEnvironment, ILogger<FileController> logger, IAddNewFileModel fileData)
         {
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
@@ -28,16 +29,43 @@ namespace Memy.Server.Controllers
 
         // GET: api/<FileController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        [Route("")]
+        [Route("{category}")]
+        [Route("{category}/{start}")]
+        public async Task<IActionResult> Get(int? start = 0, string? category = "main", int? max = 10, bool? banned = false, string? dateEnd = "empty", string? dateStart = "today")
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                var result = await _fileService.GetTaskModelsAsync(start, category, max, banned, dateEnd, dateStart);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // GET api/<FileController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        //GET api/<FileController>/5
+        [HttpGet("img/{name}")]
+        public async Task<IActionResult> GetImg(string name)
         {
-            return "value";
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var path = Path.Combine(_webHostEnvironment.ContentRootPath,
+                    _webHostEnvironment.EnvironmentName, FileRequirements.PatchFolderName, name);
+                var image = System.IO.File.OpenRead(path);
+                return File(image, $"image/{CheckingFile.GetType(name)}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
         }
 
         // POST api/<FileController>
@@ -59,9 +87,10 @@ namespace Memy.Server.Controllers
 
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
 
-                await _fileService.InsertIntoDataBase(model, token);
 
-                return Ok();
+                var id = await _fileService.InsertIntoDataBase(model, token);
+
+                return Ok(id);
             }
             catch (Exception ex)
             {

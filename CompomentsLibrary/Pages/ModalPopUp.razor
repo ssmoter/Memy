@@ -1,0 +1,23 @@
+﻿@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+    var OpenTyp = IsVisible ? "block" : "none";
+}
+
+<div class="modal" style="display:@OpenTyp;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="toast-container p-1 bg-dark @showClass">
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">@HeaderText</strong>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close(false))"></button>
+                </div>
+
+                <div class="toast-body">
+                    @BodyText
+                </div>
+                <button class="btn btn-outline-success float-start" @onclick="@(()=>Close(true))">@YesText</button>
+                <button class="btn btn-outline-danger float-end" @onclick="@(()=>Close(false))">@NoText</button>
+            </div>
+        </div>
+    </div>
+</div>

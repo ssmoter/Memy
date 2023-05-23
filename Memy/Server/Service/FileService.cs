@@ -1,4 +1,6 @@
 ﻿using Memy.Server.Data.File;
+using Memy.Server.Helper;
+using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 namespace Memy.Server.Service
@@ -45,22 +47,51 @@ namespace Memy.Server.Service
 
         }
 
-        public async Task InsertIntoDataBase(FileUploadModel model, string token)
+        //zapisanie do bazy danych
+        public async Task<int> InsertIntoDataBase(FileUploadModel model, string token)
         {
             try
             {
-                var id = await _fileData.CreateNewFile(token, model.Title, model.Description);
+                if (model.Categories == Categories.Main)
+                {
+                    model.Categories = null;
+                }
+                if (string.IsNullOrWhiteSpace(model.Categories))
+                {
+                    model.Categories = Categories.Waiting;
+                }
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(model, Newtonsoft.Json.Formatting.Indented, JsonSettings.JsonSerializerSettings());
+                var id = await _fileData.InsertFullFile(json, token);
+
+                return id;
+            }
+            catch (Exception ex)
+            {
                 for (int i = 0; i < model.FileUploadStatuses.Length; i++)
                 {
-                    await _fileData.AddFileData(id, model.FileUploadStatuses[i].Name, model.FileUploadStatuses[i].Typ);
+                    CheckingFile.DeleteFile(model.FileUploadStatuses[i].Name, model.FileUploadStatuses[i].Typ, _webHostEnvironment);
                 }
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        //pobieranie plikow
+        public async Task<TaskModel[]> GetTaskModelsAsync(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart)
+        {
+            try
+            {
+                var json = await _fileData.GetTaskAsync(start, category, max, banned, dateEnd, dateStart);
+                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Root>(json);
+
+                return result.TaskModel.ToArray();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
                 throw;
             }
-        }
 
+        }
     }
 }

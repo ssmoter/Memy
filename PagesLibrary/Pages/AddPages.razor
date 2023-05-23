@@ -8,26 +8,32 @@
 @inject NavigationManager _navigation
 @inject AuthenticationStateProvider _authStateProvider
 @inject PopupListService _popUp
+@inject ModalPopUpService _modal
 
 <div>
-    <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
+    <EditForm EditContext="_editContext">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div>
             <div class="form-group">
-                <InputText id="title" @bind-Value="@_fileAdd.Title" />
+                <InputText id="title" @bind-Value="@_fileAdd.Title" placeholder="Tytuł" />
             </div>
             <div class="form-group">
-                <InputText id="tag" @bind-Value="@_fileAdd.SimpleTag" @onkeyup="AddNewTag" />
+                <InputText id="tag" @bind-Value="@_fileAdd.SimpleTag" @oninput="@AddNewTag" placeholder="Tag" />
                 <div>
                     @for (int i = 0; i < _fileAdd.Tag.Count; i++)
                     {
-                        <span>@_fileAdd.Tag[i]&nbsp;</span>
+                        var index = i;
+                        <span @onclick="()=>RemoveTagAt(index)">@_fileAdd.Tag[i]&nbsp;</span>
                     }
                 </div>
             </div>
             <div class="form-group">
-                <InputTextArea id="description" @bind-Value="@_fileAdd.Description" />
+                <InputTextArea id="description" @bind-Value="@_fileAdd.Description" placeholder="Opis" />
+            </div>
+            <div>
+                <DropDownList Description="Wybór kategori" List="@CategoriesTable" @bind-Value="@_fileAdd.Categories" />
+                <span>Wybrana kategoria:@_fileAdd.Categories.Item2</span>
             </div>
             <div>
                 <InputFile OnChange="@Preview" multiple />
@@ -41,9 +47,8 @@
 
                         <div class="alert alert-info" @onclick="()=>RemoveAt(index)">
                             <p>@_fileUploadStatuses[i].Name</p>
-                            <img src="@_fileUploadStatuses[i].ImgUrl" width="100" height="100" />
+                            <img src="@_fileUploadStatuses[i].ImgUrl" width="100" height="100" alt="@_fileUploadStatuses[i].Name" />
                         </div>
-
                     }
                 }
             </div>
@@ -55,23 +60,31 @@
                 }
             }
             <dvi>
-                <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Dodaj</button>
+                <button class="btn btn-primary" @onclick="@HandleValidSubmit" disabled="@_formInvalid">Dodaj</button>
             </dvi>
         </div>
     </EditForm>
 </div>
+
 @code {
     FileAdd _fileAdd = new FileAdd();
     EditContext? _editContext;
     private bool? _formInvalid = false;
-    List<string?>? _error;
+    List<string>? _error;
     List<FileUploadStatus?>? _fileUploadStatuses;
+    const string space = "Space";
+    CancellationTokenSource cts;
+    (string, string)[] CategoriesTable = new (string, string)[]
+    {
+        (Memy.Shared.Helper.Categories.Waiting,""),
+    };
 
     #region Preview
     private async Task Preview(InputFileChangeEventArgs inputFile)
     {
         try
         {
+            _popUp.ShowToats("Trwa wczytywanie plików", "Pliki", PopupLevel.Level.None);
             _logger.LogInformation("Initialized Preview");
             if (inputFile.FileCount > Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
             {
@@ -84,19 +97,22 @@
                     break;
 
                 var status = Data.File.CheckingFile.GetStatus(inputFile.GetMultipleFiles()[i]);
-
                 if (!string.IsNullOrWhiteSpace(status.Item2))
                 {
                     _error.Add(status.Item2);
                     _logger.LogError("Error: {0}", status.Item2);
-                    StateHasChanged();
                     continue;
                 }
+                _fileUploadStatuses.Add(status.Item1);
+                StateHasChanged();
+                var result = await Data.File.CheckingFile.CorrectData(inputFile.GetMultipleFiles()[i], _fileUploadStatuses[i]);
+                if (_fileUploadStatuses[i] != null)
+                {
+                    _fileUploadStatuses[i] = result;
+                }
 
-                var result = await Data.File.CheckingFile.CorrectData(inputFile.GetMultipleFiles()[i], status.Item1);
-                _fileUploadStatuses.Add(result);
-                _popUp.ShowToats($"{status.Item1.Name} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
-                _logger.LogInformation("Show new image {0}", status.Item1.Name);
+                _popUp.ShowToats($"{_fileUploadStatuses[i].Name} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
+                _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].Name);
                 StateHasChanged();
             }
         }
@@ -123,14 +139,44 @@
             _logger.LogError(ex.Message);
         }
     }
+    public void AddNewTag(ChangeEventArgs e)
+    {
+        if (e.Value is string)
+        {
+            ReadOnlySpan<char> tag = (string)e.Value;
+            if (tag.Length < 3)
+            {
+                return;
+            }
+            if (tag[tag.Length - 1] == ' ')
+            {
+                _fileAdd.Tag.Add(tag.ToString());
+                _fileAdd.SimpleTag = "";
+                e.Value = "";
+                StateHasChanged();
+                _logger.LogInformation("Add new tag");
+            }
+        }
+    }
+    private void RemoveTagAt(int index)
+    {
+        if (index >= 0)
+        {
+            _fileAdd.Tag.RemoveAt(index);
+            _logger.LogInformation("Remove tag");
+        }
+    }
     #endregion
 
     protected override void OnInitialized()
     {
         _editContext = new EditContext(_fileAdd);
         _editContext.OnFieldChanged += HandleFieldChanged;
+
         _fileUploadStatuses = new List<FileUploadStatus?>();
         _error = new List<string?>();
+        cts = new CancellationTokenSource();
+        _fileAdd.Categories = CategoriesTable[0];
         _logger.LogInformation("Initialized page");
     }
     public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
@@ -151,10 +197,15 @@
         {
             try
             {
+                if (!(await _modal.ShowPopup("Przesyłanie","Czy na pewno chcesz przesłać pliki?","Tak","Nie")))
+                {
+                    return;
+                }
                 _popUp.ShowToats("Rozpoczęto przestłanie pliku", "Przesyłanie", PopupLevel.Level.Info);
                 var request = new FileUploadModel();
                 request.Title = _fileAdd.Title;
                 request.Description = _fileAdd.Description;
+                request.Categories = _fileAdd.Categories.Item1;
                 request.Tag = new string[_fileAdd.Tag.Count];
                 for (int i = 0; i < _fileAdd.Tag.Count; i++)
                 {
@@ -177,13 +228,14 @@
                 if (result.IsSuccessStatusCode)
                 {
                     _popUp.ShowToats("Plik został udostępniony", "Przesyłanie", PopupLevel.Level.Success);
-                    await Task.Run(() =>
+                    await Task.Run(async () =>
                     {
-                        Thread.Sleep(5 * 1000);
+                        await Task.Delay(5 * 1000);
                         _error.Clear();
                         _fileAdd = new FileAdd();
                         _fileUploadStatuses.Clear();
                         StateHasChanged();
+
                     });
                 }
                 else
@@ -198,9 +250,6 @@
             }
         }
     }
-
-
-
     #endregion
 
 
@@ -211,22 +260,6 @@
         {
             _editContext.OnFieldChanged -= HandleFieldChanged;
         }
-    }
-
-    public void AddNewTag(KeyboardEventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(_fileAdd.SimpleTag))
-        {
-            return;
-        }
-
-        if (e.Code == "Enter")
-        {
-            _fileAdd.Tag.Add(_fileAdd.SimpleTag);
-            _fileAdd.SimpleTag = "";
-            StateHasChanged();
-        }
-        _logger.LogInformation("Add new tag");
     }
 
 
@@ -240,7 +273,9 @@
         [System.ComponentModel.DataAnnotations.MaxLength(length: 5000, ErrorMessage = "Opis jest za długi")]
         public string? Description { get; set; }
         public List<string> Tag { get; set; }
+        [System.ComponentModel.DataAnnotations.MaxLength(length: 20, ErrorMessage = "Tag jest za długi")]
         public string SimpleTag { get; set; }
+        public (string,string) Categories { get; set; }
         public FileAdd()
         {
             Tag = new List<string>();

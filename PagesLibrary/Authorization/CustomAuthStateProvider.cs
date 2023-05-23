@@ -37,9 +37,13 @@ namespace PagesLibrary.Authorization
                 var identity = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.Name,user.UserName),
-                    new Claim(ClaimTypes.SerialNumber,user.Token),
-                    new Claim(ClaimTypes.Role,user.Role)
+                    new Claim(ClaimTypes.SerialNumber,user.Token)                 
                 }, "Memy");
+
+                if (!string.IsNullOrWhiteSpace(user.Role))
+                {
+                    identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+                }
                 state = new AuthenticationState(new ClaimsPrincipal(identity));
             }
 

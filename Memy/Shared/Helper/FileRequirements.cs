@@ -11,4 +11,11 @@
         };
         public static string PatchFolderName { get => "unsafe_uploads"; }
     }
+
+    public static class Categories
+    {
+        public static string Main { get => "main"; }
+        public static string Waiting { get => "waiting"; }
+
+    }
 }
