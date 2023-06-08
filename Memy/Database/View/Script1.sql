@@ -1,1 +1,1 @@
-﻿Select * from dbo.UserSimple
+﻿

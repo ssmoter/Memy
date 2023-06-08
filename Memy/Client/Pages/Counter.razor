@@ -10,20 +10,11 @@
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
+
 @code {
     private int currentCount = 0;
-
-    private async void IncrementCount()
+    private void IncrementCount()
     {
-        var content = new Memy.Shared.Model.UserSimple()
-            {
-                Email = "slaweksmoter82@gmail.com",
-                Password = "slaweksmoter82@gmail.com"
-            };
-
-        var forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
-        var result = await Http.PostAsJsonAsync("api/UserLog", content);
-
         currentCount++;
     }
 }

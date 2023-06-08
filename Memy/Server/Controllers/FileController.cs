@@ -19,7 +19,9 @@ namespace Memy.Server.Controllers
         private readonly IAddNewFileModel _fileData;
         private readonly FileService _fileService;
 
-        public FileController(IWebHostEnvironment webHostEnvironment, ILogger<FileController> logger, IAddNewFileModel fileData)
+        public FileController(IWebHostEnvironment webHostEnvironment,
+                              ILogger<FileController> logger,
+                              IAddNewFileModel fileData)
         {
             _webHostEnvironment = webHostEnvironment;
             _logger = logger;
@@ -28,15 +30,18 @@ namespace Memy.Server.Controllers
         }
 
         // GET: api/<FileController>
+        //pobieranie listy z moelami
         [HttpGet]
         [Route("")]
-        [Route("{category}")]
+        [Route("{start}")]
         [Route("{category}/{start}")]
-        public async Task<IActionResult> Get(int? start = 0, string? category = "main", int? max = 10, bool? banned = false, string? dateEnd = "empty", string? dateStart = "today")
+        public async Task<IActionResult> Get(int? start = 1, string? category = "main", int? max = 10, bool? banned = false, string? dateEnd = "empty", string? dateStart = "today")
         {
             try
             {
-                var result = await _fileService.GetTaskModelsAsync(start, category, max, banned, dateEnd, dateStart);
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+
+                var result = await _fileService.GetTaskModelsAsync(start, category, max, banned, dateEnd, dateStart, token);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -45,6 +50,7 @@ namespace Memy.Server.Controllers
             }
         }
 
+        //wyświetlanie obrazów
         //GET api/<FileController>/5
         [HttpGet("img/{name}")]
         public async Task<IActionResult> GetImg(string name)
@@ -68,6 +74,7 @@ namespace Memy.Server.Controllers
             }
         }
 
+        //pobieranie danych posta
         // POST api/<FileController>
         [TokenAuthenticationFilter]
         [HttpPost]
@@ -86,7 +93,6 @@ namespace Memy.Server.Controllers
                 }
 
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-
 
                 var id = await _fileService.InsertIntoDataBase(model, token);
 

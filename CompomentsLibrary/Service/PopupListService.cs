@@ -1,20 +1,14 @@
 ﻿using CompomentsLibrary.Helper;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CompomentsLibrary.Service
 {
     public class PopupListService
     {
-        public event Action<string?, string?, PopupLevel.Level?>? OnShow;
+        public event Action<string?, string?, PopupLevel.Level?, int>? OnShow;
 
-        public void ShowToats(string? bodyText, string? headerText = "", PopupLevel.Level? level = null)
+        public void ShowToats(string? bodyText, string? headerText = "", PopupLevel.Level? level = null, int time = 5)
         {
-            OnShow?.Invoke(bodyText, headerText, level);
+            OnShow?.Invoke(bodyText, headerText, level, time);
         }
     }
 }

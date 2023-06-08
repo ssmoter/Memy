@@ -15,30 +15,39 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div>
-            <div class="form-group">
-                <InputText id="title" @bind-Value="@_fileAdd.Title" placeholder="Tytuł" />
+            <div class="form-group p-1">
+                <InputText class="bg-black text-white" id="title" @bind-Value="@_fileAdd.Title" placeholder="Tytuł" />
             </div>
-            <div class="form-group">
-                <InputText id="tag" @bind-Value="@_fileAdd.SimpleTag" @oninput="@AddNewTag" placeholder="Tag" />
+            <div class="form-group p-1">
+                <InputDropDownList List="@TagTable" @bind-Value="@_fileAdd.SimpleTag" Placeholder="Tag" />
                 <div>
                     @for (int i = 0; i < _fileAdd.Tag.Count; i++)
                     {
                         var index = i;
-                        <span @onclick="()=>RemoveTagAt(index)">@_fileAdd.Tag[i]&nbsp;</span>
+                        <span @onclick="()=>RemoveTagAt(index)">
+                            @_fileAdd.Tag[i]&nbsp;
+                        </span>
                     }
                 </div>
             </div>
-            <div class="form-group">
-                <InputTextArea id="description" @bind-Value="@_fileAdd.Description" placeholder="Opis" />
+            <div class="form-group p-1">
+                <InputTextArea class="bg-black text-white" id="description" @bind-Value="@_fileAdd.Description" placeholder="Opis" />
             </div>
-            <div>
+            <div class="form-group p-1">
                 <DropDownList Description="Wybór kategori" List="@CategoriesTable" @bind-Value="@_fileAdd.Categories" />
-                <span>Wybrana kategoria:@_fileAdd.Categories.Item2</span>
+                <span>Wybrana kategoria: @_fileAdd.Categories.Item2</span>
             </div>
-            <div>
+            <div class="form-group p-1">
                 <InputFile OnChange="@Preview" multiple />
             </div>
-            <div>
+            @if (_error != null)
+            {
+                for (int i = 0; i < _error.Count; i++)
+                {
+                    <div class="alert alert-danger">@_error[i]</div>
+                }
+            }
+            <div class="form-group p-1">
                 @if (_fileUploadStatuses != null)
                 {
                     @for (int i = 0; i < _fileUploadStatuses.Count; i++)
@@ -52,18 +61,12 @@
                     }
                 }
             </div>
-            @if (_error != null)
-            {
-                for (int i = 0; i < _error.Count; i++)
-                {
-                    <div class="alert alert-danger">@_error[i]</div>
-                }
-            }
-            <dvi>
-                <button class="btn btn-primary" @onclick="@HandleValidSubmit" disabled="@_formInvalid">Dodaj</button>
-            </dvi>
+
         </div>
     </EditForm>
+    <dvi class="form-group p-1">
+        <button class="btn btn-primary" @onclick="@HandleValidSubmit" disabled="@_formInvalid">Dodaj</button>
+    </dvi>
 </div>
 
 @code {
@@ -72,11 +75,14 @@
     private bool? _formInvalid = false;
     List<string>? _error;
     List<FileUploadStatus?>? _fileUploadStatuses;
-    const string space = "Space";
     CancellationTokenSource cts;
+    string[]? TagTable { get; set; }
     (string, string)[] CategoriesTable = new (string, string)[]
     {
         (Memy.Shared.Helper.Categories.Waiting,""),
+#if DEBUG
+    (Memy.Shared.Helper.Categories.Main,"Main"),
+#endif
     };
 
     #region Preview
@@ -105,12 +111,12 @@
                 }
                 _fileUploadStatuses.Add(status.Item1);
                 StateHasChanged();
-                var result = await Data.File.CheckingFile.CorrectData(inputFile.GetMultipleFiles()[i], _fileUploadStatuses[i]);
+
+                var result = await Data.File.CheckingFile.CorrectData(inputFile.GetMultipleFiles()[i], status.Item1);
                 if (_fileUploadStatuses[i] != null)
                 {
-                    _fileUploadStatuses[i] = result;
+                    _fileUploadStatuses[_fileUploadStatuses.Count] = result;
                 }
-
                 _popUp.ShowToats($"{_fileUploadStatuses[i].Name} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
                 _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].Name);
                 StateHasChanged();
@@ -139,25 +145,7 @@
             _logger.LogError(ex.Message);
         }
     }
-    public void AddNewTag(ChangeEventArgs e)
-    {
-        if (e.Value is string)
-        {
-            ReadOnlySpan<char> tag = (string)e.Value;
-            if (tag.Length < 3)
-            {
-                return;
-            }
-            if (tag[tag.Length - 1] == ' ')
-            {
-                _fileAdd.Tag.Add(tag.ToString());
-                _fileAdd.SimpleTag = "";
-                e.Value = "";
-                StateHasChanged();
-                _logger.LogInformation("Add new tag");
-            }
-        }
-    }
+
     private void RemoveTagAt(int index)
     {
         if (index >= 0)
@@ -177,7 +165,21 @@
         _error = new List<string?>();
         cts = new CancellationTokenSource();
         _fileAdd.Categories = CategoriesTable[0];
+
         _logger.LogInformation("Initialized page");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        var taglist = await _iFileManager.GetTagAsync();
+        if (taglist.IsSuccessStatusCode)
+        {
+            TagTable = Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(await taglist.Content.ReadAsStringAsync());
+        }
+        else
+        {
+            _logger.LogError("Tag Error:{0}",await taglist.Content.ReadAsStringAsync());
+        }
+        _logger.LogInformation("Initialized async page");
     }
     public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
     {
@@ -197,7 +199,11 @@
         {
             try
             {
-                if (!(await _modal.ShowPopup("Przesyłanie","Czy na pewno chcesz przesłać pliki?","Tak","Nie")))
+                if (!_editContext.Validate())
+                {
+                    return;
+                }
+                if (!(await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać pliki?", "Tak", "Nie")))
                 {
                     return;
                 }
@@ -230,7 +236,7 @@
                     _popUp.ShowToats("Plik został udostępniony", "Przesyłanie", PopupLevel.Level.Success);
                     await Task.Run(async () =>
                     {
-                        await Task.Delay(5 * 1000);
+                        await Task.Delay(2 * 1000);
                         _error.Clear();
                         _fileAdd = new FileAdd();
                         _fileUploadStatuses.Clear();
@@ -262,8 +268,6 @@
         }
     }
 
-
-
     class FileAdd
     {
         [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Tytuł jest wymagany")]
@@ -274,8 +278,31 @@
         public string? Description { get; set; }
         public List<string> Tag { get; set; }
         [System.ComponentModel.DataAnnotations.MaxLength(length: 20, ErrorMessage = "Tag jest za długi")]
-        public string SimpleTag { get; set; }
-        public (string,string) Categories { get; set; }
+        private string? _SimpleTag;
+        public string? SimpleTag
+        {
+            get => _SimpleTag;
+            set
+            {
+                if (_SimpleTag != value)
+                {
+                    _SimpleTag = value;
+                    if (string.IsNullOrWhiteSpace(_SimpleTag))
+                    {
+                        return;
+                    }
+                    if (_SimpleTag[SimpleTag.Length - 1] == ' ')
+                    {
+                        ReadOnlySpan<char> chars = _SimpleTag;
+                        Tag.Add(chars.Slice(0, chars.Length - 1).ToString());
+                        _SimpleTag = string.Empty;
+                    }
+                }
+            }
+        }
+
+
+        public (string, string) Categories { get; set; }
         public FileAdd()
         {
             Tag = new List<string>();

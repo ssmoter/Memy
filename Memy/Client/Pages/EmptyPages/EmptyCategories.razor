@@ -1,7 +1,8 @@
 ﻿@page "/{Categories?}"
 @page "/{Categories?}/{Start:int?}/{Banned:bool?}"
-
-<MainFileListPages Start="@Start" Categories="@Categories" Max="@Max" Banned="@Banned" DateEnd="@DateEnd" DateStart="@DateStart"></MainFileListPages>
+<div>
+    <MainFileListPages Start="@Start" Categories="@Categories" Max="@Max" Banned="@Banned" DateEnd="@DateEnd" DateStart="@DateStart"></MainFileListPages>
+</div>
 
 @code {
     [Parameter]

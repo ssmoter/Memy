@@ -4,22 +4,25 @@
 @inject IFileManager _iFileManager
 @inject NavigationManager _navigation
 @inject PopupListService _popUp
+@inject IReaction _reaction
 
-<div>
+
+<div style="max-width:fit-content">
     @if (TaskModels != null)
     {
         @for (int i = 0; i < TaskModels.Length; i++)
         {
+            var index = i;
             <div>
-                <h4>@TaskModels[i].Title</h4>
+                <h4>@TaskModels[i].Id @TaskModels[i].Title</h4>
                 <div>
                     <span>@TaskModels[i].User.Name</span>
-                    <span>@TaskModels[i].CreatedDate</span>
+                    <span>@TaskModels[i].CreatedDate.ToLocalTime().ToString("dd.MM.yyyy")</span>
                 </div>
                 <div>
                     @if (TaskModels[i].Tag != null)
                     {
-                        for (int j = 0; j < TaskModels[i].Tag.Count; j++)
+                        for (int j = 0; j < TaskModels[i].Tag.Length; j++)
                         {
                             <span>@TaskModels[i].Tag[j].Value &nbsp;</span>
                         }
@@ -33,49 +36,80 @@
                 <div>
                     @if (TaskModels[i].FileModel != null)
                     {
-                        @for (int j = 0; j < TaskModels[i].FileModel.Count; j++)
+                        @for (int j = 0; j < TaskModels[i].FileModel.Length; j++)
                         {
                             var img = (TaskModels[i].FileModel[j].Name, TaskModels[i].FileModel[j].Typ);
-                            <img src="@(_iFileManager.GetImgAsync(img.Name,img.Typ))" alt="@img.Name" width="100" height="100" />
+                            <img src="@(_iFileManager.GetImgAsync(img.Name,img.Typ))" alt="@img.Name" width="100" height="100" loading="lazy" />
                         }
                     }
                 </div>
+                <div class="m-auto d-sm-flex justify-content-center">
+                    <div class="border border-1 border-primary form-check-inline ">
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (TaskModels[index].Reaction.Value >= 0)
+                                {
+                                    <button class="btn oi oi-minus btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(TaskModels[index].Id,-1))" />
+                                }
+                                @if (TaskModels[index].Reaction.Value != 0)
+                                {
+                                    <button class="btn btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(TaskModels[index].Id,0))">
+                                        @TaskModels[index].Reaction.ValueSum
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="p-2">@TaskModels[index].Reaction.ValueSum</span>
+                                }
+                                @if (TaskModels[index].Reaction.Value <= 0)
+                                {
+                                    <button class="oi oi-plus btn btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(TaskModels[index].Id,1))" />
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <span class="p-2">@TaskModels[index].Reaction.ValueSum</span>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </div>
             </div>
+            @* <CommentComponent Id="TaskModels[index].Id"></CommentComponent>*@
         }
     }
     else
     {
         <p>Loading...</p>
     }
+    <br />
     <div class="m-auto d-sm-flex justify-content-sm-center">
         @{
             var EnableBack = false;
             if (Start == null)
             {
-                Start = 0;
+                Start = 1;
                 EnableBack = false;
             }
             if (Start != null)
             {
-                EnableBack = (int)Start == 0 ? true : false;
+                EnableBack = (int)Start == 1 ? true : false;
             }
         }
         <dvi>
             <span class="m-auto d-sm-flex justify-content-sm-center">
-                <button class="btn oi oi-arrow-thick-left btn-outline-dark" disabled="@EnableBack" @onclick="@(()=>ChangePage((int)Start-1))">@((int)Start - 1)</button>
-                <button class="btn oi oi-arrow-thick-right btn-outline-dark" @onclick="@(()=>ChangePage((int)Start+1))">@((int)Start + 1)</button>
+                <button class="btn oi oi-arrow-thick-left btn-outline-primary text-white" disabled="@EnableBack" @onclick="@(()=>ChangePage((int)Start-1))">@((int)Start - 1)</button>
+                <button class="btn oi oi-arrow-thick-right btn-outline-primary text-white" @onclick="@(()=>ChangePage((int)Start+1))">@((int)Start + 1)</button>
             </span>
             <div>
-                @for (int i = (int)Start - 2; i < (int)Start + 3; i++)
+                @for (int i = (int)Start - 2; i < (int)Start + 5; i++)
                 {
                     int index = i;
                     if (Start == index)
                     {
                         continue;
                     }
-                    if (i > 2)
+                    if (i > 0)
                     {
-                        <button class="btn btn-outline-dark" @onclick="@(()=>ChangePage(index))">@i</button>
+                        <button class="btn btn-outline-primary text-white" @onclick="@(()=>ChangePage(index))">@i</button>
                     }
                 }
             </div>
@@ -86,7 +120,7 @@
 
 @code {
     [Parameter]
-    public int? Start { get; set; } = 0;
+    public int? Start { get; set; } = 1;
     [Parameter]
     public int? Max { get; set; } = 10;
     [Parameter]
@@ -117,6 +151,7 @@
         {
             _navigation.NavigateTo($"/{index}");
         }
+        Start = index;
         await GetTaskAsync();
     }
 
@@ -131,7 +166,7 @@
         {
             if (Start == null)
             {
-                Start = 0;
+                Start = 1;
             }
             _logger.LogInformation("Initialized page");
             var result = await _iFileManager.GetTaskModelsAsync(Start, Categories, Max, Banned, DateEnd, DateStart);
@@ -149,5 +184,34 @@
             _logger.LogError(ex.Message);
         }
     }
+
+
+    private async Task SetReaction(int id, int value)
+    {
+        try
+        {
+            var result = await _reaction.SetReaction(id, value, Memy.Shared.Helper.MyEnums.TypOfReaction.File);
+
+            if (result != null)
+            {
+                _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success);
+                var model = TaskModels.FirstOrDefault(x => x.Id == id);
+                if (model != null)
+                {
+                    model.Reaction = result;
+                }
+            }
+            else
+            {
+                _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Error);
+            _logger.LogError(ex.Message);
+        }
+    }
+
 
 }

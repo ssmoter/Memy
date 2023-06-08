@@ -1,7 +1,5 @@
 ﻿using Memy.Server.Data.SqlDataAccess;
 
-using Newtonsoft.Json.Linq;
-
 namespace Memy.Server.Data.File
 {
     public interface IAddNewFileModel
@@ -9,7 +7,8 @@ namespace Memy.Server.Data.File
         Task<bool> AddFileData(int FileSimpleId, string ImgName, string ImgType);
         Task<bool> AddFileTag(int FileSimpleId, string Value);
         Task<int> CreateNewFile(string token, string title, string description);
-        Task<string> GetTaskAsync(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart);
+        Task<IList<string>> GetTagList();
+        Task<T[]> GetTaskAsync<T>(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart,string? token);
         Task<int> InsertFullFile(string json, string token);
     }
 
@@ -80,7 +79,7 @@ namespace Memy.Server.Data.File
 
             return await sqlData.LoadData<bool>(sql.ToString());
         }
-        public async Task<string> GetTaskAsync(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart)
+        public async Task<T[]> GetTaskAsync<T>(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, string? token)
         {
             sql.Clear();
             sql.Append("EXEC [GetFileByDate] ");
@@ -95,27 +94,43 @@ namespace Memy.Server.Data.File
             }
             if (category != null)
             {
-                sql.Append(", ");
+                sql.Append(", '");
                 sql.Append(category);
+                sql.Append("'");
             }
-            if (banned!=null)
+            if (banned != null)
             {
                 sql.Append(", ");
                 sql.Append(banned);
             }
             if (dateEnd != null)
             {
-                sql.Append(", ");
+                sql.Append(", '");
                 sql.Append(dateEnd);
+                sql.Append("'");
             }
             if (dateStart != null)
             {
-                sql.Append(", ");
+                sql.Append(", '");
                 sql.Append(dateStart);
+                sql.Append("'");
+            }
+            if (token != null)
+            {
+                sql.Append(", '");
+                sql.Append(token);
+                sql.Append("'");
             }
 
-            return await sqlData.LoadData<string>(sql.ToString());
+            return (await sqlData.LoadDataList<T>(sql.ToString())).ToArray();
         }
+        public async Task<IList<string>> GetTagList()
+        {
+            sql.Clear();
+            sql.Append("SELECT Value FROM [dbo].[FileTagList]");
+            return await sqlData.LoadDataList<string>(sql.ToString());
+        }
+
 
     }
 }

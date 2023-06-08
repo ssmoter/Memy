@@ -67,9 +67,12 @@ namespace Memy.Server.Service
             }
             catch (Exception ex)
             {
-                for (int i = 0; i < model.FileUploadStatuses.Length; i++)
+                if (model.FileUploadStatuses != null)
                 {
-                    CheckingFile.DeleteFile(model.FileUploadStatuses[i].Name, model.FileUploadStatuses[i].Typ, _webHostEnvironment);
+                    for (int i = 0; i < model.FileUploadStatuses.Length; i++)
+                    {
+                        CheckingFile.DeleteFile(model.FileUploadStatuses[i].Name, model.FileUploadStatuses[i].Typ, _webHostEnvironment);
+                    }
                 }
                 _logger.LogError(ex.Message);
                 throw;
@@ -77,14 +80,29 @@ namespace Memy.Server.Service
         }
 
         //pobieranie plikow
-        public async Task<TaskModel[]> GetTaskModelsAsync(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart)
+        public async Task<TaskModel[]?> GetTaskModelsAsync(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, string? token)
         {
             try
             {
-                var json = await _fileData.GetTaskAsync(start, category, max, banned, dateEnd, dateStart);
-                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Root>(json);
+                var task = await _fileData.GetTaskAsync<GetTask>(start, category, max, banned, dateEnd, dateStart, token);
 
-                return result.TaskModel.ToArray();
+                var result = new TaskModel[task.Length];
+
+                for (int i = 0; i < result.Length; i++)
+                {
+                    result[i] = new TaskModel();
+                    result[i].Id = task[i].Id;
+                    result[i].Title = task[i].Title;
+                    result[i].Description = task[i].Description;
+                    result[i].CreatedDate = task[i].CreatedDate;
+
+                    result[i].User = GetTask.GetValue<User?>(task[i].User);
+                    result[i].FileModel = GetTask.GetValue<FileModel[]?>(task[i].FileModel);
+                    result[i].Tag = GetTask.GetValue<Tag[]?>(task[i].Tag);
+                    result[i].Reaction = GetTask.GetValue<ReactionModel?>(task[i].Reaction);
+                }
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -92,6 +110,32 @@ namespace Memy.Server.Service
                 throw;
             }
 
+        }
+
+    }
+
+
+    class GetTask
+    {
+        public int Id { get; set; }
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public DateTimeOffset CreatedDate { get; set; }
+        public string? User { get; set; }
+        public string? FileModel { get; set; }
+        public string? Tag { get; set; }
+        public string? Reaction { get; set; }
+
+        public static T? GetValue<T>(string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+            }
+            else
+            {
+                return default(T?);
+            }
         }
     }
 }

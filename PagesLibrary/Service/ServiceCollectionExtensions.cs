@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using PagesLibrary.Authorization;
 using PagesLibrary.Data;
+using PagesLibrary.Data.Comment;
 using PagesLibrary.Data.File;
 using PagesLibrary.Data.User;
 
@@ -26,6 +27,9 @@ namespace PagesLibrary.Service
 
             services.AddSingleton<ILogInOut, LogInOut>();
             services.AddSingleton<IFileManager, FileManager>();
+            services.AddSingleton<IReaction, Reaction>();
+            services.AddSingleton<ICommentApi, CommentApi>();
+
 
             services.AddCompomentsService();
 

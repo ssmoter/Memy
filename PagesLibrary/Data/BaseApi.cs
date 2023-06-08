@@ -4,10 +4,7 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Logging;
-
 using System.Net;
-using System.Net.Http;
 
 namespace PagesLibrary.Data
 {
@@ -41,7 +38,10 @@ namespace PagesLibrary.Data
         {
             UserStorage? userStorage = await GetUserStorage();
             _HttpClient.DefaultRequestHeaders.Clear();
-            _HttpClient.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token);
+            if (userStorage != null)
+            {
+                _HttpClient.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token.ToUpper());
+            }
             return _HttpClient;
         }
 

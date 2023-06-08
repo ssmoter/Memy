@@ -21,4 +21,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Category" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="15c97e1f-8f5c-481d-b989-58cfe02874fa" ChangeDateTime="05/28/2023 19:56:04">
+    <Property Name="ElementName" Value="[dbo].[FilerReaction].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FilerReaction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Plus" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="932829ca-a220-4d85-874d-28421cee806c" ChangeDateTime="05/28/2023 19:56:16">
+    <Property Name="ElementName" Value="[dbo].[FilerReaction].[Plus]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FilerReaction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Typ" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a3f031db-ae3d-4bef-8081-7385be682dc6" ChangeDateTime="05/28/2023 19:56:31">
+    <Property Name="ElementName" Value="[dbo].[FilerReaction].[Typ]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FilerReaction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1d46f33d-a2fe-40c9-97e7-9d9de69445b2" ChangeDateTime="05/30/2023 10:49:10">
+    <Property Name="ElementName" Value="[dbo].[FilerReaction].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FilerReaction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Value" />
+  </Operation>
 </Operations>

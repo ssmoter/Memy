@@ -1,0 +1,68 @@
+﻿@if (List != null)
+{
+    <div class="w-auto maxWidth">
+        <div class="dropdown-header ">
+            <h6>@Description</h6>
+            <input @onkeyup="CleanInput" class="bg-black text-white" type="text" @bind-Value="@Value" @bind-Value:event="oninput" list="@nameof(pList)" name="@nameof(pList)" placeholder="@Placeholder" />
+            @if (pList.Count > 0)
+            {
+                <datalist class="" name="@nameof(pList)" id="@nameof(pList)"
+                  @onchange="@(EventCallback.Factory.Create(this,e=>Value = (((ChangeEventArgs)e).Value.ToString())))">
+                    @for (int i = 0; i < count; i++)
+                    {
+                        <option class="dropdown-item" value="@pList[i]">@pList[i]</option>
+                    }
+                </datalist>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string Placeholder { get; set; }
+    [Parameter]
+    public string? Theme { get; set; }
+    [Parameter]
+    public string? Description { get; set; }
+    [Parameter]
+    public IList<string?> List { get; set; }
+    IList<string?> pList { get; set; }
+    int count = 0;
+    string? _value;
+    [Parameter]
+    public string? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value != value)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    pList = List.Where(x => x.Contains(value.ToString())).ToArray();
+                    count = pList.Count;
+                }
+                else
+                {
+                    pList = new string[0];
+                }
+                _value = value;
+                ValueChanged.InvokeAsync(Value);
+            }
+        }
+    }
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+    private void CleanInput(KeyboardEventArgs e)
+    {
+        if (e.Code=="Space")
+        {
+            Value = "";   
+        }        
+    }
+    protected override void OnInitialized()
+    {
+        pList = new string[0];
+    }
+}

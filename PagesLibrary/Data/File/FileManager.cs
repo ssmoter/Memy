@@ -12,6 +12,7 @@ namespace PagesLibrary.Data.File
     public interface IFileManager
     {
         string GetImgAsync(string name, string typ);
+        Task<HttpResponseMessage> GetTagAsync();
         Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart);
         Task<HttpResponseMessage> PostFileAsync(FileUploadModel file);
     }
@@ -22,6 +23,7 @@ namespace PagesLibrary.Data.File
         {
         }
 
+        //wysyłanie modelu
         public async Task<HttpResponseMessage> PostFileAsync(FileUploadModel file)
         {
             try
@@ -38,11 +40,11 @@ namespace PagesLibrary.Data.File
             }
         }
         //pobieranie listy modelów do wyświetlenia
-        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd , string? dateStart)
+        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart)
         {
             try
             {
-                var client = GetHttpClient();
+                var client = await SetAuthorizationHeader();
                 StringBuilder sb = new StringBuilder(Routes.File);
 
                 if (categories != null)
@@ -55,11 +57,11 @@ namespace PagesLibrary.Data.File
                     sb.Append("/");
                     sb.Append(start);
                 }
-                if (max!=null || banned!=null || dateEnd !=null || dateStart !=null)
+                if (max != null || banned != null || dateEnd != null || dateStart != null)
                 {
                     sb.Append("/?");
                 }
-                if (max!=null)
+                if (max != null)
                 {
                     sb.Append("max=");
                     sb.Append(max);
@@ -98,6 +100,20 @@ namespace PagesLibrary.Data.File
         {
             string url = $"{UrlStringName}{Routes.File}/{Routes.Img}/{name}.{typ}";
             return url;
+        }
+        //pobieranie tagów
+        public async Task<HttpResponseMessage> GetTagAsync()
+        {
+            try
+            {
+                var client = await SetAuthorizationHeader();
+                var result = await client.GetAsync(Routes.Tag);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

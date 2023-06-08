@@ -1,0 +1,152 @@
+﻿@using PagesLibrary.Data.Comment;
+@inject ILogger<CommentComponent> _logger
+@inject NavigationManager _navigation
+@inject PopupListService _popUp
+@inject IReaction _reaction
+@inject ICommentApi _commentApi
+
+<div class="m-1">
+    <button class="btn btn-outline-primary text-white border border-1 border-primary" @onclick="@(()=>showComment = !showComment)">Komentarze</button>
+    @if (showComment)
+    {
+
+        <div class="">
+            <button class="btn btn-outline-primary text-white">Popularne</button>
+            <button class="btn btn-outline-primary text-white">Najnowsze</button>
+        </div>
+
+        <div>
+        </div>
+        @if (_commentModel != null)
+        {
+            <div class="h-25">                
+                @for (int i = 0; i < _commentModel.Length; i++)
+                {
+                    var index = i;
+                    <div>
+                        <div>
+                            <div class="m-auto d-sm-flex justify-content-sm-end">
+                                <div class="">@_commentModel[i].User.Name &nbsp;</div>
+                                <div>@_commentModel[i].Date.ToLocalTime().ToString("dd.MM.yyyy")</div>
+                                <div class="border border-1 border-primary form-check-inline">
+                                    <AuthorizeView>
+                                        <Authorized>
+                                            @if (_commentModel[index].Reaction[0].Value >= 0)
+                                            {
+                                                <button class="btn oi oi-minus btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(_commentModel[index].Id,-1))" />
+                                            }
+                                            @if (_commentModel[index].Reaction[0].Value != 0)
+                                            {
+                                                <button class="btn btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(_commentModel[index].Id,0))">
+                                                    @_commentModel[index].Reaction[0].ValueSum
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <span class="p-2">@_commentModel[index].Reaction[0].ValueSum</span>
+                                            }
+                                            @if (_commentModel[index].Reaction[0].Value <= 0)
+                                            {
+                                                <button class="oi oi-plus btn btn-outline-primary text-white border border-0" @onclick="@(()=>SetReaction(_commentModel[index].Id,1))" />
+                                            }
+                                        </Authorized>
+                                        <NotAuthorized>
+                                            <span class="p-2">@_commentModel[index].Reaction[0].ValueSum</span>
+                                        </NotAuthorized>
+                                    </AuthorizeView>
+                                </div>
+                            </div>
+                            <div>
+                                @_commentModel[i].Description
+                            </div>
+                        </div>
+
+
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <span>Loading...</span>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    int _orderTyp { get; set; } = 0;
+    CommentModel[] _commentModel { get; set; }
+    bool showComment = false;
+
+    #region Override
+    protected override async Task OnInitializedAsync()
+    {
+        _logger.LogInformation("InitializedAsync");
+        try
+        {
+            var result = await _commentApi.GetCommentAsync(Id, _orderTyp);
+            var json = await result.Content.ReadAsStringAsync();
+            if (result.IsSuccessStatusCode)
+            {
+                _commentModel = Newtonsoft.Json.JsonConvert.DeserializeObject<Root>(json).CommentModel;
+            }
+            else
+            {
+                if (json != "Sequence contains no elements")
+                {
+                    _popUp.ShowToats("Nie udało się pobrać komentarzy", "Wystąpił błąd", PopupLevel.Level.Warning);
+                }
+                _logger.LogWarning(json);
+            }
+        }
+        catch (Exception ex)
+        {
+            _popUp.ShowToats("Nie udało się pobrać komentarzy", "Wystąpił błąd", PopupLevel.Level.Error);
+            _logger.LogError(ex.Message);
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        //pobranie OrderTyp z localstorage
+        _logger.LogInformation("Initialized");
+    }
+    #endregion
+
+
+
+
+    private async Task SetReaction(int id, int value)
+    {
+        //try
+        //{
+        //    var result = await _reaction.SetReaction(id, value, Memy.Shared.Helper.MyEnums.TypOfReaction.File);
+
+        //    if (result != null)
+        //    {
+        //        _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success);
+        //        var model = TaskModels.FirstOrDefault(x => x.Id == id);
+        //        if (model != null)
+        //        {
+        //            model.Reaction[0] = result;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Warning);
+        //    }
+        //}
+        //catch (Exception ex)
+        //{
+        //    _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Error);
+        //    _logger.LogError(ex.Message);
+        //}
+    }
+
+    class Root
+    {
+        public CommentModel[] CommentModel { get; set; }
+    }
+}

@@ -1,4 +1,6 @@
-﻿using Memy.Server.Data.File;
+﻿using Memy.Server.Data.Comment;
+using Memy.Server.Data.File;
+using Memy.Server.Data.Reaction;
 using Memy.Server.Data.SqlDataAccess;
 using Memy.Server.Data.User;
 using Memy.Server.TokenAuthentication;
@@ -13,9 +15,14 @@ namespace Memy.Server.Service
         {
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<IUserData, LoginData>();
+
             services.AddSingleton<ITokenManager, TokenManager>();
 
             services.AddTransient<IAddNewFileModel, AddNewFileModel>();
+            services.AddTransient<IReactionDataBase, ReactionDataBase>();
+            services.AddTransient<ICommentData, CommentData>();
+
+
 
             return services;
         }

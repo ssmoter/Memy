@@ -28,22 +28,25 @@ namespace CompomentsLibrary.Pages
         }
         private void ElapsedTimer(object source, System.Timers.ElapsedEventArgs e)
         {
-            _ms++;
-            if (_ms % 3 == 0)
+            for (int i = 0; i < toasts.Count; i++)
             {
-                Close();
-                _ms = 0;
+                toasts[i].Time--;
+                if (toasts[i].Time == 0)
+                {
+                    Close(i);
+                }
             }
         }
 
-        public void Show(string bodyText, string headerText = "", PopupLevel.Level? level = null)
+        public void Show(string bodyText, string headerText = "", PopupLevel.Level? level = null, int time = 5)
         {
             toasts.Add(new Toasts()
             {
                 BodyText = bodyText,
                 HeaderText = headerText,
                 Level = level,
-                IsVisible = true
+                IsVisible = true,
+                Time = time
             });
 
             ToatsLevel(level);
@@ -109,6 +112,7 @@ namespace CompomentsLibrary.Pages
             public string? BodyText { get; set; }
             public PopupLevel.Level? Level { get; set; } = PopupLevel.Level.None;
             public string? BackgroundCssClass { get; set; }
+            public int Time { get; set; } = 5;
         }
     }
 }

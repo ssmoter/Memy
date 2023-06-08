@@ -17,7 +17,7 @@ DECLARE @myTable TABLE (id INT)
 		,GETDATE()
 		,(SELECT JSON_VALUE(@json,'$.Title'))
 		,(SELECT JSON_VALUE(@json,'$.Description'))
-		,(SELECT JSON_VALUE(@json,'$.Category'))
+		,(SELECT JSON_VALUE(@json,'$.Categories'))
 		,0)
 -- pobranie jego id
 	SELECT  @id = id FROM @myTable	
