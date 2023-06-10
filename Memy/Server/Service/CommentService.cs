@@ -16,13 +16,25 @@ namespace Memy.Server.Service
             _commentData = commentData;
         }
 
-        public async Task<string> InsertComment(string procedure, string token, Comment commentModel, int orderTyp)
+        public async Task<CommentModel[]> InsertComment(string procedure, string token, Comment commentModel, int orderTyp)
         {
             try
             {
                 var json = JsonConvert.SerializeObject(commentModel);
-                var result = await _commentData.InsertComment(procedure, token, json, orderTyp);
-                return result;
+                var task = await _commentData.InsertComment<GetTask>(procedure, token, json, orderTyp);
+                var comment = new CommentModel[task.Length];
+                for (int i = 0; i < comment.Length; i++)
+                {
+                    comment[i] = new CommentModel();
+                    comment[i].Id = task[i].Id;
+                    comment[i].Description = task[i].Description;
+                    comment[i].Date = task[i].Date;
+                    comment[i].FileSimpleId = task[i].FileSimpleId;
+                    comment[i].User = GetTask.GetValue<User>(task[i].User);
+                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                }
+
+                return comment;
             }
             catch (Exception ex)
             {
@@ -30,11 +42,25 @@ namespace Memy.Server.Service
                 throw;
             }
         }
-        public async Task<string> GetComment(string procedure, int id, int orderTyp, string token)
+        public async Task<CommentModel[]> GetComment(string procedure, int id, int orderTyp, string token)
         {
             try
             {
-                return await _commentData.GetComment(procedure, id, orderTyp, token);
+                var task = await _commentData.GetComment<GetTask>(procedure, id, orderTyp, token);
+
+                var comment = new CommentModel[task.Length];
+                for (int i = 0; i < comment.Length; i++)
+                {
+                    comment[i] = new CommentModel();
+                    comment[i].Id = task[i].Id;
+                    comment[i].Description = task[i].Description;
+                    comment[i].Date = task[i].Date;
+                    comment[i].FileSimpleId = task[i].FileSimpleId;
+                    comment[i].User = GetTask.GetValue<User>(task[i].User);
+                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                }
+
+                return comment;
             }
             catch (Exception ex)
             {
@@ -43,6 +69,27 @@ namespace Memy.Server.Service
             }
         }
 
+        private class GetTask
+        {
+            public int Id { get; set; }
+            public int FileSimpleId { get; set; }
+            public DateTimeOffset Date { get; set; }
+            public string? Description { get; set; }
+            public string? User { get; set; }
+            public string? Reaction { get; set; }
+
+            public static T? GetValue<T>(string value)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+                }
+                else
+                {
+                    return default(T?);
+                }
+            }
+        }
 
 
     }

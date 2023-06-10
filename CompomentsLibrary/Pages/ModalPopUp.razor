@@ -1,10 +1,10 @@
 ﻿@{
     var showClass = IsVisible ? "d-block" : "d-none";
-    var OpenTyp = IsVisible ? "block" : "none";
 }
 
-<div class="modal" style="display:@OpenTyp;">
-    <div class="modal-dialog modal-dialog-centered">
+<div class="modal @showClass"  @onclick="MouseClose"
+@onmouseout="@MouseOut">
+    <div class="modal-dialog modal-dialog-centered" style="z-index:1066;" @onmousemove="@MouseEnter">
         <div class="toast-container p-1 bg-primary @showClass">
             <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">

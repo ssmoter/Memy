@@ -5,6 +5,7 @@ using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 using System.Net;
+using System.Text;
 
 namespace PagesLibrary.Data
 {
@@ -37,12 +38,13 @@ namespace PagesLibrary.Data
         public async Task<HttpClient> SetAuthorizationHeader()
         {
             UserStorage? userStorage = await GetUserStorage();
-            _HttpClient.DefaultRequestHeaders.Clear();
+            var client = GetHttpClient();
+            client.DefaultRequestHeaders.Clear();
             if (userStorage != null)
             {
-                _HttpClient.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token.ToUpper());
+                client.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token.ToUpper());
             }
-            return _HttpClient;
+            return client;
         }
 
         //wylogowanie użytkownika po komunikacie od serwera
@@ -57,34 +59,40 @@ namespace PagesLibrary.Data
         //pobranie danych użytkownika w zależności gdzie zostały zapisane
         public async Task<UserStorage?> GetUserStorage()
         {
-            UserStorage? user;
+            UserStorage? user = null;
 
-            user = await GetUserSession();
-            if (user == null)
+            var result = await GetUserSession();
+            if (result == null)
             {
-                user = await GetUserLocal();
+                result = await GetUserLocal();
             }
+            if (result != null)
+            {
+                var byteArr = Convert.FromBase64String(result);
+                string str = Encoding.ASCII.GetString(byteArr);
+
+                user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserStorage>(str);
+            }
+
             return user;
         }
         //pobranie danych zapisanych w local storage
-        private async Task<UserStorage?> GetUserLocal()
+        private async Task<string?> GetUserLocal()
         {
             var resultRav = await _localStorageService.GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
             if (resultRav != null)
             {
-                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<UserStorage>(resultRav);
-                return result;
+                return resultRav;
             }
             return null;
         }
         //pobranie danych zapisanych w seasion storage
-        private async Task<UserStorage?> GetUserSession()
+        private async Task<string?> GetUserSession()
         {
             var resultRav = await _sessionStorageService.GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
             if (resultRav != null)
             {
-                var result = Newtonsoft.Json.JsonConvert.DeserializeObject<UserStorage>(resultRav);
-                return result;
+                return resultRav;
             }
             return null;
         }

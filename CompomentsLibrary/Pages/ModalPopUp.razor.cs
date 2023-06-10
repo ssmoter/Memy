@@ -2,12 +2,6 @@
 
 using Microsoft.AspNetCore.Components;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace CompomentsLibrary.Pages
 {
     public partial class ModalPopUp
@@ -25,7 +19,7 @@ namespace CompomentsLibrary.Pages
         [Parameter]
         public string? NoText { get; set; }
         private CancellationTokenSource FinishConfirm;
-
+        private bool IsInside { get; set; }
         [Inject] ModalPopUpService PopupService { get; set; }
         protected override void OnInitialized()
         {
@@ -45,6 +39,7 @@ namespace CompomentsLibrary.Pages
             YesText = yesText;
             NoText = noText;
             IsVisible = true;
+            IsInside = true;
             StateHasChanged();
             try
             {
@@ -69,6 +64,22 @@ namespace CompomentsLibrary.Pages
             {
                 FinishConfirm.Cancel();
             }
+        }
+
+        private void MouseClose()
+        {
+            if (!IsInside)
+            {
+                Close(false);
+            }
+        }
+        private void MouseOut()
+        {
+            IsInside = false;
+        }
+        private void MouseEnter()
+        {
+            IsInside = true;
         }
     }
 }

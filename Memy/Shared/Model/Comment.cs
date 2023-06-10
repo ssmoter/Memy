@@ -2,12 +2,12 @@
 {
     public class CommentModel : Comment
     {
-        public ReactionModel[] Reaction { get; set; }
+        public ReactionModel Reaction { get; set; }
         public User User { get; set; }
 
         public CommentModel()
         {
-            Reaction = new ReactionModel[0];
+            Reaction = new ReactionModel();
             User = new User();
         }
     }
