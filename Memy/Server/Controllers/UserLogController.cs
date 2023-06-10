@@ -7,6 +7,8 @@ using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
 
+using System.Text;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Memy.Server.Controllers
@@ -75,7 +77,11 @@ namespace Memy.Server.Controllers
                         result.Role = null;
                     }
                     var json = Newtonsoft.Json.JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented, JsonSettings.JsonSerializerSettings());
-                    return Ok(json);
+                    
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    var jsonBytes = Convert.ToBase64String(bytes);
+
+                    return Ok(jsonBytes);
                 }
                 return NotFound("Nie znaleziono konta");
             }

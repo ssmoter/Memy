@@ -30,6 +30,7 @@ namespace PagesLibrary.Service
             services.AddSingleton<IReaction, Reaction>();
             services.AddSingleton<ICommentApi, CommentApi>();
 
+            services.AddSingleton<MainFilePopUpService>();
 
             services.AddCompomentsService();
 

@@ -1,8 +1,10 @@
-﻿namespace Memy.Server.Data.Comment
+﻿using Memy.Shared.Model;
+
+namespace Memy.Server.Data.Comment
 {
     public interface ICommentData
     {
-        Task<string> GetComment(string procedure, int id, int orderTyp, string token);
-        Task<string> InsertComment(string procedure, string token, string json, int orderTyp);
+        Task<T[]> GetComment<T>(string procedure, int id, int orderTyp, string token);
+        Task<T[]> InsertComment<T>(string procedure, string token, string json, int orderTyp);
     }
 }

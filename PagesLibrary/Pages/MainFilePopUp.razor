@@ -1,0 +1,74 @@
+﻿@using PagesLibrary.Data.File
+
+@inject ILogger<MainFilePopUp> _logger
+@inject IReaction _reaction
+@inject IFileManager _iFileManager
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+@if (TaskModel != null)
+{
+    <div class="modal @showClass " @onclick="MouseClose" @onmouseout="@MouseOut" >
+        <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:800px" @onmousemove="@MouseEnter">
+            <div class="toast-container p-1 bg-black ">
+
+                <div class="toast show w-100 bg-dark " role="application">
+                    <div class="toast-header sectionTitle">
+                        <strong class="me-auto">@TaskModel.Title</strong>
+                        <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close())"></button>
+                    </div>
+                    <div class="toast-body">
+                        <strong class="me-auto">
+                            @TaskModel.User.Name &nbsp;
+                            <span>@_date</span>
+                        </strong>
+                    </div>
+
+                    <div class="toast-body">
+                        <div class="">
+                            @TaskModel.Description
+                        </div>
+                        @if (TaskModel.FileModel != null)
+                        {
+                            if (TaskModel.FileModel.Length > 1)
+                            {
+                                <div class="m-auto d-flex justify-content-center">
+                                    @for (int j = 0; j < TaskModel.FileModel.Length; j++)
+                                    {
+                                        var img = j;
+                                        <button class="btn" @onclick="@(()=>ChangeImg(img))">
+                                            <img src="@(_iFileManager.GetImgAsync(TaskModel.FileModel[j].Name,TaskModel.FileModel[j].Typ))"
+                                                 alt="@TaskModel.FileModel[j].Name" width="50" height="50" loading="lazy" />
+                                        </button>
+                                    }
+                                </div>
+                            }
+                            <img src="@(_iFileManager.GetImgAsync(TaskModel.FileModel[_maingImg].Name,TaskModel.FileModel[_maingImg].Typ))"
+                                 alt="@TaskModel.FileModel[_maingImg].Name" style="width: 100%; object-fit: cover;" loading="lazy" />
+                        }
+                    </div>
+                    <div class="toast-body ">
+                        <CommentComponent Id="@TaskModel.Id"></CommentComponent>
+                        <span class="m-auto d-flex justify-content-end ">
+                            <button  disabled type="button" class=" oi oi-arrow-circle-top btn btn-outline-primary"
+                                    aria-label="Close"></button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+}
+
+
+@code {
+
+    [Parameter]
+    public TaskModel? TaskModel { get; set; }
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+}

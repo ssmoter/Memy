@@ -111,31 +111,29 @@ namespace Memy.Server.Service
             }
 
         }
-
-    }
-
-
-    class GetTask
-    {
-        public int Id { get; set; }
-        public string? Title { get; set; }
-        public string? Description { get; set; }
-        public DateTimeOffset CreatedDate { get; set; }
-        public string? User { get; set; }
-        public string? FileModel { get; set; }
-        public string? Tag { get; set; }
-        public string? Reaction { get; set; }
-
-        public static T? GetValue<T>(string value)
+        private class GetTask
         {
-            if (!string.IsNullOrWhiteSpace(value))
+            public int Id { get; set; }
+            public string? Title { get; set; }
+            public string? Description { get; set; }
+            public DateTimeOffset CreatedDate { get; set; }
+            public string? User { get; set; }
+            public string? FileModel { get; set; }
+            public string? Tag { get; set; }
+            public string? Reaction { get; set; }
+
+            public static T? GetValue<T>(string value)
             {
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
-            }
-            else
-            {
-                return default(T?);
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(value);
+                }
+                else
+                {
+                    return default(T?);
+                }
             }
         }
+
     }
 }

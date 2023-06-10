@@ -362,3 +362,4 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Memy/Database/View/SQLQuery5.sql
+/Memy/Server/Development/unsafe_uploads
