@@ -1,0 +1,79 @@
+﻿@using PagesLibrary.Data.Comment;
+
+@inject ILogger<CommentComponentList> _logger
+@inject NavigationManager _navigation
+@inject PopupListService _popUp
+@inject IReaction _reaction
+@inject ICommentApi _commentApi
+@inject ModalPopUpService _modal
+
+<AuthorizeView Context="authContext">
+    <Authorized>
+
+        <EditForm Context="formContext" Model="@NewComment" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="p-2 w-100">
+                <InputTextArea class="bg-black text-white w-100" @bind-Value="@NewComment.Description" placeholder="Nowy komentarz" />
+                <div class="float-end">
+                    <button type="submit" class="btn btn-outline-primary" aria-label="submit">Prześlij</button>
+                </div>
+            </div>
+        </EditForm>
+    </Authorized>
+</AuthorizeView>
+
+<div class="m-auto d-sm-flex justify-content-center">
+    @if (popTyp)
+    {
+        <button class="btn oi oi-arrow-thick-top btn-outline-primary text-white" @onclick="@(async()=> await GetComment(Id,2))">Popularne</button>
+    }
+    else
+    {
+        <button class="btn oi oi-arrow-thick-bottom btn-outline-primary text-white" @onclick="@(async()=> await GetComment(Id,3))">Popularne</button>
+    }
+    &nbsp;
+    @if (dateTyp)
+    {
+        <button class="btn oi oi-arrow-thick-top btn-outline-primary text-white" @onclick="@(async()=> await GetComment(Id,0))">Najnowsze</button>
+    }
+    else
+    {
+        <button class="btn oi oi-arrow-thick-bottom btn-outline-primary text-white" @onclick="@(async()=> await GetComment(Id,1))">Najnowsze</button>
+    }
+</div>
+@if (_commentModel != null)
+{
+    <div class="d-inline-block w-100">
+        @for (int i = 0; i < _commentModel.Length; i++)
+        {
+            var index = i;
+            <div>
+                <br/>
+                <CommentComponent CommentModel="_commentModel[index]" OrderTyp="_orderTyp"/>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <span>Loading...</span>
+}
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    int _orderTyp { get; set; } = 0;
+    bool popTyp { get; set; } = false;
+    bool dateTyp { get; set; } = false;
+    /// <summary>
+    ///  0 = data od najnowszej
+    ///  1 = data od najstarszej
+    ///  2 = reakcje max
+    ///  3 = reackcje min
+    /// </summary>
+    CommentModel[]? _commentModel { get; set; }
+    CommentAdd? NewComment { get; set; } = new CommentAdd();
+
+}

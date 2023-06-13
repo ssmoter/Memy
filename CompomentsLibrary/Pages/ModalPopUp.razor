@@ -2,9 +2,9 @@
     var showClass = IsVisible ? "d-block" : "d-none";
 }
 
-<div class="modal @showClass"  @onclick="MouseClose"
+<div class="modal @showClass bg-opacity-75 bg-dark" style="z-index:1077;" @onclick="MouseClose"
 @onmouseout="@MouseOut">
-    <div class="modal-dialog modal-dialog-centered" style="z-index:1066;" @onmousemove="@MouseEnter">
+    <div class="modal-dialog modal-dialog-centered" style="z-index:2066;" @onmousemove="@MouseEnter">
         <div class="toast-container p-1 bg-primary @showClass">
             <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">

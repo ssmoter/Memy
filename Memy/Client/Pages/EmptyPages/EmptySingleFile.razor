@@ -1,0 +1,10 @@
+﻿@page "/obj/{Id:int}"
+
+<div class="" style="max-width:800px">
+    <MainFilePage Id="Id" />
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+}

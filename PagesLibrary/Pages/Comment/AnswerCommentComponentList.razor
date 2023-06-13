@@ -1,0 +1,61 @@
+﻿@using PagesLibrary.Data.Comment;
+
+@inject ILogger<CommentComponentList> _logger
+@inject NavigationManager _navigation
+@inject PopupListService _popUp
+@inject IReaction _reaction
+@inject ICommentApi _commentApi
+@inject ModalPopUpService _modal
+
+<div>
+    <button class="btn btn-outline-primary" @onclick="@(()=>addComment=!addComment)">Dodaj odpowiedź</button>
+</div>
+<div class="px-5">
+    @if (addComment)
+    {
+        <AuthorizeView Context="authContext">
+            <Authorized>
+
+                <EditForm Context="formContext" Model="@NewComment" OnValidSubmit="@OnValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="p-2 w-100">
+                        <InputTextArea class="bg-black text-white w-100" @bind-Value="@NewComment.Description" placeholder="Nowy komentarz" />
+                        <div class="float-end">
+                            <button type="submit" class="btn btn-outline-primary" aria-label="submit">Prześlij</button>
+                        </div>
+                    </div>
+                </EditForm>
+            </Authorized>
+        </AuthorizeView>
+    }
+    @if (_commentModel != null)
+    {
+        <div class="d-inline-block w-100">
+            @for (int i = 0; i < _commentModel.Length; i++)
+            {
+                var index = i;
+                <div>
+                    <AnswerCommentComponent AnswerCommentModel="_commentModel[index]" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <span>Loading...</span>
+    }
+</div>
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public int OrderTyp { get; set; }
+
+    bool addComment { get; set; }
+
+    CommentModel[]? _commentModel { get; set; }
+    CommentAdd? NewComment { get; set; } = new CommentAdd();
+
+}

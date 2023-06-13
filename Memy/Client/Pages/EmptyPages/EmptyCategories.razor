@@ -1,5 +1,5 @@
-﻿@page "/{Categories?}"
-@page "/{Categories?}/{Start:int?}/{Banned:bool?}"
+﻿@page "/directory/{Categories?}"
+@page "/directory/{Categories?}/{Start:int?}/{Banned:bool?}"
 <div>
     <MainFileListPages Start="@Start" Categories="@Categories" Max="@Max" Banned="@Banned" DateEnd="@DateEnd" DateStart="@DateStart"></MainFileListPages>
 </div>

@@ -10,9 +10,9 @@
 
 @if (TaskModel != null)
 {
-    <div class="modal @showClass " @onclick="MouseClose" @onmouseout="@MouseOut" >
-        <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:800px" @onmousemove="@MouseEnter">
-            <div class="toast-container p-1 bg-black ">
+    <div class="modal @showClass bg-opacity-75 bg-dark " @onclick="MouseClose" @onmouseout="@MouseOut">
+        <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:800px;" @onmousemove="@MouseEnter">
+            <div class="toast-container p-1 bg-black w-100">
 
                 <div class="toast show w-100 bg-dark " role="application">
                     <div class="toast-header sectionTitle">
@@ -50,9 +50,9 @@
                         }
                     </div>
                     <div class="toast-body ">
-                        <CommentComponent Id="@TaskModel.Id"></CommentComponent>
+                        <CommentComponentList Id="@TaskModel.Id"></CommentComponentList>
                         <span class="m-auto d-flex justify-content-end ">
-                            <button  disabled type="button" class=" oi oi-arrow-circle-top btn btn-outline-primary"
+                            <button disabled type="button" class=" oi oi-arrow-circle-top btn btn-outline-primary"
                                     aria-label="Close"></button>
                         </span>
                     </div>
@@ -60,7 +60,6 @@
             </div>
         </div>
     </div>
-
 }
 
 

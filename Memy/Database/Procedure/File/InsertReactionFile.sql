@@ -8,9 +8,8 @@ DECLARE @exists int
 DECLARE @userId int
 BEGIN
 
-SET @userId = (SELECT UserId
-				FROM dbo.UserToken
-				WHERE Value = TRY_CAST (@token as UNIQUEIDENTIFIER))
+EXEC dbo.SelectUserId @token, @userId OUTPUT
+
 
 SET @exists = (SELECT COUNT(*) 
 				FROM dbo.FilerReaction 
@@ -31,14 +30,22 @@ ELSE
 		VALUES(@fileSimpleId,@value,@userId)
 	END
 
-	--pobranie danych o reakcjach
-	SELECT SUM(FilerReaction.Value) AS 'ValueSum'
-	--pobranie czy dany użytkownik dodał reakcje i jaką
-	,(SELECT TOP (1) Value
+
+	--pobranie ilosci reakcji + i -
+	SELECT SUM(FilerReaction.Value) AS 'ValueSumPositive'
+	,(SELECT SUM(FilerReaction.Value)
+		FROM FilerReaction
+		WHERE FilerReaction.FileSimpleId=@fileSimpleId
+		AND FilerReaction.Value < 0)  AS 'ValueSumNegative'
+--pobranie czy dany użytkownik dodał reakcje i jaką
+	,(SELECT TOP (1) Value 
 		FROM FilerReaction 
 		WHERE FilerReaction.FileSimpleId=@fileSimpleId
 		AND FilerReaction.UserId=@userId) AS 'Value'
-	FROM [FilerReaction]
- 	WHERE FilerReaction.FileSimpleId=@fileSimpleId
-	FOR JSON PATH,without_array_wrapper
+	FROM FilerReaction
+	WHERE FilerReaction.FileSimpleId=@fileSimpleId
+	AND FilerReaction.Value > 0
+	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER
+
+
 END

@@ -5,7 +5,7 @@ using Memy.Shared.Model;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
-namespace PagesLibrary.Pages
+namespace PagesLibrary.Pages.File
 {
     public partial class AddPages : IDisposable
     {
@@ -133,7 +133,7 @@ namespace PagesLibrary.Pages
                     {
                         return;
                     }
-                    if (!(await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać pliki?", "Tak", "Nie")))
+                    if (!await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać pliki?", "Tak", "Nie"))
                     {
                         return;
                     }

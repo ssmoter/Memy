@@ -29,6 +29,11 @@ namespace Memy.Server.Service
                         procedure = ProcedureName.InsertReactionComment;
                     }
                     break;
+                case Shared.Helper.MyEnums.TypOfReaction.AnswerComment:
+                    {
+                        procedure = ProcedureName.InsertAnswerReactionComment;
+                    }
+                    break;
             }
 
             try

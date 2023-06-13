@@ -15,7 +15,8 @@ namespace Memy.Shared.Model
 
         }
         public int Id { get; set; }
-        public int ValueSum { get; set; }
+        public int ValueSumPositive { get; set; }
+        public int ValueSumNegative { get; set; }
         public int Value { get; set; }
         public MyEnums.TypOfReaction TypOfReaction { get; set; }
 

@@ -1,10 +1,12 @@
 ﻿using CompomentsLibrary.Helper;
 
+using Memy.Shared.Model;
+
 using Microsoft.Extensions.Logging;
 
 using PagesLibrary.Data;
 
-namespace PagesLibrary.Pages
+namespace PagesLibrary.Pages.File
 {
     public partial class MainFilePage : IDisposable
     {
@@ -14,9 +16,32 @@ namespace PagesLibrary.Pages
 
         protected override void OnInitialized()
         {
-            _date = CompareDate.GetDate(TaskModel.CreatedDate);
+
 #if DEBUG
             _logger.LogInformation("Initialized page");
+#endif
+        }
+
+
+        protected override async Task OnInitializedAsync()
+        {
+            if (TaskModel == null)
+            {
+                var result = await _iFileManager.GetTaskModelAsync(Id);
+                var json = await result.Content.ReadAsStringAsync();
+                if (result.IsSuccessStatusCode)
+                {
+                    TaskModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskModel>(json);
+                }
+                else
+                {
+                    _logger.LogError(json);
+                }
+            }
+
+            _date = CompareDate.GetDate(TaskModel.CreatedDate);
+#if DEBUG
+            _logger.LogInformation("InitializedAsync page");
 #endif
         }
 
@@ -28,18 +53,17 @@ namespace PagesLibrary.Pages
 
                 if (result != null)
                 {
-                    _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success);
+                    _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success, 2);
                     TaskModel.Reaction = result;
-
                 }
                 else
                 {
-                    _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Warning);
+                    _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Warning, 2);
                 }
             }
             catch (Exception ex)
             {
-                _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Error);
+                _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Error, 2);
                 _logger.LogError(ex.Message);
             }
         }

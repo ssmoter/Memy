@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 
 using System.ComponentModel.DataAnnotations;
 
-namespace PagesLibrary.Pages
-{
-    public partial class CommentComponent : IDisposable
-    {
 
+namespace PagesLibrary.Pages.Comment
+{
+    public partial class CommentComponentList
+    {
         #region Override
         protected override async Task OnInitializedAsync()
         {
@@ -22,13 +22,13 @@ namespace PagesLibrary.Pages
 
         protected override void OnInitialized()
         {
+
             //pobranie OrderTyp z localstorage
 #if DEBUG
             _logger.LogInformation("Initialized");
 #endif
         }
         #endregion
-
         public async Task GetComment(int id, int orderTyp)
         {
             try
@@ -49,10 +49,7 @@ namespace PagesLibrary.Pages
                 }
                 else
                 {
-                    if (json != "Sequence contains no elements")
-                    {
-                        _popUp.ShowToats("Nie udało się pobrać komentarzy", "Wystąpił błąd", PopupLevel.Level.Warning);
-                    }
+                    _popUp.ShowToats("Nie udało się pobrać komentarzy", "Wystąpił błąd", PopupLevel.Level.Warning);
                     _logger.LogWarning(json);
                 }
             }
@@ -62,54 +59,47 @@ namespace PagesLibrary.Pages
                 _logger.LogError(ex.Message);
             }
         }
-
-        private async Task SetReaction(int id, int value)
-        {
-            //try
-            //{
-            //    var result = await _reaction.SetReaction(id, value, Memy.Shared.Helper.MyEnums.TypOfReaction.File);
-
-            //    if (result != null)
-            //    {
-            //        _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success);
-            //        var model = TaskModels.FirstOrDefault(x => x.Id == id);
-            //        if (model != null)
-            //        {
-            //            model.Reaction[0] = result;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Warning);
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    _popUp.ShowToats("Wystąpił błąd, spróbuj ponownie", "Dodawanie reakcji", PopupLevel.Level.Error);
-            //    _logger.LogError(ex.Message);
-            //}
-        }
         public async Task OnValidSubmit()
         {
-            if (!(await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać komentarz?", "Tak", "Nie")))
+            if (!await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać komentarz?", "Tak", "Nie"))
             {
                 return;
+            }
+            try
+            {
+                var comm = new Memy.Shared.Model.Comment()
+                {
+                    Description = NewComment.Description,
+                    ObjectId = Id,
+                };
+
+                var result = await _commentApi.SendCommentAsync(comm, _orderTyp);
+                var json = await result.Content.ReadAsStringAsync();
+
+                if (result.IsSuccessStatusCode)
+                {
+                    NewComment = new CommentAdd();
+                    _commentModel = Newtonsoft.Json.JsonConvert.DeserializeObject<CommentModel[]>(json);
+                }
+                else
+                {
+                    _popUp.ShowToats("Nie udało się wysłać komentarza", "Wystąpił błąd", PopupLevel.Level.Warning);
+                    _logger.LogWarning(json);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
             }
 
 
         }
-
-        public void Dispose()
-        {
-            _commentModel = null;
-            NewComment = null;
-        }
-
         class CommentAdd
         {
-            [Required(ErrorMessage ="Wiadomość jest wymagana")]
+            [Required(ErrorMessage = "Wiadomość jest wymagana")]
             [MinLength(length: 3, ErrorMessage = "Wiadomość jest za krótka")]
-            [MaxLength(length: 100, ErrorMessage = "Wiadomość jest zadługa")]
+            [MaxLength(length: 20000, ErrorMessage = "Wiadomość jest zadługa")]
             public string? Description { get; set; }
         }
     }

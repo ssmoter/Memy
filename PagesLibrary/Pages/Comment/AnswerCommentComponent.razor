@@ -1,0 +1,101 @@
+﻿@using PagesLibrary.Data.Comment;
+@inject ILogger<CommentComponent> _logger
+@inject NavigationManager _navigation
+@inject PopupListService _popUp
+@inject IReaction _reaction
+@inject ICommentApi _commentApi
+@inject ModalPopUpService _modal
+
+<div class="p-1 bg-gradient">
+    <div class="m-auto">
+        <span class="">@AnswerCommentModel.User.Name &nbsp;</span>
+        <span>@CompareDate.GetDate(AnswerCommentModel.Date)</span>
+        <div class=" border border-1 border-primary form-check-inline float-end">
+            <AuthorizeView>
+                <Authorized>
+                    @if (AnswerCommentModel.Reaction.Value >= 0)
+                    {
+                        <button class="btn btn-outline-primary text-white border border-0 "
+                        @onclick="@(()=>SetReaction(AnswerCommentModel.Id,-1))">
+                            <h6 class="oi oi-minus p-1 my-0"></h6>
+                            <h5 class="d-inline-block my-0">
+                                @AnswerCommentModel.Reaction.ValueSumNegative
+                            </h5>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn  btn-outline-primary text-white border border-0 "
+                        @onclick="@(()=>SetReaction(AnswerCommentModel.Id,0))">
+                            <h6 class="oi oi-minus bg-danger p-1 rounded-3 my-0"></h6>
+                            <h5 class="d-inline-block my-0">
+                                @AnswerCommentModel.Reaction.ValueSumNegative
+                            </h5>
+                        </button>
+                    }
+                    @if (AnswerCommentModel.Reaction.Value <= 0)
+                    {
+
+                        <button class="btn btn-outline-primary text-white border border-0 "
+                        @onclick="@(()=>SetReaction(AnswerCommentModel.Id,1))">
+                            <h6 class="oi oi-plus p-1 my-0"></h6>
+                            <h5 class="d-inline-block my-0">
+                                @AnswerCommentModel.Reaction.ValueSumPositive
+                            </h5>
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline-primary text-white border border-0 "
+                        @onclick="@(()=>SetReaction(AnswerCommentModel.Id,0))">
+                            <h6 class="oi oi-plus p-1 bg-success rounded-3 my-0"></h6>
+                            <h5 class="d-inline-block my-0">
+                                @AnswerCommentModel.Reaction.ValueSumPositive
+                            </h5>
+                        </button>
+                    }
+                </Authorized>
+                <NotAuthorized>
+                    <button disabled class="btn btn-outline-primary text-white border border-0 ">
+                        <h6 class="oi oi-minus bg-danger p-1 my-0"></h6>
+                        <h5 class="d-inline-block my-0">
+                            @AnswerCommentModel.Reaction.ValueSumNegative
+                        </h5>
+                    </button>
+                    <button disabled class="btn btn-outline-primary text-white border border-0 ">
+                        <h6 class="oi oi-plus bg-success p-1 my-0"></h6>
+                        <h5 class="d-inline-block my-0">
+                            @AnswerCommentModel.Reaction.ValueSumPositive
+                        </h5>
+                    </button>
+                </NotAuthorized>
+            </AuthorizeView>
+        </div>
+    </div>
+    <div>
+        @if (AnswerCommentModel.Description != null)
+        {
+            @if (AnswerCommentModel.Description.Length > _descriptionLength)
+            {
+                <details>
+                    <summary>
+                        @(GetFirstSegment(AnswerCommentModel.Description).ToString())
+
+                    </summary>
+                    @(GetRestSegment(AnswerCommentModel.Description).ToString())
+                </details>
+            }
+            else
+            {
+                <p>
+                    @AnswerCommentModel.Description
+                </p>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CommentModel AnswerCommentModel { get; set; }
+}

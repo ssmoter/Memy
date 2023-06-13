@@ -5,39 +5,39 @@
 @inject AuthenticationStateProvider _authStateProvider
 @inject PopupListService _popUp
 
-<div>
-    <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label style="color:white">
-                Email
-                <InputText class="form-group" id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
-                <ValidationMessage For="@(()=>_user.Email)" />
-            </label>
-        </div>
-        <div class="form-group">
-            <label style="color:white">
-                Hasło
-                <InputText class="form-group" id="password" type="password" @bind-Value="@_user.Password" placeholder="Hasło"></InputText>
-                <ValidationMessage For="@(()=>_user.Password)" />
-            </label>
-        </div>
-        <div>
-            <label style="color:white" class="form-check-label">
-                Chcesz, aby Cię nie wylogowywać?
-                <InputCheckbox @bind-Value="@_user.DoNotLogOut"></InputCheckbox>
-            </label>
-        </div>
-        <div>
-            <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Zaloguj</button>
-        </div>
-        @if (!string.IsNullOrWhiteSpace(error))
-        {
-            <div class="alert alert-danger">@error</div>
-        }
-    </EditForm>
-</div>
+
+<EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="form-group">
+        <label style="color:white">
+            Email
+            <InputText class="form-group" id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
+            <ValidationMessage For="@(()=>_user.Email)" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label style="color:white">
+            Hasło
+            <InputText class="form-group" id="password" type="password" @bind-Value="@_user.Password" placeholder="Hasło"></InputText>
+            <ValidationMessage For="@(()=>_user.Password)" />
+        </label>
+    </div>
+    <div>
+        <label style="color:white" class="form-check-label">
+            Chcesz, aby Cię nie wylogowywać?
+            <InputCheckbox @bind-Value="@_user.DoNotLogOut"></InputCheckbox>
+        </label>
+    </div>
+    <div>
+        <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Zaloguj</button>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+</EditForm>
+
 
 
 

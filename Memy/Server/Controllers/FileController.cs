@@ -50,6 +50,27 @@ namespace Memy.Server.Controllers
             }
         }
 
+        [HttpGet("obj/{id}")]
+        public async Task<IActionResult> GetOne(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return NotFound();
+                }
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+
+                var result = await _fileService.GetTaskModelAsync(id, token);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         //wyświetlanie obrazów
         //GET api/<FileController>/5
         [HttpGet("img/{name}")]

@@ -29,7 +29,7 @@ namespace Memy.Server.Service
                     comment[i].Id = task[i].Id;
                     comment[i].Description = task[i].Description;
                     comment[i].Date = task[i].Date;
-                    comment[i].FileSimpleId = task[i].FileSimpleId;
+                    comment[i].ObjectId = task[i].FileSimpleId;
                     comment[i].User = GetTask.GetValue<User>(task[i].User);
                     comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
                 }
@@ -55,7 +55,7 @@ namespace Memy.Server.Service
                     comment[i].Id = task[i].Id;
                     comment[i].Description = task[i].Description;
                     comment[i].Date = task[i].Date;
-                    comment[i].FileSimpleId = task[i].FileSimpleId;
+                    comment[i].ObjectId = task[i].FileSimpleId;
                     comment[i].User = GetTask.GetValue<User>(task[i].User);
                     comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
                 }

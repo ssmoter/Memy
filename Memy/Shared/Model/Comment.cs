@@ -15,7 +15,7 @@
     public class Comment
     {
         public int Id { get; set; }
-        public int FileSimpleId { get; set; }
+        public int ObjectId { get; set; }
         public int UserId { get; set; }
         public DateTimeOffset Date { get; set; }
         public string Description { get; set; }

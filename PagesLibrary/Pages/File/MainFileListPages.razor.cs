@@ -2,7 +2,7 @@
 
 using Microsoft.Extensions.Logging;
 
-namespace PagesLibrary.Pages
+namespace PagesLibrary.Pages.File
 {
     public partial class MainFileListPages : IDisposable
     {
@@ -14,16 +14,16 @@ namespace PagesLibrary.Pages
             {
                 if (Banned != null)
                 {
-                    _navigation.NavigateTo($"/{Categories}/{index}/{Banned}");
+                    _navigation.NavigateTo($"/directory/{Categories}/{index}/{Banned}");
                 }
                 else
                 {
-                    _navigation.NavigateTo($"/{Categories}/{index}");
+                    _navigation.NavigateTo($"/directory/{Categories}/{index}");
                 }
             }
             else
             {
-                _navigation.NavigateTo($"/{index}");
+                _navigation.NavigateTo($"/directory/{index}");
             }
             Start = index;
             await GetTaskAsync();

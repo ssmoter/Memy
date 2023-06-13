@@ -12,6 +12,9 @@ DECLARE @dateEndAsDate datetimeoffset(7)
 DECLARE @dateStartAsDate datetimeoffset(7)
 DECLARE @tableID table(Id int)
 DECLARE @type int
+DECLARE @userId INT
+
+EXEC dbo.SelectUserId @token,@userid OUTPUT
 
 --ustawienie start jako id ostatniego rekordu
 IF(@start <= 1)
@@ -53,6 +56,7 @@ END
 	,FileModel.Description as 'Description'
 	,FileModel.Date as 'CreatedDate'
 
+--pobranie danych użytkownika
 	,(SELECT Nick AS 'Name' 
 		FROM UserSimple 
 		WHERE UserSimple.Id = FileModel.UserId
@@ -72,23 +76,24 @@ END
 	WHERE FileTagConnected.FileSimpleId=FileModel.Id 
 	FOR JSON PATH) as 'Tag'
 
---pobranie ilosci reakcji
-	,(SELECT SUM(FilerReaction.Value) AS 'ValueSum'
-	--pobranie czy dany użytkownik dodał reakcje i jaką
-	,(SELECT TOP (1) Value
+--pobranie ilosci reakcji + i -
+	,(SELECT SUM(FilerReaction.Value) AS 'ValueSumPositive'
+	,(SELECT SUM(FilerReaction.Value)
+		FROM FilerReaction
+		WHERE FilerReaction.FileSimpleId=FileModel.Id
+		AND FilerReaction.Value < 0)  AS 'ValueSumNegative'
+--pobranie czy dany użytkownik dodał reakcje i jaką
+	,(SELECT TOP (1) Value 
 		FROM FilerReaction 
 		WHERE FilerReaction.FileSimpleId=FileModel.Id
-		AND FilerReaction.UserId=
-				(SELECT UserId
-				FROM [dbo].[UserToken] 
-				WHERE Value = TRY_CAST (@token as UNIQUEIDENTIFIER))) AS 'Value'
-	FROM [FilerReaction]
- 	WHERE FilerReaction.FileSimpleId=FileModel.Id
-	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER ) AS 'Reaction'
+		AND FilerReaction.UserId=@userId) AS 'Value'
+	FROM FilerReaction
+	WHERE FilerReaction.FileSimpleId=FileModel.Id
+	AND FilerReaction.Value > 0
+	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER)AS 'Reaction'
 
 	FROM [dbo].FileSimple AS FileModel
 
-	LEFT JOIN UserSimple ON FileModel.UserId = UserSimple.Id
 	WHERE FileModel.Id <= @start 
 	AND FileModel.Category = @category 
 	AND FileModel.Banned = @banned

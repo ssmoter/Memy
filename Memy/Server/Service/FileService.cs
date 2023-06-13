@@ -84,7 +84,7 @@ namespace Memy.Server.Service
         {
             try
             {
-                var task = await _fileData.GetTaskAsync<GetTask>(start, category, max, banned, dateEnd, dateStart, token);
+                var task = await _fileData.GetTasksAsync<GetTask>(start, category, max, banned, dateEnd, dateStart, token);
 
                 var result = new TaskModel[task.Length];
 
@@ -109,8 +109,36 @@ namespace Memy.Server.Service
                 _logger.LogError(ex.Message);
                 throw;
             }
-
         }
+        public async Task<TaskModel?> GetTaskModelAsync(int id, string token)
+        {
+            try
+            {
+                var task = await _fileData.GetTaskAsync<GetTask>(id, token);
+
+                var result = new TaskModel();
+
+                    result = new TaskModel();
+                    result.Id = task.Id;
+                    result.Title = task.Title;
+                    result.Description = task.Description;
+                    result.CreatedDate = task.CreatedDate;
+
+                    result.User = GetTask.GetValue<User?>(task.User);
+                    result.FileModel = GetTask.GetValue<FileModel[]?>(task.FileModel);
+                    result.Tag = GetTask.GetValue<Tag[]?>(task.Tag);
+                    result.Reaction = GetTask.GetValue<ReactionModel?>(task.Reaction);
+                
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
         private class GetTask
         {
             public int Id { get; set; }

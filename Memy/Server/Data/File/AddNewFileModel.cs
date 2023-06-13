@@ -8,7 +8,8 @@ namespace Memy.Server.Data.File
         Task<bool> AddFileTag(int FileSimpleId, string Value);
         Task<int> CreateNewFile(string token, string title, string description);
         Task<IList<string>> GetTagList();
-        Task<T[]> GetTaskAsync<T>(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart,string? token);
+        Task<T> GetTaskAsync<T>(int id, string? token);
+        Task<T[]> GetTasksAsync<T>(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart, string? token);
         Task<int> InsertFullFile(string json, string token);
     }
 
@@ -79,7 +80,7 @@ namespace Memy.Server.Data.File
 
             return await sqlData.LoadData<bool>(sql.ToString());
         }
-        public async Task<T[]> GetTaskAsync<T>(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, string? token)
+        public async Task<T[]> GetTasksAsync<T>(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, string? token)
         {
             sql.Clear();
             sql.Append("EXEC [GetFileByDate] ");
@@ -124,6 +125,22 @@ namespace Memy.Server.Data.File
 
             return (await sqlData.LoadDataList<T>(sql.ToString())).ToArray();
         }
+        public async Task<T> GetTaskAsync<T>(int id, string? token)
+        {
+            sql.Clear();
+            sql.Append("EXEC [GetSingleFile] ");
+            sql.Append(id);
+
+            if (token != null)
+            {
+                sql.Append(", '");
+                sql.Append(token);
+                sql.Append("'");
+            }
+
+            return await sqlData.LoadData<T>(sql.ToString());
+        }
+
         public async Task<IList<string>> GetTagList()
         {
             sql.Clear();

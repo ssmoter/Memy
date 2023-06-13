@@ -11,6 +11,7 @@
         {
             File = 0,
             Comment = 1,
+            AnswerComment=2,
         }
         public enum OrderTyp
         {

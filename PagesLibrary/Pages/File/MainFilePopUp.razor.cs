@@ -6,9 +6,7 @@ using Microsoft.Extensions.Logging;
 using PagesLibrary.Data;
 using PagesLibrary.Service;
 
-using System.Text;
-
-namespace PagesLibrary.Pages
+namespace PagesLibrary.Pages.File
 {
     public partial class MainFilePopUp : IDisposable
     {
@@ -45,7 +43,7 @@ namespace PagesLibrary.Pages
         private void Close()
         {
 #if DEBUG
-            _logger.LogInformation("Close {0}",TaskModel.Id);
+            _logger.LogInformation("Close {0}", TaskModel.Id);
 #endif
             TaskModel = null;
             IsVisible = false;

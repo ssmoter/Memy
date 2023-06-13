@@ -21,6 +21,7 @@ namespace Memy.Server.Controllers
             _commentData = commentData;
             _commentService = new CommentService(logger, commentData);
         }
+        #region comment
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetComment(int id, int orderTyp = 0)
@@ -64,7 +65,54 @@ namespace Memy.Server.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        #endregion
 
+        #region answer
+
+        [HttpGet("answer/{id}")]
+        public async Task<IActionResult> GetAnswerComment(int id, int orderTyp = 0)
+        {
+            try
+            {
+                if (id < 0)
+                {
+                    return NoContent();
+                }
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+
+                var result = await _commentService.GetComment(ProcedureName.GetAnswerComment, id, orderTyp, token);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [TokenAuthenticationFilter]
+        [HttpPost("answer")]
+        public async Task<IActionResult> InsertAnswerComment([FromBody] Comment model, int orderTyp = 0)
+        {
+            try
+            {
+                if (model == null)
+                {
+                    return NoContent();
+                }
+
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                var result = await _commentService.InsertComment(ProcedureName.InsertAnswerComment, token, model, orderTyp);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
+        #endregion
 
     }
 }

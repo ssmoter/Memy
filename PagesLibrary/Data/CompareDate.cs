@@ -6,6 +6,7 @@
         public static string GetDate(DateTimeOffset dateTimeOffset)
         {
             var date = DateTimeOffset.Now - dateTimeOffset.AddHours(-2).ToUniversalTime();
+
             if (date.TotalSeconds < 60)
             {
                 return $"{(int)date.TotalSeconds} sekund temu";

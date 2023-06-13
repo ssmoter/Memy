@@ -13,6 +13,7 @@ namespace PagesLibrary.Data.File
     {
         string GetImgAsync(string name, string typ);
         Task<HttpResponseMessage> GetTagAsync();
+        Task<HttpResponseMessage> GetTaskModelAsync(int id);
         Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart);
         Task<HttpResponseMessage> PostFileAsync(FileUploadModel file);
     }
@@ -85,6 +86,26 @@ namespace PagesLibrary.Data.File
                     sb.Append(dateStart);
                     sb.Append("&");
                 }
+
+                var result = await client.GetAsync(sb.ToString());
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        //pobieranie jednego pliku
+        public async Task<HttpResponseMessage> GetTaskModelAsync(int id)
+        {
+            try
+            {
+                var client = await SetAuthorizationHeader();
+                StringBuilder sb = new StringBuilder(Routes.File);
+
+                sb.Append("/obj/");
+                sb.Append(id);
 
                 var result = await client.GetAsync(sb.ToString());
 
