@@ -5,71 +5,74 @@
 @inject IReaction _reaction
 @inject ICommentApi _commentApi
 @inject ModalPopUpService _modal
+@inject PagesLibrary.Service.LoginPopUpService _LoginPopup
 
-<div class="p-1 bg-gradient">
+<div class="p-1 bg-gradient pb-sm-0">
     <div class="m-auto">
         <span class="">@CommentModel.User.Name &nbsp;</span>
         <span>@CompareDate.GetDate(CommentModel.Date)</span>
-        <div class=" border border-1 border-primary form-check-inline float-end">
-            <AuthorizeView>
-                <Authorized>
-                    @if (CommentModel.Reaction.Value >= 0)
-                    {
-                        <button class="btn btn-outline-primary text-white border border-0 "
-                        @onclick="@(()=>SetReaction(CommentModel.Id,-1))">
-                            <h6 class="oi oi-minus p-1 my-0"></h6>
-                            <h5 class="d-inline-block my-0">
-                                @CommentModel.Reaction.ValueSumNegative
-                            </h5>
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn  btn-outline-primary text-white border border-0 "
-                        @onclick="@(()=>SetReaction(CommentModel.Id,0))">
-                            <h6 class="oi oi-minus bg-danger p-1 rounded-3 my-0"></h6>
-                            <h5 class="d-inline-block my-0">
-                                @CommentModel.Reaction.ValueSumNegative
-                            </h5>
-                        </button>
-                    }
-                    @if (CommentModel.Reaction.Value <= 0)
-                    {
+        <div class="float-end" style="transform:translateX(1rem);">
+            <div class="border border-1 border-primary form-check-inline float-end rounded-3 m-auto p-auto" style="transform:scale(0.7);">
+                <AuthorizeView>
+                    <Authorized>
+                        @if (CommentModel.Reaction.Value >= 0)
+                        {
+                            <button class="btn btn-outline-primary text-white border border-0 "
+                            @onclick="@(()=>SetReaction(CommentModel.Id,-1))">
+                                <h5 class="oi oi-minus p-1 my-0"></h5>
+                                <h4 class="d-inline-block my-0 ">
+                                    @CommentModel.Reaction.ValueSumNegative
+                                </h4>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn  btn-outline-primary text-white border border-0 "
+                            @onclick="@(()=>SetReaction(CommentModel.Id,0))">
+                                <h5 class="oi oi-minus bg-danger p-1 rounded-3 my-0"></h5>
+                                <h4 class="d-inline-block my-0">
+                                    @CommentModel.Reaction.ValueSumNegative
+                                </h4>
+                            </button>
+                        }
+                        @if (CommentModel.Reaction.Value <= 0)
+                        {
 
-                        <button class="btn btn-outline-primary text-white border border-0 "
-                        @onclick="@(()=>SetReaction(CommentModel.Id,1))">
-                            <h6 class="oi oi-plus p-1 my-0"></h6>
-                            <h5 class="d-inline-block my-0">
-                                @CommentModel.Reaction.ValueSumPositive
-                            </h5>
+                            <button class="btn btn-outline-primary text-white border border-0 "
+                            @onclick="@(()=>SetReaction(CommentModel.Id,1))">
+                                <h5 class="oi oi-plus p-1 my-0"></h5>
+                                <h4 class="d-inline-block my-0">
+                                    @CommentModel.Reaction.ValueSumPositive
+                                </h4>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-primary text-white border border-0 "
+                            @onclick="@(()=>SetReaction(CommentModel.Id,0))">
+                                <h5 class="oi oi-plus p-1 bg-success rounded-3 my-0"></h5>
+                                <h4 class="d-inline-block my-0">
+                                    @CommentModel.Reaction.ValueSumPositive
+                                </h4>
+                            </button>
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <button class="btn btn-outline-primary text-white border border-0 " @onclick="@_LoginPopup.ShowPopUp">
+                            <span class="oi oi-minus bg-danger p-1 my-0"></span>
+                            <span class="d-inline-block my-0">
+                                @CommentModel.Reaction.ValueSumNegative
+                            </span>
                         </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-outline-primary text-white border border-0 "
-                        @onclick="@(()=>SetReaction(CommentModel.Id,0))">
-                            <h6 class="oi oi-plus p-1 bg-success rounded-3 my-0"></h6>
-                            <h5 class="d-inline-block my-0">
+                        <button class="btn btn-outline-primary text-white border border-0" @onclick="@_LoginPopup.ShowPopUp">
+                            <h5 class="oi oi-plus bg-success p-1 my-0"></h5>
+                            <h4 class="d-inline-block my-0">
                                 @CommentModel.Reaction.ValueSumPositive
-                            </h5>
+                            </h4>
                         </button>
-                    }
-                </Authorized>
-                <NotAuthorized>
-                    <button disabled class="btn btn-outline-primary text-white border border-0 ">
-                        <h6 class="oi oi-minus bg-danger p-1 my-0"></h6>
-                        <h5 class="d-inline-block my-0">
-                            @CommentModel.Reaction.ValueSumNegative
-                        </h5>
-                    </button>
-                    <button disabled class="btn btn-outline-primary text-white border border-0 ">
-                        <h6 class="oi oi-plus bg-success p-1 my-0"></h6>
-                        <h5 class="d-inline-block my-0">
-                            @CommentModel.Reaction.ValueSumPositive
-                        </h5>
-                    </button>
-                </NotAuthorized>
-            </AuthorizeView>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
         </div>
     </div>
     <div>
@@ -87,9 +90,9 @@
             }
             else
             {
-                <p>
+                <span>
                     @CommentModel.Description
-                </p>
+                </span>
             }
         }
     </div>

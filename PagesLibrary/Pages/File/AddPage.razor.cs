@@ -7,9 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace PagesLibrary.Pages.File
 {
-    public partial class AddPages : IDisposable
+    public partial class AddPage : IDisposable
     {
-
         #region Preview
         private async Task Preview(InputFileChangeEventArgs inputFile)
         {
@@ -21,8 +20,8 @@ namespace PagesLibrary.Pages.File
 #endif
                 if (inputFile.FileCount > Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
                 {
-                    _error.Add($"Przekroczyłeś dopuszczalną liczbę plików {Environment.NewLine}Dopuszczalna liczba = {Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles}");
-                    _logger.LogError("Too many images max {0}", Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles);
+                    _error.Add($"Przekroczyłeś dopuszczalną liczbę obkiektów {Environment.NewLine}Dopuszczalna liczba = {Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles}");
+                    _logger.LogError("Too many object max {0}", Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles);
                 }
                 for (int i = 0; i < inputFile.FileCount; i++)
                 {
@@ -43,15 +42,50 @@ namespace PagesLibrary.Pages.File
                     if (_fileUploadStatuses[i] != null)
                     {
                         _fileUploadStatuses[_fileUploadStatuses.Count - 1] = result;
+                        _fileUploadStatuses[_fileUploadStatuses.Count - 1].ObjOrder = _fileUploadStatuses.Count;
                     }
-                    _popUp.ShowToats($"{_fileUploadStatuses[i].Name} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
-                    _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].Name);
+
+                    _popUp.ShowToats($"{_fileUploadStatuses[i].ObjName} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
+                    _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].ObjName);
                     StateHasChanged();
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.Message);
+            }
+        }
+        private void PreviewText(string text, int typ)
+        {
+            if (_fileUploadStatuses.Count > Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
+            {
+                _error.Add($"Przekroczyłeś dopuszczalną liczbę obkiektów {Environment.NewLine}Dopuszczalna liczba = {Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles}");
+                _logger.LogError("Too many object max {0}", Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles);
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return;
+            }
+            if (typ == (int)Memy.Shared.Helper.MyEnums.FileTyp.YouTube)
+            {
+                _fileUploadStatuses.Add(new FileUploadStatus()
+                {
+                    ObjName = GetIdYT(text).ToString(),
+                    ObjTyp = typ,
+                    ObjOrder = _fileUploadStatuses.Count,
+                });
+                _ytText = "";
+            }
+            else
+            {
+                _fileUploadStatuses.Add(new FileUploadStatus()
+                {
+                    ObjName = text,
+                    ObjTyp = typ,
+                    ObjOrder = _fileUploadStatuses.Count,
+                });
+                _moreText = "";
             }
         }
         private void RemoveAt(int index)
@@ -60,11 +94,16 @@ namespace PagesLibrary.Pages.File
             {
                 if (_fileUploadStatuses != null)
                 {
-                    var name = _fileUploadStatuses[index].Name;
+                    var name = _fileUploadStatuses[index].ObjName;
                     _fileUploadStatuses.RemoveAt(index);
                     StateHasChanged();
                     _popUp.ShowToats($"{name} został usunięty", "Usunięty", PopupLevel.Level.Info);
                     _logger.LogInformation("Remove item at {0}", index);
+
+                    if (index == _maingImg)
+                    {
+                        _maingImg = 0;
+                    }
                 }
             }
             catch (Exception ex)
@@ -72,7 +111,6 @@ namespace PagesLibrary.Pages.File
                 _logger.LogError(ex.Message);
             }
         }
-
         private void RemoveTagAt(int index)
         {
             if (index >= 0)
@@ -81,6 +119,42 @@ namespace PagesLibrary.Pages.File
                 _logger.LogInformation("Remove tag");
             }
         }
+        private ReadOnlySpan<char> GetIdYT(ReadOnlySpan<char> value)
+        {
+            int start = 0;
+            for (int i = 0; i < value.Length; i++)
+            {
+                if (value[i] == '=')
+                {
+                    start = i + 1;
+                    break;
+                }
+            }
+            return value.Slice(start, value.Length - start);
+        }
+        private void ImgLeft()
+        {
+            if (_maingImg > 0)
+            {
+                _maingImg--;
+            }
+            else
+            {
+                _maingImg = _fileUploadStatuses.Count - 1;
+            }
+        }
+        private void ImgRight()
+        {
+            if (_maingImg < _fileUploadStatuses.Count - 1)
+            {
+                _maingImg++;
+            }
+            else
+            {
+                _maingImg = 0;
+            }
+        }
+
         #endregion
 
         protected override void OnInitialized()
@@ -111,7 +185,7 @@ namespace PagesLibrary.Pages.File
             _logger.LogInformation("Initialized async page");
 #endif
         }
-        public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+        public async void HandleFieldChanged(object sender, FieldChangedEventArgs e)
         {
             if (_editContext != null)
             {
@@ -153,10 +227,14 @@ namespace PagesLibrary.Pages.File
                     for (int i = 0; i < _fileUploadStatuses.Count; i++)
                     {
                         request.FileUploadStatuses[i] = new FileUploadStatus();
-                        request.FileUploadStatuses[i].Name = _fileUploadStatuses[i].Name;
-                        request.FileUploadStatuses[i].Typ = _fileUploadStatuses[i].Typ;
-                        request.FileUploadStatuses[i].Data = new byte[_fileUploadStatuses[i].Data.Length];
-                        request.FileUploadStatuses[i].Data = _fileUploadStatuses[i].Data;
+                        request.FileUploadStatuses[i].ObjName = _fileUploadStatuses[i].ObjName;
+                        request.FileUploadStatuses[i].ObjTyp = _fileUploadStatuses[i].ObjTyp;
+                        request.FileUploadStatuses[i].ObjOrder = _fileUploadStatuses[i].ObjOrder;
+                        if (_fileUploadStatuses[i].Data != null)
+                        {
+                            request.FileUploadStatuses[i].Data = new byte[_fileUploadStatuses[i].Data.Length];
+                            request.FileUploadStatuses[i].Data = _fileUploadStatuses[i].Data;
+                        }
                     }
 
                     var result = await _iFileManager.PostFileAsync(request);
@@ -187,7 +265,6 @@ namespace PagesLibrary.Pages.File
             }
         }
         #endregion
-
 
         public void Dispose()
         {

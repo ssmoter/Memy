@@ -14,4 +14,16 @@ namespace Memy.Shared.Model
             Token = new Token();
         }
     }
+
+    public class UserPublicModel
+    {
+        public int? Id { get; set; }
+        public string? Nick { get; set; }
+        public DateTimeOffset? CreatedDate { get; set; }
+        public int SumTaskLike { get; set; }
+        public int SumTaskUnLike { get; set; }
+        public int NumberOfTask { get; set; }
+        public string? Avatar { get; set; }
+    }
+
 }

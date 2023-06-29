@@ -17,16 +17,8 @@ namespace PagesLibrary.Pages.Comment
 #if DEBUG
             _logger.LogInformation("InitializedAsync");
 #endif
+            _orderTyp = await _commentApi.GetOrderTyp();
             await GetComment(Id, _orderTyp);
-        }
-
-        protected override void OnInitialized()
-        {
-
-            //pobranie OrderTyp z localstorage
-#if DEBUG
-            _logger.LogInformation("Initialized");
-#endif
         }
         #endregion
         public async Task GetComment(int id, int orderTyp)
@@ -46,6 +38,7 @@ namespace PagesLibrary.Pages.Comment
                     {
                         popTyp = !popTyp;
                     }
+                    await _commentApi.SetOrderTyp(orderTyp);
                 }
                 else
                 {

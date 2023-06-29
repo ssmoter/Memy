@@ -1,7 +1,8 @@
 ﻿@page "/directory/{Categories?}"
 @page "/directory/{Categories?}/{Start:int?}/{Banned:bool?}"
-<div>
-    <MainFileListPages Start="@Start" Categories="@Categories" Max="@Max" Banned="@Banned" DateEnd="@DateEnd" DateStart="@DateStart"></MainFileListPages>
+
+<div class="max-width-700">
+    <MainFileListPage Start="@Start" Categories="@Categories" Max="@Max" Banned="@Banned" DateEnd="@DateEnd" DateStart="@DateStart"></MainFileListPage>
 </div>
 
 @code {

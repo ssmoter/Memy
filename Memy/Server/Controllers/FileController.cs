@@ -95,6 +95,29 @@ namespace Memy.Server.Controllers
             }
         }
 
+        [HttpGet("video/{name}")]
+        public async Task<IActionResult> GetVideo(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return NotFound();
+            }
+
+            try
+            {
+                var path = Path.Combine(_webHostEnvironment.ContentRootPath,
+                    _webHostEnvironment.EnvironmentName, FileRequirements.PatchFolderName, name);
+
+                return PhysicalFile(path, "application/octet-stream", enableRangeProcessing: true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest();
+            }
+        }
+
+
         //pobieranie danych posta
         // POST api/<FileController>
         [TokenAuthenticationFilter]

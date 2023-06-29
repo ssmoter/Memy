@@ -2,8 +2,9 @@
 {
     public class FileModel
     {
-        public string? Name { get; set; }
-        public string? Typ { get; set; }
+        public string? ObjName { get; set; }
+        public int ObjTyp { get; set; }
+        public int ObjOrder { get; set; }
     }
 
     public class Tag

@@ -25,10 +25,10 @@ DECLARE @myTable TABLE (id INT)
 
 --dodanie nazwy wysłanych plików 
 	INSERT INTO [dbo].[FileData]
-		(FileSimpleId,ImgName,ImgType)
-		(SELECT @id,Name,Typ 
+		(FileSimpleId,ObjName,ObjType,ObjOrder)
+		(SELECT @id,Name,Typ ,ObjOrder
 		FROM OPENJSON(@json,'$.FileUploadStatuses') 
-		WITH (Name NVARCHAR(MAX), Typ NVARCHAR(MAX)))
+		WITH (Name NVARCHAR(MAX), Typ int,ObjOrder INT))
 
 -- tabela tymczasowa z tagami
     INSERT INTO @tagList(Value)

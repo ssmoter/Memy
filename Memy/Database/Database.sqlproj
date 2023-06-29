@@ -73,9 +73,6 @@
     <Build Include="Table\File\FileData.sql" />
     <Build Include="Table\File\FileTagList.sql" />
     <Build Include="Table\File\FileTagConnected.sql" />
-    <Build Include="Procedure\File\AddFileData.sql" />
-    <Build Include="Procedure\File\AddTag.sql" />
-    <Build Include="Procedure\File\CreateNewFile.sql" />
     <Build Include="Procedure\File\GetFileByDate.sql" />
     <Build Include="Procedure\File\InsertFullFile.sql" />
     <Build Include="Procedure\User\RegisterUser.sql" />

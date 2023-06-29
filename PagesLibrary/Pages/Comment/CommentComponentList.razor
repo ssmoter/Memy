@@ -44,12 +44,11 @@
 </div>
 @if (_commentModel != null)
 {
-    <div class="d-inline-block w-100">
+    <div class="d-inline-block w-100 pt-1">
         @for (int i = 0; i < _commentModel.Length; i++)
         {
             var index = i;
             <div>
-                <br/>
                 <CommentComponent CommentModel="_commentModel[index]" OrderTyp="_orderTyp"/>
             </div>
         }

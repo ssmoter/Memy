@@ -23,14 +23,17 @@ namespace PagesLibrary.Service
             services.AddBlazoredLocalStorageAsSingleton();
             services.AddBlazoredSessionStorageAsSingleton();
             services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
-            services.AddSingleton<BaseApi>();
+            services.AddScoped<BaseApi>();
 
-            services.AddSingleton<ILogInOut, LogInOut>();
-            services.AddSingleton<IFileManager, FileManager>();
-            services.AddSingleton<IReaction, Reaction>();
-            services.AddSingleton<ICommentApi, CommentApi>();
+            services.AddScoped<ILogInOut, LogInOut>();
+            services.AddScoped<IFileManager, FileManager>();
+            services.AddScoped<IReaction, Reaction>();
+            services.AddScoped<ICommentApi, CommentApi>();
 
             services.AddSingleton<MainFilePopUpService>();
+            services.AddSingleton<LoginPopUpService>();
+            services.AddSingleton<CategoriesPopUpServie>();
+
 
             services.AddCompomentsService();
 

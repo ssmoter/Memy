@@ -11,7 +11,7 @@ namespace PagesLibrary.Data
 {
     public class BaseApi
     {
-        private readonly HttpClient _HttpClient;
+        private static HttpClient _HttpClient;
         protected string UrlStringName { get; set; } = "https://localhost:7241/api/";
         private readonly ILocalStorageService _localStorageService;
         private readonly ISessionStorageService _sessionStorageService;
@@ -68,10 +68,7 @@ namespace PagesLibrary.Data
             }
             if (result != null)
             {
-                var byteArr = Convert.FromBase64String(result);
-                string str = Encoding.ASCII.GetString(byteArr);
-
-                user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserStorage>(str);
+                user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(result);
             }
 
             return user;

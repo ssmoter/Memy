@@ -1,0 +1,75 @@
+﻿@implements IDisposable
+@inject ILogger<RegisterPage> _ilogger
+@inject ILogInOut _logInOut
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authStateProvider
+
+<h3>Rejestracja</h3>
+<div>
+    <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        @* <ValidationSummary />*@
+
+        <div class="input-group p-1">
+            <InputText class="w-100 bg-black text-white" id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
+            <ValidationMessage For="@(()=>_user.Email)" />
+        </div>
+        <div class="input-group p-1">
+            <InputText class="w-100 bg-black text-white" id="name" @bind-Value="@_user.Nick" placeholder="Nazwa użytkownika"></InputText>
+            <ValidationMessage For="@(()=>_user.Nick)" />
+        </div>
+        @{
+            var password = showPassword ? "" : "password";
+        }
+        <div class="input-group p-1">
+            <InputText class="w-100 bg-black text-white" id="password" type="@password" @bind-Value="@_user.Password" placeholder="Hasło"></InputText>
+            <ValidationMessage For="@(()=>_user.Password)" />
+        </div>
+        <div class="input-group p-1">
+            <InputText class="w-100 bg-black text-white" id="password" type="@password" @bind-Value="@_user.PasswordConfirm" placeholder="Potwierdź"></InputText>
+        </div>
+            <span class="d-block">
+                <span class="float-end">
+                    <InputCheckbox @bind-Value="@showPassword"></InputCheckbox>
+                    <span>Pokaż hasła</span>
+                </span>
+                <ValidationMessage For="@(()=>_user.PasswordConfirm)" />
+            </span>
+
+        <div>
+            <InputCheckbox @bind-Value="@_user.Statute"></InputCheckbox>
+            <span>
+                Regulamin
+            </span>
+            <ValidationMessage For="@(()=>_user.Statute)" />
+            <p>
+                <details>
+                    <summary>
+                        Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    </summary>
+                    Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero
+                    sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo. Quisque
+                    sit amet est et sapien ullamcorper pharetra. Vestibulum erat wisi, condimentum sed, commodo vitae, ornare
+                    sit amet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus
+                    lacus enim ac dui. Donec non enim in turpis pulvinar facilisis. Ut felis. Praesent dapibus, neque id cursus
+                    faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Aliquam erat volutpat. Nam dui mi,
+                    tincidunt quis, accumsan porttitor, facilisis luctus, metus
+                </details>
+
+            </p>
+        </div>
+        <div class="m-auto d-flex justify-content-end">
+            <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Zarejestruj się</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(error))
+        {
+            <div class="alert alert-danger">@error</div>
+        }
+    </EditForm>
+</div>
+
+
+
+@code {
+
+}

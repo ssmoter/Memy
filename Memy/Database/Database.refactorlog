@@ -49,4 +49,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Value" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="e7eb6212-286b-4092-8887-4399cb5a1cc6" ChangeDateTime="06/17/2023 15:04:26">
+    <Property Name="ElementName" Value="[dbo].[FileData].[ImgName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="objName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fa0560ae-2591-4db1-b509-95f10e2bb28a" ChangeDateTime="06/17/2023 15:04:34">
+    <Property Name="ElementName" Value="[dbo].[FileData].[ImgType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ObjType" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4ca716c6-2204-4ee0-9704-f0be8e1cfe31" ChangeDateTime="06/17/2023 15:04:37">
+    <Property Name="ElementName" Value="[dbo].[FileData].[objName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ObjName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="38d0e7d6-a051-4023-85c2-69178fe18091" ChangeDateTime="06/17/2023 15:13:39">
+    <Property Name="ElementName" Value="[dbo].[FileData].[order]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Order" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ccb0d1e9-da4c-482d-b6c5-a9b637b51168" ChangeDateTime="06/17/2023 15:19:57">
+    <Property Name="ElementName" Value="[dbo].[FileData].[Order]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileData]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ObjOrder" />
+  </Operation>
 </Operations>

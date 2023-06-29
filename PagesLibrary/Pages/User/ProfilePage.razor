@@ -1,0 +1,55 @@
+﻿
+<div class="p-3 ">
+
+    <div class="border border-1 border-primary float-start px-1" style="width:10rem; height:10rem;">
+        <img alt="Avatar" src="~/background.png" />
+    </div>
+    <div class="px-3 float-start">
+        <div>
+            <label>
+                Nazwa: @Name
+            </label>
+        </div>
+        @if (_userPublicModel is not null)
+        {
+            <div>
+                <label>
+                    Data utworzenia konta: @_createdDate
+                </label>
+            </div>
+            <div>
+                <label>
+                    Suma plusów pod postami: @_userPublicModel.SumTaskLike
+                </label>
+            </div>
+            <div>
+                <label>
+                    Suma minusów pod postami: @_userPublicModel.SumTaskUnLike
+                </label>
+            </div>
+            <div>
+                <label>
+                    stosunek polubień: @_percentLike
+                </label>
+            </div>
+            <div>
+                <label>
+                    Suma postów: @_userPublicModel.NumberOfTask
+                </label>
+            </div>
+        }
+        else
+        {
+            <div>Loading...</div>
+        }
+    </div>
+
+</div>
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+    UserPublicModel? _userPublicModel;
+    decimal _percentLike = 0;
+    string? _createdDate;
+}

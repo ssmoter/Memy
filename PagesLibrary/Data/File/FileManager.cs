@@ -11,7 +11,8 @@ namespace PagesLibrary.Data.File
 {
     public interface IFileManager
     {
-        string GetImgAsync(string name, string typ);
+        string GetImg(string name);
+        string GetVideo(string name);
         Task<HttpResponseMessage> GetTagAsync();
         Task<HttpResponseMessage> GetTaskModelAsync(int id);
         Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart);
@@ -88,7 +89,7 @@ namespace PagesLibrary.Data.File
                 }
 
                 var result = await client.GetAsync(sb.ToString());
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -108,7 +109,7 @@ namespace PagesLibrary.Data.File
                 sb.Append(id);
 
                 var result = await client.GetAsync(sb.ToString());
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -117,9 +118,14 @@ namespace PagesLibrary.Data.File
             }
         }
         //ustawianie adresu z img
-        public string GetImgAsync(string name, string typ)
+        public string GetImg(string name)
         {
-            string url = $"{UrlStringName}{Routes.File}/{Routes.Img}/{name}.{typ}";
+            string url = $"{UrlStringName}{Routes.File}/{Routes.Img}/{name}";
+            return url;
+        }
+        public string GetVideo(string name)
+        {
+            string url = $"{UrlStringName}{Routes.File}/{Routes.Video}/{name}";
             return url;
         }
         //pobieranie tagów
@@ -129,6 +135,7 @@ namespace PagesLibrary.Data.File
             {
                 var client = await SetAuthorizationHeader();
                 var result = await client.GetAsync(Routes.Tag);
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)

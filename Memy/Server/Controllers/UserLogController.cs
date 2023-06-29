@@ -29,36 +29,6 @@ namespace Memy.Server.Controllers
             _loginService = new LoginService(userData, tokenManager, logger);
         }
 
-
-        // GET: api/<UserLogController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        // GET api/<UserLogController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
-        {
-            return "value";
-        }
-
-        [HttpPost("Register")]
-        public async Task<IActionResult> PostRegister([FromBody] int? a)
-        {
-            try
-            {
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return BadRequest(ex.Message);
-            }
-        }
-
         // POST api/<UserLogController>
         [HttpPost]
         public async Task<IActionResult> PostLogIn([FromBody] UserSimple? value)
@@ -76,10 +46,8 @@ namespace Memy.Server.Controllers
                     {
                         result.Role = null;
                     }
-                    var json = Newtonsoft.Json.JsonConvert.SerializeObject(result, Newtonsoft.Json.Formatting.Indented, JsonSettings.JsonSerializerSettings());
-                    
-                    var bytes = Encoding.UTF8.GetBytes(json);
-                    var jsonBytes = Convert.ToBase64String(bytes);
+
+                    var jsonBytes = Memy.Shared.Helper.ConvertByteString.ConvertToString(result);
 
                     return Ok(jsonBytes);
                 }
@@ -90,13 +58,6 @@ namespace Memy.Server.Controllers
                 _logger.LogError(ex.Message);
                 return BadRequest(ex.Message);
             }
-        }
-
-        // PUT api/<UserLogController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] UserSimple value)
-        {
-
         }
 
         // DELETE api/<UserLogController>/5

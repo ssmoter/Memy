@@ -14,8 +14,9 @@ namespace Memy.Server.Data.File
             {
                 var status = new FileUploadStatus()
                 {
-                    Name = file.Name,
-                    Typ = file.Typ
+                    ObjName = file.ObjName,
+                    ObjTyp = file.ObjTyp,
+                    ObjOrder = file.ObjOrder,
                 };
                 using (MemoryStream ms = new MemoryStream(file.Data))
                 {
@@ -26,26 +27,25 @@ namespace Memy.Server.Data.File
                         return status;
                     }
                     //sprawdzanie czy rozszerzenia pliku
-                    if (!FileRequirements.FileTypAccess.Any(x => x == status.Typ))
+                    if (!FileRequirements.FileTypAccess.Any(x => x == GetType(status.ObjName).ToString()))
                     {
                         //status.Error = "Nie poprawne rozszerzenie pliku";
                         return status;
                     }
                     //bezpieczna nazwa
-                    var trustedFileName = ToStringFromGuid(Guid.NewGuid());
+                    var trustedFileName = ToStringFromGuid(Guid.NewGuid()) + "." + GetType(status.ObjName).ToString();
                     //ścieżka do folderu
                     var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName);
                     //tworzenie folderu
                     CreateFolder(path);
                     //ścieżka do pliku
                     path = Path.Combine(path, trustedFileName);
-                    path = Path.ChangeExtension(path, status.Typ);
                     //zapisanie pliku
                     using (FileStream fs = new FileStream(path, FileMode.Create))
                     {
                         await ms.CopyToAsync(fs);
                     }
-                    status.Name = trustedFileName;
+                    status.ObjName = trustedFileName;
                 }
                 return status;
             }
@@ -88,10 +88,9 @@ namespace Memy.Server.Data.File
             }
         }
         //usuwanie plikow
-        public static void DeleteFile(string name, string typ, IWebHostEnvironment webHost)
+        public static void DeleteFile(string name, IWebHostEnvironment webHost)
         {
             var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName, name);
-            path = Path.ChangeExtension(path, typ);
             if (System.IO.File.Exists(path))
             {
                 System.IO.File.Delete(path);

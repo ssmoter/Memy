@@ -1,16 +1,19 @@
 ﻿@page "/add"
 
+
 <AuthorizeView>
     <NotAuthorized>
         <div>
             <p>
-               Zaloguj się 
+                Zaloguj się
             </p>
-            <LoginPages></LoginPages>
+            <LoginPage></LoginPage>
         </div>
     </NotAuthorized>
     <Authorized>
-        <AddPages></AddPages>
+        <div class="bg-black bg-opacity-25" style="max-width:800px">
+            <AddPage></AddPage>
+        </div>
     </Authorized>
 </AuthorizeView>
 

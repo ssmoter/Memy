@@ -1,20 +1,22 @@
 ﻿@using PagesLibrary.Data.File
 @using PagesLibrary.Service;
 
-@inject ILogger<MainFileListPages> _logger
+@inject ILogger<MainFileListPage> _logger
 @inject IFileManager _iFileManager
 @inject NavigationManager _navigation
 @inject PopupListService _popUp
 @inject IReaction _reaction
 @inject MainFilePopUpService _mainPopup
 
-<div style="max-width:700px">
+
+
+<div>
     @if (TaskModels != null)
     {
         @for (int i = 0; i < TaskModels.Length; i++)
         {
             var index = i;
-            <MainFilePage TaskModel="@TaskModels[index]"/>
+            <MainFilePage TaskModel="@TaskModels[index]" />
         }
     }
     else
@@ -72,4 +74,5 @@
     public string? DateEnd { get; set; }
     [Parameter]
     public string? DateStart { get; set; }
+
 }

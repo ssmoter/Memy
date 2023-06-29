@@ -1,0 +1,11 @@
+﻿@page "/profile/{Name?}"
+
+<div class="max-width-700 m-auto d-flex justify-content-center">
+    <ProfilePage Name="@Name" />
+</div>
+
+
+@code {
+    [Parameter]
+    public string? Name { get; set; }
+}

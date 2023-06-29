@@ -30,10 +30,13 @@ namespace Memy.Server.Service
                         var status = new FileUploadStatus();
                         for (int i = 0; i < model.Length; i++)
                         {
-                            if (i >= Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
-                                break;
-                            status = await CheckingFile.CorrectData(model[i], _webHostEnvironment);
-                            model[i] = status;
+                            if (model[i].ObjTyp == (int)MyEnums.FileTyp.image || model[i].ObjTyp == (int)MyEnums.FileTyp.video)
+                            {
+                                if (i >= Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
+                                    break;
+                                status = await CheckingFile.CorrectData(model[i], _webHostEnvironment);
+                                model[i] = status;
+                            }
                         }
                     }
                 }
@@ -71,7 +74,7 @@ namespace Memy.Server.Service
                 {
                     for (int i = 0; i < model.FileUploadStatuses.Length; i++)
                     {
-                        CheckingFile.DeleteFile(model.FileUploadStatuses[i].Name, model.FileUploadStatuses[i].Typ, _webHostEnvironment);
+                        CheckingFile.DeleteFile(model.FileUploadStatuses[i].ObjName, _webHostEnvironment);
                     }
                 }
                 _logger.LogError(ex.Message);
@@ -101,7 +104,6 @@ namespace Memy.Server.Service
                     result[i].Tag = GetTask.GetValue<Tag[]?>(task[i].Tag);
                     result[i].Reaction = GetTask.GetValue<ReactionModel?>(task[i].Reaction);
                 }
-
                 return result;
             }
             catch (Exception ex)
@@ -118,17 +120,17 @@ namespace Memy.Server.Service
 
                 var result = new TaskModel();
 
-                    result = new TaskModel();
-                    result.Id = task.Id;
-                    result.Title = task.Title;
-                    result.Description = task.Description;
-                    result.CreatedDate = task.CreatedDate;
+                result = new TaskModel();
+                result.Id = task.Id;
+                result.Title = task.Title;
+                result.Description = task.Description;
+                result.CreatedDate = task.CreatedDate;
 
-                    result.User = GetTask.GetValue<User?>(task.User);
-                    result.FileModel = GetTask.GetValue<FileModel[]?>(task.FileModel);
-                    result.Tag = GetTask.GetValue<Tag[]?>(task.Tag);
-                    result.Reaction = GetTask.GetValue<ReactionModel?>(task.Reaction);
-                
+                result.User = GetTask.GetValue<User?>(task.User);
+                result.FileModel = GetTask.GetValue<FileModel[]?>(task.FileModel);
+                result.Tag = GetTask.GetValue<Tag[]?>(task.Tag);
+                result.Reaction = GetTask.GetValue<ReactionModel?>(task.Reaction);
+
 
                 return result;
             }

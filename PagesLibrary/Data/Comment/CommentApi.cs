@@ -29,7 +29,7 @@ namespace PagesLibrary.Data.Comment
                 sb.Append(orderTyp);
 
                 var result = await client.GetAsync(sb.ToString());
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -45,7 +45,7 @@ namespace PagesLibrary.Data.Comment
                 string url = $"{Routes.Comment}?orderTyp={orderTyp}";
 
                 var result = await client.PostAsJsonAsync(url, comment);
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -67,7 +67,7 @@ namespace PagesLibrary.Data.Comment
                 sb.Append(orderTyp);
 
                 var result = await client.GetAsync(sb.ToString());
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -83,7 +83,7 @@ namespace PagesLibrary.Data.Comment
                 string url = $"{Routes.Comment}/answer?orderTyp={orderTyp}";
 
                 var result = await client.PostAsJsonAsync(url, comment);
-
+                await IfUnauthorized(result);
                 return result;
             }
             catch (Exception)
@@ -91,7 +91,17 @@ namespace PagesLibrary.Data.Comment
                 throw;
             }
         }
-
+        public async Task<int> GetOrderTyp()
+        {
+            var local = this.GetLocalStorage();
+            var order = await local.GetItemAsync<int>("order");
+            return order;
+        }
+        public async Task SetOrderTyp(int order)
+        {
+            var local = this.GetLocalStorage();
+            await local.SetItemAsync<int>("order",order);
+        }
 
     }
 }

@@ -1,0 +1,53 @@
+﻿@using Memy.Shared.Helper;
+@using Microsoft.AspNetCore.Components.Routing
+@inject ILogger<CategoriesPopUp> _logger
+
+@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="modal @showClass bg-opacity-75 bg-dark" @onclick="MouseClose" @onmouseout="@MouseOut">
+    <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:300px;" @onmousemove="@MouseEnter">
+        <div class="toast-container p-1 bg-black w-100">
+
+            <div class="toast show w-100 bg-dark " role="application">
+                <div class="toast-header ">
+                    <strong class="m-auto">Dostępne kategorie</strong>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close())"></button>
+                </div>
+                <div class="toast-body ">
+                    <table class="table table-active">
+                        <tr class="">
+                            <td>
+                                <div class="nav-item px-3">
+                                    <NavLink class="nav-link" href="/" @onclick="Close">
+                                        <span class="oi oi-browser" aria-hidden="true"></span> Główna
+                                    </NavLink>
+                                </div>
+                            </td>
+                            <td>
+
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="nav-item px-3">
+                                    <NavLink class="nav-link" href="@(directory+Categories.Waiting)" @onclick="Close">
+                                        <span class="oi oi-browser" aria-hidden="true"></span> Nowe
+                                    </NavLink>
+                                </div>
+                            </td>
+                        </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+}
+

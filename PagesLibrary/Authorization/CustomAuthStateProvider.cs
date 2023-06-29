@@ -27,23 +27,28 @@ namespace PagesLibrary.Authorization
 
             UserStorage? user;
 
-            user = await GetUserStorage();
-
-            if (user != null)
+            try
             {
-                //jeżeli jest model zostaje utworzene nowy model z danymi użytkowniak
-                var identity = new ClaimsIdentity(new[]
+                user = await GetUserStorage();
+                if (user != null)
                 {
+                    //jeżeli jest model zostaje utworzene nowy model z danymi użytkowniak
+                    var identity = new ClaimsIdentity(new[]
+                    {
                     new Claim(ClaimTypes.Name,user.UserName),
                     new Claim(ClaimTypes.SerialNumber,user.Token)
                 }, "Memy");
 
-                if (!string.IsNullOrWhiteSpace(user.Role))
-                {
-                    identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+                    if (!string.IsNullOrWhiteSpace(user.Role))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));
+                    }
+                    state = new AuthenticationState(new ClaimsPrincipal(identity));
                 }
-                state = new AuthenticationState(new ClaimsPrincipal(identity));
             }
+            catch (Exception)
+            { }
+
 
             NotifyAuthenticationStateChanged(Task.FromResult(state));
             return state;
@@ -61,9 +66,7 @@ namespace PagesLibrary.Authorization
             }
             if (result != null)
             {
-                var byteArr = Convert.FromBase64String(result);
-                string str = Encoding.ASCII.GetString(byteArr);
-                user = Newtonsoft.Json.JsonConvert.DeserializeObject<UserStorage>(str);
+                user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(result);
             }
 
             return user;

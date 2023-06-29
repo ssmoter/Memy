@@ -52,16 +52,16 @@ namespace Memy.Server.TokenAuthentication
             {
                 return false;
             }
-            //w pierwszej kolejności sprawdzana jest lista
-            if (TokenIds.FirstOrDefault(
-                x => x.Value == token
-                && !x.DoNotLogOut
-                | x.ExpiryDate > DateTimeOffset.Now) != null)
-            {
-                return true;
-            }
+            ////w pierwszej kolejności sprawdzana jest lista
+            //if (TokenIds.FirstOrDefault(
+            //    x => x.Value == token
+            //    && !x.DoNotLogOut
+            //    | x.ExpiryDate > DateTimeOffset.Now) != null)
+            //{
+            //    return true;
+            //}
             //w innym przypadku sprawdzana jest baza danych
-            else if (IUser.CheckToken(token).Result)
+            if (IUser.CheckToken(token).Result)
             {
                 return true;
             }

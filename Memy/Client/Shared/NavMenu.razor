@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using PagesLibrary.Service;
+@inject LoginPopUpService _loginPopUp
+@inject CategoriesPopUpServie _categoriesPopUp
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Memy</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -18,25 +22,28 @@
             @{
                 var link = $"/directory/{@Memy.Shared.Helper.Categories.Waiting}";
                 <NavLink class="nav-link" href="@link">
-                    <span class="oi oi-list" aria-hidden="true"></span> Nowe
+                    <span class="oi oi-browser" aria-hidden="true"></span> Nowe
                 </NavLink>
             }
         </div>
-        @*
         <div class="nav-item px-3">
-        <NavLink class="nav-link" href="fetchdata">
-        <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-        </NavLink>
-        </div>*@
+            <NavLink class="nav-link" @onclick="_categoriesPopUp.ShowPopUp">
+                <span class="oi oi-list" aria-hidden="true"></span> Więcej kategorii
+            </NavLink>
+        </div>
+
+
         <AuthorizeView>
             <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="register">
-                        <span class="oi oi-account-login" aria-hidden="true"></span> Zarejestruj się
+                <div class="nav-item px-3" @onclick="_loginPopUp.ShowPopUp">
+                    <NavLink class="nav-link">
+                        <span class="oi oi-account-login" aria-hidden="true"></span> Zaloguj się
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <LoginPages></LoginPages>
+                    <NavLink class="nav-link" href="register">
+                        <span class="oi oi-document" aria-hidden="true"></span> Zarejestruj się
+                    </NavLink>
                 </div>
             </NotAuthorized>
             <Authorized>
@@ -46,7 +53,7 @@
                     </NavLink>
                 </div>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@context.User.Identity.Name">
+                    <NavLink class="nav-link" href="@($"profile/{@context.User.Identity.Name}")">
                         <span class="oi oi-person" aria-hidden="true"></span> @context.User.Identity.Name
                     </NavLink>
                 </div>
@@ -62,11 +69,11 @@
 
 @code {
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
     }
+
 }

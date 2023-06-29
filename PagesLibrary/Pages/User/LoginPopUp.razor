@@ -1,0 +1,25 @@
+﻿@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="modal @showClass bg-opacity-75 bg-dark" style="z-index:1077;" @onclick="MouseClose"
+@onmouseout="@MouseOut">
+    <div class="modal-dialog modal-dialog-centered" style="z-index:2066;" @onmousemove="@MouseEnter">
+        <div class="toast-container p-1 @showClass">
+            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <strong class="me-auto">Logowanie</strong>
+                    <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close())"></button>
+                </div>
+
+                <div class="toast-body text-black bg-dark">
+                   <LoginPage/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

@@ -100,3 +100,48 @@ a, .btn-link {
         content: var(--blazor-load-percentage-text, "Loading");
     }
 
+.max-width-700 {
+    max-width: 700px;
+}
+
+.max-width-800 {
+    max-width: 800px;
+}
+
+
+.smallObj {
+    width: 80px;
+    height: 80px;
+}
+
+.arrow-size-2 {
+    transform: scale(2);
+}
+
+.swip-arrow {
+    z-index: 50;
+    opacity: 0.1;
+}
+
+    .swip-arrow:hover {
+        opacity: 1;
+    }
+
+.arrow-right {
+    transform: translateX(-2rem);
+}
+
+
+.arrow-left {
+    transform: translateX(2rem);
+}
+
+.img-small {
+    display: inline-block;
+    max-width: 100%;
+}
+
+
+@media (max-width: 1000px) {
+}
+

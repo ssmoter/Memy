@@ -29,11 +29,11 @@ namespace Memy.Server.Service
                 }
                 var result = new UserStorage();
                 LoginUser.UserSimpleParse(user, result);
-                _tokenManager.NewToken(new Token()
-                {
-                    Value = user.Value,
-                    ExpiryDate = user.ExpiryDate
-                });
+                //_tokenManager.NewToken(new Token()
+                //{
+                //    Value = user.Value,
+                //    ExpiryDate = user.ExpiryDate
+                //});
 
                 return result;
             }
@@ -62,6 +62,8 @@ namespace Memy.Server.Service
                 throw;
             }
         }
+
+
 
         class LoginUser
         {

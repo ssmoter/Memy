@@ -1,0 +1,45 @@
+﻿@implements IDisposable
+@inject ILogger<LoginPage> _ilogger
+@inject ILogInOut _logInOut
+@inject NavigationManager _navigation
+@inject AuthenticationStateProvider _authStateProvider
+@inject PopupListService _popUp
+@inject PagesLibrary.Service.LoginPopUpService _loginPopUp
+
+<EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    @*<ValidationSummary />*@
+    <div class="form-group">
+        <label style="color:white" class="w-100">
+            Email
+            <InputText class="form-group w-100" id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
+            <ValidationMessage For="@(()=>_user.Email)" />
+        </label>
+    </div>
+    <div class="form-group">
+        <label style="color:white" class="w-100">
+            Hasło
+            <InputText class="form-group w-100" id="password" type="password" @bind-Value="@_user.Password" placeholder="Hasło"></InputText>
+            <ValidationMessage For="@(()=>_user.Password)" />
+        </label>
+    </div>
+    <div>
+        <label style="color:white" class="form-check-label">
+            Chcesz, aby Cię nie wylogowywać?
+            <InputCheckbox @bind-Value="@_user.DoNotLogOut"></InputCheckbox>
+        </label>
+    </div>
+    <div class="m-auto d-flex justify-content-end">
+        <button class="btn btn-primary" type="submit" disabled="@_formInvalid">Zaloguj</button>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(error))
+    {
+        <div class="alert alert-danger">@error</div>
+    }
+</EditForm>
+
+
+
+
+@code {
+}

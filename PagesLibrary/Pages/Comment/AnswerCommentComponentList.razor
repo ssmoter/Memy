@@ -6,46 +6,54 @@
 @inject IReaction _reaction
 @inject ICommentApi _commentApi
 @inject ModalPopUpService _modal
+@inject Service.LoginPopUpService _loginPopUp
 
-<div>
-    <button class="btn btn-outline-primary" @onclick="@(()=>addComment=!addComment)">Dodaj odpowiedź</button>
-</div>
-<div class="px-5">
-    @if (addComment)
-    {
-        <AuthorizeView Context="authContext">
-            <Authorized>
+<AuthorizeView>
+    <Authorized>
+        <button class="btn btn-outline-primary border-0" style="transform:scale(0.8)" @onclick="@(()=>addComment=!addComment)">Dodaj odpowiedź</button>
+    </Authorized>
+    <NotAuthorized>
+        <button class="btn btn-outline-primary border-0" style="transform:scale(0.8)" @onclick="@(()=>_loginPopUp.ShowPopUp())">Dodaj odpowiedź</button>
+    </NotAuthorized>
+</AuthorizeView>
 
-                <EditForm Context="formContext" Model="@NewComment" OnValidSubmit="@OnValidSubmit">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-                    <div class="p-2 w-100">
-                        <InputTextArea class="bg-black text-white w-100" @bind-Value="@NewComment.Description" placeholder="Nowy komentarz" />
-                        <div class="float-end">
-                            <button type="submit" class="btn btn-outline-primary" aria-label="submit">Prześlij</button>
-                        </div>
+
+@if (addComment)
+{
+    <AuthorizeView Context="authContext">
+        <Authorized>
+
+            <EditForm Context="formContext" Model="@NewComment" OnValidSubmit="@OnValidSubmit">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="p-2 w-100">
+                    <InputTextArea class="bg-black text-white w-100" @bind-Value="@NewComment.Description" placeholder="Nowy komentarz" />
+                    <div class="float-end pb-1">
+                        <button type="submit" class="btn btn-outline-primary" aria-label="submit">Prześlij</button>
                     </div>
-                </EditForm>
-            </Authorized>
-        </AuthorizeView>
-    }
-    @if (_commentModel != null)
-    {
-        <div class="d-inline-block w-100">
-            @for (int i = 0; i < _commentModel.Length; i++)
-            {
-                var index = i;
-                <div>
-                    <AnswerCommentComponent AnswerCommentModel="_commentModel[index]" />
                 </div>
-            }
-        </div>
-    }
-    else
-    {
-        <span>Loading...</span>
-    }
-</div>
+            </EditForm>
+        </Authorized>
+    </AuthorizeView>
+}
+@if (_commentModel != null)
+{
+    <div class="d-inline-block w-100 ps-5">
+        @for (int i = 0; i < _commentModel.Length; i++)
+        {
+            var index = i;
+            <div>
+                <AnswerCommentComponent AnswerCommentModel="_commentModel[index]" />
+            </div>
+        }
+    </div>
+}
+else
+{
+    <span>Loading...</span>
+}
+
+
 @code {
 
     [Parameter]

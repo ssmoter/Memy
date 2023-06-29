@@ -7,7 +7,7 @@ namespace PagesLibrary.Service
         public event Action<TaskModel?>? OnShow;
         public void ShowPopUp(TaskModel model)
         {
-             OnShow?.Invoke(model);
+            OnShow?.Invoke(model);
         }
     }
 }

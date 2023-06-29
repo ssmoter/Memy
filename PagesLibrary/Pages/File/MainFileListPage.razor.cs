@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace PagesLibrary.Pages.File
 {
-    public partial class MainFileListPages : IDisposable
+    public partial class MainFileListPage : IDisposable
     {
         public TaskModel[]? TaskModels { get; set; }
 

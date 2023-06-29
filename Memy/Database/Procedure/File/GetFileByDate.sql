@@ -63,7 +63,10 @@ END
 		FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'User'
 
 --pobranie listy zdjęć
-	,(SELECT FileData.ImgName as 'Name',FileData.ImgType as'Typ'
+	,(SELECT 
+	FileData.ObjName as 'Name'
+	,FileData.ObjType as'Typ'
+	,FileData.ObjOrder as 'Order'
 	FROM [FileData] 
 	WHERE [FileData].FileSimpleId=FileModel.Id
 	FOR JSON PATH) AS 'FileModel'

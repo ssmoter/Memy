@@ -16,6 +16,7 @@ namespace PagesLibrary.Pages.File
         private int _maingImg { get; set; } = 0;
 
         [Inject] MainFilePopUpService? mainFilePopUpService { get; set; }
+        private CancellationTokenSource FinishConfirm;
 
         protected override void OnInitialized()
         {
@@ -34,10 +35,35 @@ namespace PagesLibrary.Pages.File
             _date = CompareDate.GetDate(taskModel.CreatedDate);
             StateHasChanged();
         }
+
         private void ChangeImg(int index)
         {
             _maingImg = index;
         }
+        private void ImgLeft()
+        {
+            if (_maingImg > 0)
+            {
+                _maingImg--;
+            }
+            else
+            {
+                _maingImg = TaskModel.FileModel.Length - 1;
+            }
+        }
+        private void ImgRight()
+        {
+            if (_maingImg < TaskModel.FileModel.Length - 1)
+            {
+                _maingImg++;
+            }
+            else
+            {
+                _maingImg = 0;
+            }
+        }
+
+
         #region Close
 
         private void Close()
@@ -48,7 +74,6 @@ namespace PagesLibrary.Pages.File
             TaskModel = null;
             IsVisible = false;
             StateHasChanged();
-
         }
         private void MouseClose()
         {

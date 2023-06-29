@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Memy.Server.Helper
+namespace Memy.Shared.Helper
 {
     public static class JsonSettings
     {

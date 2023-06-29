@@ -25,6 +25,7 @@ namespace PagesLibrary.Data
                 var client = await SetAuthorizationHeader();
                 var react = new ReactionModel(reactionId, value, typOfReaction);
                 var result = await client.PostAsJsonAsync(Routes.Reaction, react);
+                await IfUnauthorized(result);
                 if (result.IsSuccessStatusCode)
                 {
                     var json = await result.Content.ReadAsStringAsync();

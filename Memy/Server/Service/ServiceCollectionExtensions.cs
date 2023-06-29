@@ -16,7 +16,7 @@ namespace Memy.Server.Service
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<IUserData, LoginData>();
 
-            services.AddSingleton<ITokenManager, TokenManager>();
+            services.AddTransient<ITokenManager, TokenManager>();
 
             services.AddTransient<IAddNewFileModel, AddNewFileModel>();
             services.AddTransient<IReactionDataBase, ReactionDataBase>();

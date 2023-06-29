@@ -1,11 +1,12 @@
 ﻿@using CompomentsLibrary.Pages
+@using PagesLibrary.Data.File;
 @inherits LayoutComponentBase
 @inject PopupListService _popUp
 @inject ModalPopUpService _modal
+@inject IFileManager _iFileManager
+@inject ILogger<MainLayout> _logger
 
-<PopupList />
-<ModalPopUp />
-<MainFilePopUp/>
+<AllPopUp />
 
 <div class="page">
     <div class="sidebar">
@@ -19,13 +20,14 @@
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
         </div>
 
-        <article class="content px-4">
+        <article class="content px-1">
             @Body
         </article>
     </main>
 </div>
 
 @code {
+
     int n = 0;
     private async Task PopUpListTest()
     {

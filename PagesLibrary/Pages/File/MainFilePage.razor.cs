@@ -94,7 +94,28 @@ namespace PagesLibrary.Pages.File
             _maingImg = index;
         }
 
-
+        private void ImgLeft()
+        {
+            if (_maingImg > 0)
+            {
+                _maingImg--;
+            }
+            else
+            {
+                _maingImg = TaskModel.FileModel.Length - 1;
+            }
+        }
+        private void ImgRight()
+        {
+            if (_maingImg < TaskModel.FileModel.Length - 1)
+            {
+                _maingImg++;
+            }
+            else
+            {
+                _maingImg = 0;
+            }
+        }
         public void Dispose()
         {
             TaskModel = null;

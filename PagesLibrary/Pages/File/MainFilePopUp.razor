@@ -10,13 +10,17 @@
 
 @if (TaskModel != null)
 {
-    <div class="modal @showClass bg-opacity-75 bg-dark " @onclick="MouseClose" @onmouseout="@MouseOut">
+    <div class="modal @showClass bg-opacity-75 bg-dark" @onclick="MouseClose" @onmouseout="@MouseOut">
         <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:800px;" @onmousemove="@MouseEnter">
             <div class="toast-container p-1 bg-black w-100">
 
                 <div class="toast show w-100 bg-dark " role="application">
-                    <div class="toast-header sectionTitle">
-                        <strong class="me-auto">@TaskModel.Title</strong>
+                    <div class="toast-header ">
+                        <strong class="me-auto">
+                            <Microsoft.AspNetCore.Components.Routing.NavLink class="nav-link" href="@($"/obj/{TaskModel.Id}")">
+                                <h4>@TaskModel.Title</h4>
+                            </Microsoft.AspNetCore.Components.Routing.NavLink>
+                        </strong>
                         <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close())"></button>
                     </div>
                     <div class="toast-body">
@@ -35,18 +39,43 @@
                             if (TaskModel.FileModel.Length > 1)
                             {
                                 <div class="m-auto d-flex justify-content-center">
-                                    @for (int j = 0; j < TaskModel.FileModel.Length; j++)
-                                    {
-                                        var img = j;
-                                        <button class="btn" @onclick="@(()=>ChangeImg(img))">
-                                            <img src="@(_iFileManager.GetImgAsync(TaskModel.FileModel[j].Name,TaskModel.FileModel[j].Typ))"
-                                                 alt="@TaskModel.FileModel[j].Name" width="50" height="50" loading="lazy" />
-                                        </button>
-                                    }
+                                    <div class="float-start ">
+                                        @for (int j = 0; j < TaskModel.FileModel.Length; j++)
+                                        {
+                                            var img = j;
+                                            <button class="btn p-1 " @onclick="@(()=>ChangeImg(img))">
+                                                @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[j].ObjName))
+                                                {
+                                                    <span class="smallObj">
+                                                        <ObjectTypeComponent IsSmall="true" fileModel="TaskModel.FileModel[j]"></ObjectTypeComponent>
+                                                    </span>
+                                                }
+                                            </button>
+                                        }
+                                    </div>
                                 </div>
                             }
-                            <img src="@(_iFileManager.GetImgAsync(TaskModel.FileModel[_maingImg].Name,TaskModel.FileModel[_maingImg].Typ))"
-                                 alt="@TaskModel.FileModel[_maingImg].Name" style="width: 100%; object-fit: cover;" loading="lazy" />
+                            <div class="position-relative m-auto justify-content-center d-flex">
+
+                                @if (TaskModel.FileModel.Length > 1)
+                                {
+                                    <span class="arrow-left swip-arrow">
+                                        <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-left px-1 arrow-size-2 rounded-circle top-50" @onclick="@(ImgLeft)"></button>
+                                    </span>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[_maingImg].ObjName))
+                                {
+                                    <ObjectTypeComponent fileModel="TaskModel.FileModel[_maingImg]"></ObjectTypeComponent>
+                                }
+
+                                @if (TaskModel.FileModel.Length > 1)
+                                {
+                                    <span class="arrow-right swip-arrow">
+                                        <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-right px-1  arrow-size-2 rounded-circle top-50" @onclick="@(ImgRight)"></button>
+                                    </span>
+                                }
+
+                            </div>
                         }
                     </div>
                     <div class="toast-body ">

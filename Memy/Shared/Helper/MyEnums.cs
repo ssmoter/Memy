@@ -11,14 +11,22 @@
         {
             File = 0,
             Comment = 1,
-            AnswerComment=2,
+            AnswerComment = 2,
         }
         public enum OrderTyp
         {
-            DateDESC= 0,
+            DateDESC = 0,
             DateASC = 1,
-            ReactionDESC=2, 
-            ReactionASC=3,
+            ReactionDESC = 2,
+            ReactionASC = 3,
         }
+        public enum FileTyp
+        {
+            text = 1,
+            image,
+            video,
+            YouTube,
+        }
+
     }
 }
