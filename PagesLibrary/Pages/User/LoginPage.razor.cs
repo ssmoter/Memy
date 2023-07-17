@@ -14,9 +14,11 @@ namespace PagesLibrary.Pages.User
 
         protected override void OnInitialized()
         {
-            _ilogger.LogInformation("Initialized page");
             _editContext = new EditContext(_user);
             _editContext.OnFieldChanged += HandleFieldChanged;
+#if DEBUG
+            _ilogger.LogInformation("Initialized page");
+#endif
         }
         public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
         {
@@ -75,7 +77,6 @@ namespace PagesLibrary.Pages.User
 
         public void Dispose()
         {
-            _ilogger.LogInformation("Dispose");
             if (_editContext != null)
             {
                 _editContext.OnFieldChanged -= HandleFieldChanged;
@@ -83,6 +84,9 @@ namespace PagesLibrary.Pages.User
             _editContext = null;
             _user = null;
             error = "";
+#if DEBUG
+            _ilogger.LogInformation("Dispose");
+#endif
         }
 
         class LoginUser

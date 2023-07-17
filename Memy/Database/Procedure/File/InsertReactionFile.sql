@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[InsertReactionFile]
 @fileSimpleId int,
 @value int,
-@token NVARCHAR(MAX)
-
+@token NVARCHAR(MAX),
+@get bit = 1
 AS
 DECLARE @exists int
 DECLARE @userId int
@@ -31,6 +31,8 @@ ELSE
 	END
 
 
+	IF(@get = 1)
+	BEGIN
 	--pobranie ilosci reakcji + i -
 	SELECT SUM(FilerReaction.Value) AS 'ValueSumPositive'
 	,(SELECT SUM(FilerReaction.Value)
@@ -46,6 +48,7 @@ ELSE
 	WHERE FilerReaction.FileSimpleId=@fileSimpleId
 	AND FilerReaction.Value > 0
 	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER
+	END
 
 
 END

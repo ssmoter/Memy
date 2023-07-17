@@ -4,6 +4,7 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging;
 
 using System.Net;
@@ -21,6 +22,10 @@ namespace PagesLibrary.Data.User
     public class LogInOut : BaseApi, ILogInOut
     {
         public LogInOut(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        {
+        }
+
+        public LogInOut(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 
@@ -73,7 +78,7 @@ namespace PagesLibrary.Data.User
                     }
                 };
                 //przesłanie hasła w postaci byte zapisanych jako string
-                newUser.Password = System.BitConverter.ToString(System.Text.Encoding.UTF8.GetBytes(password));
+                newUser.Password = ConvertByteString.ConvertToString(password);
                 var result = await _httpClient.PostAsJsonAsync(Routes.UserLog, newUser);
                 var content = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)

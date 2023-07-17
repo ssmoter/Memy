@@ -1,16 +1,17 @@
 ﻿using Memy.Server.Data.User;
 using Memy.Server.TokenAuthentication;
+using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 namespace Memy.Server.Service
 {
     public class LoginService
     {
-        private readonly IUserData _userData;
+        private readonly ILoginData _userData;
         private readonly ITokenManager _tokenManager;
         private readonly ILogger _logger;
 
-        public LoginService(IUserData userData, ITokenManager tokenManager, ILogger logger)
+        public LoginService(ILoginData userData, ITokenManager tokenManager, ILogger logger)
         {
             _userData = userData;
             _tokenManager = tokenManager;
@@ -22,7 +23,7 @@ namespace Memy.Server.Service
         {
             try
             {
-                var user = await _userData.LogIn<LoginUser>(value.Email, value.Password, value.Token.DoNotLogOut);
+                var user = await _userData.LogIn<LoginUser>(value.Email, ConvertByteString.ConvertToObject<string>(value.Password), value.Token.DoNotLogOut);
                 if (user.Id == 0)
                 {
                     return null;

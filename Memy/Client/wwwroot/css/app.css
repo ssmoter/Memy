@@ -141,7 +141,12 @@ a, .btn-link {
     max-width: 100%;
 }
 
+.hideTextInSmall{
+}
 
 @media (max-width: 1000px) {
+    .hideTextInSmall {
+        display: none !important
+    }
 }
 

@@ -23,20 +23,48 @@ namespace Memy.Server.Data
 
             for (int i = 0; i < args.Length; i++)
             {
+                if (i > 0)
+                {
+                    sql.Append(", ");
+                }
                 if (args[i] is string)
                 {
-                    sql.Append("'");
+                    sql.Append("N'");
                     sql.Append(args[i]);
-                    sql.Append("', ");
+                    sql.Append("' ");
                 }
                 else
                 {
                     sql.Append(args[i]);
-                    sql.Append(", ");
                 }
             }
             return await sqlData.LoadData<T>(sql.ToString());
         }
+        public async Task<IList<T>> ExecProcedureList<T>(string procedure, params object?[] args)
+        {
+            sql.Clear();
+            sql.Append("EXEC [dbo].[");
+            sql.Append(procedure);
+            sql.Append("] ");
 
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (i > 0)
+                {
+                    sql.Append(", ");
+                }
+                if (args[i] is string)
+                {
+                    sql.Append("N'");
+                    sql.Append(args[i]);
+                    sql.Append("' ");
+                }
+                else
+                {
+                    sql.Append(args[i]);
+                }
+            }
+            return await sqlData.LoadDataList<T>(sql.ToString());
+        }
     }
 }

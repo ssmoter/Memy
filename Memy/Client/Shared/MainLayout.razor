@@ -14,32 +14,16 @@
     </div>
 
     <main>
-        <div class="top-row px-4  bg-black text-white">
-            <button @onclick="ModalTest">+</button>
-            <button @onclick="PopUpListTest">+</button>
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <div class="top-row px-4  bg-opacity-75 bg-black text-white">
+            <UserMessagesComponent />
         </div>
 
         <article class="content px-1">
             @Body
         </article>
+
     </main>
 </div>
 
 @code {
-
-    int n = 0;
-    private async Task PopUpListTest()
-    {
-        _popUp.ShowToats("Popup body text", "None", CompomentsLibrary.Helper.PopupLevel.Level.None, 10);
-        _popUp.ShowToats("Popup body text", "Info", CompomentsLibrary.Helper.PopupLevel.Level.Info, 2);
-        _popUp.ShowToats("Popup body text", "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning, 3);
-        _popUp.ShowToats("Popup body text", "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error, 4);
-        _popUp.ShowToats("Popup body text", "Success", CompomentsLibrary.Helper.PopupLevel.Level.Success, 5);
-    }
-    private async Task ModalTest()
-    {
-        var result = await _modal.ShowPopup("headre", "body", "Yes", "No");
-        _popUp.ShowToats("Popup body text", result.ToString(), CompomentsLibrary.Helper.PopupLevel.Level.None);
-    }
 }

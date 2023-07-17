@@ -10,6 +10,7 @@
             "jpg",  //1
             "gif",  //2
             "mp4",  //3
+            "svg"
         };
         public static string PatchFolderName { get => "unsafe_uploads"; }
     }

@@ -1,50 +1,149 @@
-﻿
-<div class="p-3 ">
+﻿@using PagesLibrary.Pages.User.ProfileEdit
 
-    <div class="border border-1 border-primary float-start px-1" style="width:10rem; height:10rem;">
-        <img alt="Avatar" src="~/background.png" />
-    </div>
-    <div class="px-3 float-start">
-        <div>
-            <label>
-                Nazwa: @Name
-            </label>
-        </div>
+@inject ILogger<ProfilePage> _ilogger
+@inject IProfileData _profile
+@inject PopupListService _popUp
+@inject IFileManager _fileManager
+@inject ICommentApi _comment
+@inject AuthenticationStateProvider _authStateProvider
+
+<div class="m-auto d-flex justify-content-center ">
+
+    <div class="p-3 bg-gradient w-100 w-auto rounded-3">
         @if (_userPublicModel is not null)
         {
-            <div>
-                <label>
-                    Data utworzenia konta: @_createdDate
-                </label>
-            </div>
-            <div>
-                <label>
-                    Suma plusów pod postami: @_userPublicModel.SumTaskLike
-                </label>
-            </div>
-            <div>
-                <label>
-                    Suma minusów pod postami: @_userPublicModel.SumTaskUnLike
-                </label>
-            </div>
-            <div>
-                <label>
-                    stosunek polubień: @_percentLike
-                </label>
-            </div>
-            <div>
-                <label>
-                    Suma postów: @_userPublicModel.NumberOfTask
-                </label>
+            <div class="float-start">
+                <AvatarComponent ImgName="@_userPublicModel.Avatar" AvatarSize="@Memy.Shared.Helper.MyEnums.AvatarSize.Profile" />
             </div>
         }
-        else
-        {
-            <div>Loading...</div>
-        }
+
+        <div class="px-3 float-start">
+
+            @if (_userPublicModel is not null)
+            {
+                <table class="table table-primary text-white ">
+                    <tr class="">
+                        <th>@Name</th>
+                    </tr>
+
+                    <tr>
+                        <td>Data utworzenia konta:</td>
+                        <td class="text-center">@_createdDate</td>
+                    </tr>
+                    <tr>
+                        <td>Suma plusów pod postami:</td>
+                        <td class="text-center">@_userPublicModel.SumTaskLike</td>
+                    </tr>
+                    <tr>
+                        <td>Suma minusów pod postami:</td>
+                        <td class="text-center">@_userPublicModel.SumTaskUnLike</td>
+                    </tr>
+                    <tr>
+                        <td>stosunek polubień:</td>
+                        <td class="text-center">@_percentLike</td>
+                    </tr>
+                    <tr>
+                        <td>Suma postów:</td>
+                        <td class="text-center">@_userPublicModel.NumberOfTask</td>
+                    </tr>
+
+                </table>
+            }
+            else
+            {
+                <div>Loading...</div>
+            }
+        </div>
+
+        <div class="d-block">
+
+            <AuthorizeView>
+                <Authorized>
+                    @if (context.User.Identity.Name == Name)
+                    {
+                        <button class="btn btn-outline-primary text-white border-0 w-100" @onclick="BtnEditProfile">Edytuj</button>
+                        @if (editProfil)
+                        {
+                            <span class="">
+                                <ProfileOptionsComponent Func="CalculateProfile" />
+                            </span>
+                        }
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </div>
     </div>
 
+
 </div>
+
+
+
+
+
+
+
+
+
+<div class="w-100">
+    <div class="text-center ">
+        <div class="text-center">Wczytaj</div>
+        <div>
+            <button class="btn btn-outline-primary text-white border-0" @onclick="BtnGetTasksAsync">Posty</button>
+            <button class="btn btn-outline-primary text-white border-0" @onclick="BtnGetCommentAsync">Komentarze</button>
+            <AuthorizeView>
+                <Authorized>
+                    @if (context.User.Identity.Name == Name)
+                    {
+                        <button class="btn btn-outline-primary text-white border-0" @onclick="BtnGetLikeTasksAsync">Polubione posty</button>
+                        <button class="btn btn-outline-primary text-white border-0" @onclick="BtnGetLikeCommentAsync">Polubione komentarze</button>
+                    }
+                </Authorized>
+            </AuthorizeView>
+        </div>
+    </div>
+</div>
+
+@if (_taskModels != null)
+{
+    <div>
+        <div class="m-auto d-flex justify-content-end">
+            <div class="float-end d-inline w-auto">
+                <DropDownList List="_orderList" @bind-Value="@_orderTyp" Func="ChangePageTask"></DropDownList>
+            </div>
+        </div>
+        @for (int i = 0; i < _taskModels.Length; i++)
+        {
+            var index = i;
+
+            <MainFilePage TaskModel="@_taskModels[index]" />
+
+        }
+        <br />
+        <NextPageButtonsComponent Start="_start" OnClick="ChangePage" />
+    </div>
+}
+else if (_commentModel != null)
+{
+    <div class="w-100 pt-1">
+        <div class="m-auto d-flex justify-content-end">
+            <div class=" w-auto">
+                <DropDownList List="_orderList" @bind-Value="@_orderTyp" Func="ChangePageComment"></DropDownList>
+            </div>
+        </div>
+
+        @for (int i = 0; i < _commentModel.Length; i++)
+        {
+            var index = i;
+            <div>
+                <CommentComponent CommentModel="_commentModel[index]" OrderTyp="int.Parse(_orderTyp.Item1)" />
+            </div>
+        }
+    </div>
+}
+
+
+
 
 @code {
     [Parameter]
@@ -52,4 +151,24 @@
     UserPublicModel? _userPublicModel;
     decimal _percentLike = 0;
     string? _createdDate;
+    bool editProfil;
+
+    TaskModel[]? _taskModels;
+    int _start = 0;
+    int _max = 10;
+    (string, string) _orderTyp = ("0", "");
+    bool _likeSelectedTask = false;
+
+    CommentModel[]? _commentModel;
+    bool _likeSelectedComment = false;
+
+
+    (string, string)[] _orderList = new (string, string)[]
+    {
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateDESC).ToString(),"Najnowsze"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateASC).ToString(),"Najstarsze"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionDESC).ToString(),"Popularne"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionASC).ToString(),"Niepopularne"),
+
+    };
 }

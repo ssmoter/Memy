@@ -7,10 +7,17 @@
 @inject ModalPopUpService _modal
 @inject PagesLibrary.Service.LoginPopUpService _LoginPopup
 
-<div class="p-1 bg-gradient pb-sm-0">
+<div class="p-1 bg-gradient pb-sm-0 w-100 overflow-hidden">
     <div class="m-auto">
-        <span class="">@CommentModel.User.Name &nbsp;</span>
-        <span>@CompareDate.GetDate(CommentModel.Date)</span>
+
+        <div class="d-inline-flex h-auto">
+            <AvatarComponent AvatarSize="@Memy.Shared.Helper.MyEnums.AvatarSize.Comment" ImgName="@CommentModel.User.Avatar" />
+            <div class="h-auto justify-content-center m-auto">
+                <div class="top-50">@CommentModel.User.Name</div>
+                <div class="top-50">@CompareDate.GetDate(CommentModel.Date)</div>
+            </div>
+        </div>
+
         <div class="float-end" style="transform:translateX(1rem);">
             <div class="border border-1 border-primary form-check-inline float-end rounded-3 m-auto p-auto" style="transform:scale(0.7);">
                 <AuthorizeView>
@@ -75,13 +82,13 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="w-100">
         @if (CommentModel.Description != null)
         {
             @if (CommentModel.Description.Length > _descriptionLength)
             {
-                <details>
-                    <summary>
+                <details class="w-100">
+                    <summary class="w-100">
                         @(GetFirstSegment(CommentModel.Description).ToString())
 
                     </summary>

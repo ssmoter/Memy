@@ -1,21 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace PagesLibrary.Pages.User
 {
     public partial class RegisterPage
     {
-        RegisterUser _user = new RegisterUser();
-        EditContext? _editContext;
-        private bool? _formInvalid = false;
-        string? error = "";
-        bool showPassword = false;
 
         protected override void OnInitialized()
         {
@@ -79,7 +68,7 @@ namespace PagesLibrary.Pages.User
             }
         }
 
-       private class RegisterUser
+        private class RegisterUser
         {
             [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Nazwa użytkownika jest wymagana")]
             public string? Nick { get; set; }

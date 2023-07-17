@@ -1,0 +1,43 @@
+﻿@using Microsoft.AspNetCore.Authorization;
+
+<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+    <Authorized>
+        <div class="dropdown">
+
+            <button class="btn btn-outline-primary text-white" @onclick="Show">
+                <span class="oi oi-menu"></span>
+                <span class="hideTextInSmall">Panel administratora</span>
+            </button>
+
+            @{
+                var showClass = IsVisible ? "d-block" : "d-none";
+            }
+
+            @if (Model != null)
+            {
+                <div class="p-1 bg-black bg-opacity-75 dropdown-menu  @showClass">
+                    <div class="text-center ">
+
+                        <AdminChangeOfCategoryComponent/>
+                        <AdminBanButtonComponent Id="@Model.Id" Title="@Model.Title" Type="Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="Func"/>
+                        <AdminDeleteButtonComponent Id="@Model.Id" Title="@Model.Title" Type="Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="Func"/>
+
+                    </div>
+                </div>
+
+            }
+
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+
+@code {
+    [Parameter]
+    public TaskModel? Model { get; set; }
+    [Parameter]
+    public Func<Task>? Func { get; set; }
+
+    bool IsVisible;
+
+}

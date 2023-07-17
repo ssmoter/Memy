@@ -114,5 +114,39 @@ namespace Memy.Server.Controllers
 
         #endregion
 
+        [Route("User")]
+        [HttpGet]
+        public async Task<IActionResult> GetUserComment(string? name, int orderTyp = 0)
+        {
+            try
+            {
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+
+                if (string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(token))
+                {
+                    if (string.IsNullOrWhiteSpace(token))
+                    {
+                        return Unauthorized();
+                    }
+                    var resultLike = await _commentService.GetLikeUserComment(token, orderTyp);
+                    return Ok(resultLike);
+                }
+
+                var resultPost = await _commentService.GetUserComment(name, orderTyp);
+
+                if (resultPost==null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(resultPost);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return BadRequest(ex.Message);
+            }
+        }
+
     }
 }

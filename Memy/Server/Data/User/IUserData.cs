@@ -1,9 +1,14 @@
-﻿namespace Memy.Server.Data.User
+﻿using Memy.Shared.Model;
+
+namespace Memy.Server.Data.User
 {
     public interface IUserData
     {
-        Task<bool> CheckToken(Guid? value);
-        Task<T> LogIn<T>(string email, string password, bool doNotLogOut);
-        Task LogOut(string value);
+        Task<string> GetEmail(string token);
+        Task<UserPublicModel> GetProfil(string name);
+        Task<bool> NameIsAvailable(string value);
+        Task UpdateAvatar(string token, string avatar);
+        Task UpdateName(string token, string value);
+        Task UpdatePassword(string token, string old, string @new);
     }
 }

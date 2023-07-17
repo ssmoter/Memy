@@ -17,9 +17,11 @@ EXEC [dbo].[SelectUserId] @token,@userId OUTPUT
 	,Comment.Date
 	,Comment.Description
 
-	--pobranie danych użytkownika
+		--pobranie danych użytkownika
 	,(SELECT Nick AS 'Name' 
+			,Avatar AS 'Avatar'
 		FROM UserSimple 
+		JOIN UserData on UserSimple.Id = UserData.UserId
 		WHERE UserSimple.Id = Comment.UserId
 		FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'User'
 

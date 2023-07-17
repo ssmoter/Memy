@@ -1,0 +1,73 @@
+﻿@inject ILogger<UserMessagesComponent> _logger
+@inject IReportedMessagesApi _messagesApi
+
+<AuthorizeView>
+    <Authorized>
+
+        @{
+            int number = 0;
+            if (messages != null)
+            {
+                number = messages.Count(x => x.BeenChecked == false);
+            }
+            var newMessages = number > 0 ? "btn-outline-danger" : "btn-outline-primary";
+        }
+
+
+
+        <div class="dropdown" style="direction:rtl;">
+            <button class="btn @newMessages text-white" @onclick="BtnGetMessages">
+                @if (number > 0)
+                {
+                    <span>@number</span>
+                }
+                <span class="hideTextInSmall">Komunikaty</span>
+                <span class="oi oi-bell"></span>
+            </button>
+
+            @{
+                var showClass = IsVisible ? "d-block" : "d-none";
+            }
+            @if (messages != null)
+            {
+                <div class="bg-black bg-opacity-75 position-absolute  @showClass" style="max-height:50vh;">
+                    <div class="float-end " style="direction:ltr; max-height: 50vh; overflow-y: auto;">
+                        @for (int i = 0; i < messages.Count; i++)
+                        {
+                            var showClassItemDelete = messages[i].BeenDelete ? "d-none" : "d-block";
+                            var showClassItemChecked = messages[i].BeenChecked ? "" : "bg-danger";
+                            var index = i;
+
+                            <div class="toast-container p-2 @showClassItemDelete @showClassItemChecked " @onmouseover="@(()=>this.IsChecked(index))">
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header">
+
+                                        <Microsoft.AspNetCore.Components.Routing.NavLink class="me-auto" href="@($"/obj/{messages[index].FileSimpleId}")">
+                                            @messages[index].Header
+                                        </Microsoft.AspNetCore.Components.Routing.NavLink>
+                                        <span>@CompareDate.GetDate(messages[i].CreatedDate)</span>
+                                        <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>BtnRemoveMessages(index))"></button>
+
+                                    </div>
+
+                                    <div class="toast-body text-black">
+                                        @messages[i].Body
+                                    </div>
+                                </div>
+                            </div>
+
+                        }
+
+                    </div>
+                </div>
+            }
+        </div>
+
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    bool IsVisible;
+    private List<ReportedMessagesModel>? messages;
+
+}

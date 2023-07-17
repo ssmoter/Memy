@@ -1,0 +1,14 @@
+﻿
+<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+    <Authorized>
+        <span>
+            @ReportedSum
+        </span>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    [Parameter]
+    public int ReportedSum { get; set; }
+
+}

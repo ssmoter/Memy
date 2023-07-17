@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Memy.Shared.Model
+﻿namespace Memy.Shared.Model
 {
     public class UserSimple
     {
@@ -25,5 +23,12 @@ namespace Memy.Shared.Model
         public int NumberOfTask { get; set; }
         public string? Avatar { get; set; }
     }
+
+    public struct Password
+    {
+        public string Old { get; set; }
+        public string New { get; set; }
+    }
+
 
 }

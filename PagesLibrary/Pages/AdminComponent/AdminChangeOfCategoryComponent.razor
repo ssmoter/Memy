@@ -1,0 +1,22 @@
+﻿<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+    <Authorized>
+
+        <span class="px-1">
+            <button class="btn btn-outline-primary text-white">
+                <span class="oi oi-star"></span>
+                <span class="hideTextInSmall">Główna</span>
+            </button>
+        </span>
+
+        <span class="px-1">
+            <button class="btn btn-outline-primary text-white">
+                <span class="oi oi-cog"></span>
+                <span class="hideTextInSmall">Zmiana kategori</span>
+            </button>
+        </span>
+    </Authorized>
+</AuthorizeView>
+@code {
+
+
+}

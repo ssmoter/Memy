@@ -4,27 +4,38 @@
 
 AS
 DECLARE @userId INT
+DECLARE @admin bit = 0
+
 BEGIN
 
-EXEC dbo.SelectUserId @token,@userid OUTPUT
+EXEC dbo.GetAdminId @token, @userId OUTPUT
+IF @userId>0
+	SET @admin=1
+ELSE
+	EXEC dbo.SelectUserId @token,@userid OUTPUT
+
 
 SELECT TOP (1) 
 	 FileModel.Id as'Id'
 	,FileModel.Title as'Title' 
 	,FileModel.Description as 'Description'
 	,FileModel.Date as 'CreatedDate'
+	,FileModel.Banned as 'Banned'
+
 
 --pobranie danych użytkownika
 	,(SELECT Nick AS 'Name' 
+			,Avatar AS 'Avatar'
 		FROM UserSimple 
+		JOIN UserData on UserSimple.Id = UserData.UserId
 		WHERE UserSimple.Id = FileModel.UserId
 		FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'User'
 
 --pobranie listy zdjęć
 	,(SELECT 
-	FileData.ObjName as 'Name'
-	,FileData.ObjType as'Typ'
-	,FileData.ObjOrder as 'Order'	
+	FileData.ObjName as 'ObjName'
+	,FileData.ObjType as'ObjTyp'
+	,FileData.ObjOrder as 'ObjOrder'	
 	FROM [FileData] 
 	WHERE [FileData].FileSimpleId=FileModel.Id
 	FOR JSON PATH) AS 'FileModel'
@@ -52,6 +63,18 @@ SELECT TOP (1)
 	WHERE FilerReaction.FileSimpleId=FileModel.Id
 	AND FilerReaction.Value > 0
 	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER)AS 'Reaction'
+
+	--pobranie ilości reportów i czy user zgłosił
+,(SELECT SUM(FileReported.Value) as'ValueSum'
+	,(SELECT FileReported.Value 
+	FROM FileReported
+	WHERE FileReported.FileSimpleId=@id
+		AND FileReported.UserId=@userId) AS 'Value'
+	FROM FileReported
+	WHERE FileReported.FileSimpleId=@id
+	AND @admin=1
+	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'Reported'
+
 
 
 	FROM [dbo].FileSimple AS FileModel

@@ -1,0 +1,86 @@
+﻿@using Memy.Shared.Helper;
+@inject IFileManager _fileManager
+
+
+
+<div class="px-1 h-100 ">
+    <div class="top-50">
+        <div class="border border-1 border-primary m-1 @SetSize()">
+            @if (Dowloand)
+            {
+                <img alt="Avatar" src="@url" width="@width" height="@height" />
+            }
+            else
+            {
+                <img alt="Avatar" src="@ImgName" width="@width" height="@height" />
+            }
+
+        </div>
+    </div>
+</div>
+
+
+
+
+@code {
+    [Parameter]
+    public MyEnums.AvatarSize AvatarSize { get; set; }
+
+    [Parameter]
+    public string? ImgName { get; set; }
+
+    [Parameter]
+    public bool Dowloand { get; set; } = true;
+
+    string url = "";
+    int width = 0;
+    int height = 0;
+
+    protected override void OnInitialized()
+    {
+        if (Dowloand)
+            url = _fileManager.GetImg(ImgName);
+    }
+
+    string answer = "avatar-AnswerComment";
+    string commnt = "avatar-Comment";
+    string file = "avatar-File";
+    string profile = "avatar-Profile";
+    string none = "d-none";
+
+    private string SetSize()
+    {
+        switch (AvatarSize)
+        {
+            case MyEnums.AvatarSize.AnswerComment:
+                {
+                    width = 32;
+                    height = 32;
+                }
+                return answer;
+
+            case MyEnums.AvatarSize.Comment:
+                {
+                    width = 32;
+                    height = 32;
+                }
+                return commnt;
+
+            case MyEnums.AvatarSize.File:
+                {
+                    width = 64;
+                    height = 64;
+                }
+                return file;
+
+            case MyEnums.AvatarSize.Profile:
+                {
+                    width = 184;
+                    height = 184;
+                }
+                return profile;
+        }
+        return none;
+    }
+
+}

@@ -1,11 +1,14 @@
 ﻿using Memy.Server.Data.Comment;
 using Memy.Shared.Model;
 
+using Microsoft.Extensions.Primitives;
+
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Memy.Server.Service
 {
-    public class CommentService
+    internal class CommentService
     {
         private readonly ILogger _logger;
         private readonly ICommentData _commentData;
@@ -47,6 +50,60 @@ namespace Memy.Server.Service
             try
             {
                 var task = await _commentData.GetComment<GetTask>(procedure, id, orderTyp, token);
+
+                var comment = new CommentModel[task.Length];
+                for (int i = 0; i < comment.Length; i++)
+                {
+                    comment[i] = new CommentModel();
+                    comment[i].Id = task[i].Id;
+                    comment[i].Description = task[i].Description;
+                    comment[i].Date = task[i].Date;
+                    comment[i].ObjectId = task[i].FileSimpleId;
+                    comment[i].User = GetTask.GetValue<User>(task[i].User);
+                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                }
+
+                return comment;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<CommentModel[]> GetLikeUserComment(string token, int orderTyp)
+        {
+            try
+            {
+                var task = await _commentData.GetLikeUserComment<GetTask>(orderTyp, token);
+
+                var comment = new CommentModel[task.Length];
+                for (int i = 0; i < comment.Length; i++)
+                {
+                    comment[i] = new CommentModel();
+                    comment[i].Id = task[i].Id;
+                    comment[i].Description = task[i].Description;
+                    comment[i].Date = task[i].Date;
+                    comment[i].ObjectId = task[i].FileSimpleId;
+                    comment[i].User = GetTask.GetValue<User>(task[i].User);
+                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                }
+
+                return comment;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                throw;
+            }
+        }
+
+        public async Task<CommentModel[]> GetUserComment(string? name, int orderTyp)
+        {
+            try
+            {
+                var task = await _commentData.GetUserComment<GetTask>(orderTyp, name);
 
                 var comment = new CommentModel[task.Length];
                 for (int i = 0; i < comment.Length; i++)

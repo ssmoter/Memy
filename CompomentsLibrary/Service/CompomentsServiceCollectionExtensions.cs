@@ -16,6 +16,7 @@ namespace CompomentsLibrary.Service
         {
             services.AddSingleton<PopupListService>();
             services.AddSingleton<ModalPopUpService>();
+            services.AddSingleton<ModalAdminMessageService>();
 
             return services;
         }

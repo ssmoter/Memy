@@ -13,12 +13,23 @@
 @if (TaskModel != null)
 {
     <div class="p-1 bg-gradient rounded-top">
+
+        @if (TaskModel.Banned)
+        {
+            <div class="w-100 bg-danger text-center">
+                Dany post został zbanowany
+            </div>
+        }
+
         <Microsoft.AspNetCore.Components.Routing.NavLink class="nav-link" href="@($"/obj/{TaskModel.Id}")">
             <h4 class="">@TaskModel.Title</h4>
         </Microsoft.AspNetCore.Components.Routing.NavLink>
-        <div>
-            <span>@TaskModel.User.Name</span>
-            <span>@_date</span>
+        <div class="d-inline-flex h-auto">
+            <AvatarComponent AvatarSize="@Memy.Shared.Helper.MyEnums.AvatarSize.File" ImgName="@TaskModel.User.Avatar" />
+            <div class="h-auto justify-content-center m-auto">
+                <div class="top-50">@TaskModel.User.Name</div>
+                <div class="top-50">@_date</div>
+            </div>
         </div>
         <div>
             @if (TaskModel.Tag != null)
@@ -95,78 +106,96 @@
                 </div>
             }
         </div>
-        <div class="m-auto d-sm-flex justify-content-center p-1 ">
-            @if (Id <= 0)
-            {
-                <button class="btn btn-outline-primary text-white border border-1 border-primary" @onclick="@(() => _mainPopup.ShowPopUp(TaskModel))">Komentarze</button>
-                <span>&nbsp;</span>
-            }
-            <div class="border border-1 border-primary form-check-inline rounded-3 ">
-                <AuthorizeView>
-                    <Authorized>
-                        @if (TaskModel.Reaction.Value >= 0)
-                        {
-                            <button class="btn btn-outline-primary text-white border border-0 "
-                            @onclick="@(()=>SetReaction(TaskModel.Id,-1))">
-                                <h5 class="oi oi-minus p-1 my-0"></h5>
-                                <h4 class="d-inline-block my-0">
-                                    @TaskModel.Reaction.ValueSumNegative
-                                </h4>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn  btn-outline-primary text-white border border-0 "
-                            @onclick="@(()=>SetReaction(TaskModel.Id,0))">
-                                <h5 class="oi oi-minus bg-danger p-1 rounded-3 my-0"></h5>
-                                <h4 class="d-inline-block my-0">
-                                    @TaskModel.Reaction.ValueSumNegative
-                                </h4>
-                            </button>
-                        }
-                        @if (TaskModel.Reaction.Value <= 0)
-                        {
 
-                            <button class="btn btn-outline-primary text-white border border-0 "
-                            @onclick="@(()=>SetReaction(TaskModel.Id,1))">
-                                <h5 class="oi oi-plus p-1 my-0"></h5>
-                                <h4 class="d-inline-block my-0">
-                                    @TaskModel.Reaction.ValueSumPositive
-                                </h4>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-outline-primary text-white border border-0 "
-                            @onclick="@(()=>SetReaction(TaskModel.Id,0))">
-                                <h5 class="oi oi-plus p-1 bg-success rounded-3 my-0"></h5>
-                                <h4 class="d-inline-block my-0">
-                                    @TaskModel.Reaction.ValueSumPositive
-                                </h4>
-                            </button>
-                        }
-                    </Authorized>
-                    <NotAuthorized>
-                        <button class="btn btn-outline-primary text-white border border-0 " @onclick="@_LoginPopup.ShowPopUp">
-                            <h5 class="oi oi-minus bg-danger p-1 my-0"></h5>
-                            <h4 class="d-inline-block my-0">
-                                @TaskModel.Reaction.ValueSumNegative
-                            </h4>
+        <div class="p-1">
+            <div class="m-auto d-flex justify-content-center">
+
+                <AdminPanelComponent Model="TaskModel" Func="Func"></AdminPanelComponent>
+
+                <ReportButtonComponent Reported="TaskModel.Reported" Id="TaskModel.Id"></ReportButtonComponent>
+
+
+                @if (Id <= 0)
+                {
+                    <span class="px-1">
+                        <button class="btn btn-outline-primary text-white " @onclick="@(() => _mainPopup.ShowPopUp(TaskModel))">
+                            <span class="oi oi-chat"></span>
+                            <span class="hideTextInSmall">Komentarze</span>
                         </button>
-                        <button class="btn btn-outline-primary text-white border border-0 " @onclick="@_LoginPopup.ShowPopUp">
-                            <h5 class="oi oi-plus bg-success p-1 my-0"></h5>
-                            <h4 class="d-inline-block my-0">
-                                @TaskModel.Reaction.ValueSumPositive
-                            </h4>
-                        </button>
-                    </NotAuthorized>
-                </AuthorizeView>
+                    </span>
+                }
+
+                <div class="px-1">
+                    <div class="border border-1 border-primary form-check-inline me-0 rounded-3 ">
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (TaskModel.Reaction.Value >= 0)
+                                {
+                                    <button class="btn btn-outline-primary text-white border border-0 "
+                                    @onclick="@(()=>SetReaction(TaskModel.Id,-1))">
+                                        <h5 class="oi oi-minus p-1 my-0"></h5>
+                                        <h4 class="d-inline-block my-0">
+                                            @TaskModel.Reaction.ValueSumNegative
+                                        </h4>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn  btn-outline-primary text-white border border-0 "
+                                    @onclick="@(()=>SetReaction(TaskModel.Id,0))">
+                                        <h5 class="oi oi-minus bg-danger p-1 rounded-3 my-0"></h5>
+                                        <h4 class="d-inline-block my-0">
+                                            @TaskModel.Reaction.ValueSumNegative
+                                        </h4>
+                                    </button>
+                                }
+                                @if (TaskModel.Reaction.Value <= 0)
+                                {
+
+                                    <button class="btn btn-outline-primary text-white border border-0 "
+                                    @onclick="@(()=>SetReaction(TaskModel.Id,1))">
+                                        <h5 class="oi oi-plus p-1 my-0"></h5>
+                                        <h4 class="d-inline-block my-0">
+                                            @TaskModel.Reaction.ValueSumPositive
+                                        </h4>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-primary text-white border border-0 "
+                                    @onclick="@(()=>SetReaction(TaskModel.Id,0))">
+                                        <h5 class="oi oi-plus p-1 bg-success rounded-3 my-0"></h5>
+                                        <h4 class="d-inline-block my-0">
+                                            @TaskModel.Reaction.ValueSumPositive
+                                        </h4>
+                                    </button>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <button class="btn btn-outline-primary text-white border border-0 " @onclick="@_LoginPopup.ShowPopUp">
+                                    <h5 class="oi oi-minus bg-danger p-1 my-0"></h5>
+                                    <h4 class="d-inline-block my-0">
+                                        @TaskModel.Reaction.ValueSumNegative
+                                    </h4>
+                                </button>
+                                <button class="btn btn-outline-primary text-white border border-0 " @onclick="@_LoginPopup.ShowPopUp">
+                                    <h5 class="oi oi-plus bg-success p-1 my-0"></h5>
+                                    <h4 class="d-inline-block my-0">
+                                        @TaskModel.Reaction.ValueSumPositive
+                                    </h4>
+                                </button>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
+                </div>
             </div>
+            @if (Id > 0)
+            {
+                <div class="d-block">
+                    <CommentComponentList Id="TaskModel.Id" />
+                </div>
+            }
         </div>
-        @if (Id > 0)
-        {
-            <CommentComponentList Id="TaskModel.Id" />
-        }
     </div>
 }
 else
@@ -179,4 +208,7 @@ else
     public TaskModel? TaskModel { get; set; }
     [Parameter]
     public int Id { get; set; }
+
+    [Parameter]
+    public Func<Task>? Func { get; set; }
 }

@@ -1,6 +1,8 @@
 ﻿using Memy.Server.Data.SqlDataAccess;
 using Memy.Shared.Model;
 
+using Newtonsoft.Json.Linq;
+
 namespace Memy.Server.Data.Comment
 {
     public class CommentData : BaseData, ICommentData
@@ -9,7 +11,7 @@ namespace Memy.Server.Data.Comment
         {
         }
 
-        public async Task<T[]> InsertComment<T>(string procedure, string token, string json,int orderTyp)
+        public async Task<T[]> InsertComment<T>(string procedure, string token, string json, int orderTyp)
         {
             sql.Clear();
             sql.Append("EXEC [dbo].");
@@ -40,5 +42,16 @@ namespace Memy.Server.Data.Comment
             return (await sqlData.LoadDataList<T>(sql.ToString())).ToArray();
         }
 
+        public async Task<T[]> GetLikeUserComment<T>(int orderTyp, string token)
+        {
+            var result = await this.ExecProcedureList<T>("GetUserLikeComment", orderTyp, token);
+            return result.ToArray();
+        }
+
+        public async Task<T[]> GetUserComment<T>(int orderTyp, string? name)
+        {
+            var result = await this.ExecProcedureList<T>("GetUserComment", orderTyp, name);
+            return result.ToArray();
+        }
     }
 }

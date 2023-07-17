@@ -1,0 +1,53 @@
+﻿@inject IProfileData _profileData
+@inject AuthenticationStateProvider _authStateProvider
+@inject ILogger<ProfileEditComponent> _logger
+@inject PopupListService _popUp;
+
+
+<div class="p-1">
+    <div class="justify-content-center m-auto w-100">
+
+        <div class="bg-gradient rounded-3">
+            <span class="ps-3">Edytuj nazwę użytkownika</span>
+            <EditForm Model="_user" OnValidSubmit="HandleValidSubmitName">
+                <DataAnnotationsValidator />
+
+                <div class="input-group p-1">
+                    <InputText class="w-100 bg-black text-white" id="name" @bind-Value="@_user.Nick" placeholder="Nazwa użytkownika"></InputText>
+                    <ValidationMessage For="@(()=>_user.Nick)" />
+                </div>
+                <div class="m-auto d-flex justify-content-end">
+                    <button class="btn btn-primary " type="submit">Zapisz</button>
+                </div>
+            </EditForm>
+        </div>
+        <div class="bg-gradient rounded-3">
+            <span class="ps-3">Edytuj avatar użytkownika</span>
+            <div class="input-group p-1">
+                @if (_avatarstr != null)
+                {
+                    <AvatarComponent AvatarSize="Memy.Shared.Helper.MyEnums.AvatarSize.Profile" ImgName="@_avatarstr" Dowloand="false" />
+                }
+                <div class="float-start">
+                    <InputFile class="w-auto h-auto" OnChange="PreviewAvatar" />
+                    <div class="">Plik powinien być w wymiarach 184px na 184px</div>
+                </div>
+
+            </div>
+            <div class="m-auto d-flex justify-content-end">
+                <button class="btn btn-primary " type="submit" @onclick="HandleValidSubmitAvatar">Zapisz</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+    [Parameter]
+    public Func<string?, Task>? Func { get; set; }
+
+    EditUser? _user { get; set; } = new EditUser();
+    FileUploadStatus? _avatar { get; set; }
+    string? _avatarstr { get; set; }
+}

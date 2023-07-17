@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 using PagesLibrary.Authorization;
 using PagesLibrary.Data;
+using PagesLibrary.Data.Admin;
 using PagesLibrary.Data.Comment;
 using PagesLibrary.Data.File;
 using PagesLibrary.Data.User;
@@ -29,6 +30,14 @@ namespace PagesLibrary.Service
             services.AddScoped<IFileManager, FileManager>();
             services.AddScoped<IReaction, Reaction>();
             services.AddScoped<ICommentApi, CommentApi>();
+            services.AddScoped<IProfileData, ProfileData>();
+            services.AddScoped<IReported, Reported>();
+            services.AddScoped<IReportedMessagesApi, ReportedMessagesApi>();
+
+
+            services.AddScoped<AdminFileApi>();
+            services.AddScoped<AdminCommentApi>();
+
 
             services.AddSingleton<MainFilePopUpService>();
             services.AddSingleton<LoginPopUpService>();

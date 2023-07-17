@@ -1,0 +1,29 @@
+﻿@inject IReported _reportedApi
+@inject PopupListService _popUp
+@inject ILogger<ReportButtonComponent> _logger
+
+
+@if (Reported != null)
+{    
+     var reported = Reported.IsChecked ? "btn-outline-warning" : "btn-outline-primary";   
+
+    <AuthorizeView>
+        <Authorized>
+            <span class="px-1">
+                <button class="btn text-white @reported" @onclick="ReportBtn">
+                    <span class="oi oi-warning"></span>
+                    <span class="hideTextInSmall">Zgłoś</span>
+                    <AdminReportedSumComponent ReportedSum="Reported.ValueSum"/>
+                </button>
+            </span>
+        </Authorized>
+    </AuthorizeView>
+}
+
+
+@code {
+    [Parameter]
+    public ReportedModel Reported { get; set; }
+    [Parameter]
+    public int Id { get; set; }
+}

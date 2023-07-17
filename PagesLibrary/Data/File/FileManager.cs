@@ -4,6 +4,8 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
+using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Net.Http.Json;
 using System.Text;
 
@@ -15,13 +17,18 @@ namespace PagesLibrary.Data.File
         string GetVideo(string name);
         Task<HttpResponseMessage> GetTagAsync();
         Task<HttpResponseMessage> GetTaskModelAsync(int id);
-        Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart);
+        Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart, int? orderTyp);
         Task<HttpResponseMessage> PostFileAsync(FileUploadModel file);
+        Task<HttpResponseMessage> GetUserTaskModelsAsync(string name, int? start, int? max, int? orderTyp, bool? banned);
     }
 
     public class FileManager : BaseApi, IFileManager
     {
         public FileManager(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        {
+        }
+
+        public FileManager(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 
@@ -42,7 +49,7 @@ namespace PagesLibrary.Data.File
             }
         }
         //pobieranie listy modelów do wyświetlenia
-        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart)
+        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart,int? orderTyp)
         {
             try
             {
@@ -59,7 +66,7 @@ namespace PagesLibrary.Data.File
                     sb.Append("/");
                     sb.Append(start);
                 }
-                if (max != null || banned != null || dateEnd != null || dateStart != null)
+                if (max != null || banned != null || dateEnd != null || dateStart != null || orderTyp != null)
                 {
                     sb.Append("/?");
                 }
@@ -87,6 +94,13 @@ namespace PagesLibrary.Data.File
                     sb.Append(dateStart);
                     sb.Append("&");
                 }
+                if (orderTyp != null)
+                {
+                    sb.Append("orderTyp=");
+                    sb.Append(orderTyp);
+                    sb.Append("&");
+                }
+
 
                 var result = await client.GetAsync(sb.ToString());
                 await IfUnauthorized(result);
@@ -135,6 +149,60 @@ namespace PagesLibrary.Data.File
             {
                 var client = await SetAuthorizationHeader();
                 var result = await client.GetAsync(Routes.Tag);
+                await IfUnauthorized(result);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<HttpResponseMessage> GetUserTaskModelsAsync(string? name, int? start, int? max, int? orderTyp, bool? banned)
+        {
+            try
+            {
+                var client = await SetAuthorizationHeader();
+                StringBuilder sb = new StringBuilder(Routes.File);
+
+                sb.Append("/");
+                sb.Append(Routes.User);
+
+                if (name != null || start != null || max != null || orderTyp != null || banned != null)
+                {
+                    sb.Append("?");
+                }
+                if (name != null)
+                {
+                    sb.Append("name=");
+                    sb.Append(name);
+                    sb.Append("&");
+                }
+                if (start != null)
+                {
+                    sb.Append("start=");
+                    sb.Append(start);
+                    sb.Append("&");
+                }
+                if (max != null)
+                {
+                    sb.Append("max=");
+                    sb.Append(max);
+                    sb.Append("&");
+                }
+                if (orderTyp != null)
+                {
+                    sb.Append("orderTyp=");
+                    sb.Append(orderTyp);
+                    sb.Append("&");
+                }
+                if (banned != null)
+                {
+                    sb.Append("banned=");
+                    sb.Append(banned);
+                    sb.Append("&");
+                }
+                var result = await client.GetAsync(sb.ToString());
                 await IfUnauthorized(result);
                 return result;
             }

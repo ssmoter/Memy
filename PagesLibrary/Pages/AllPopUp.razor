@@ -3,3 +3,10 @@
 <MainFilePopUp />
 <LoginPopUp />
 <CategoriesPopUp />
+
+
+<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+    <Authorized>
+        <ModalAdminMessage />
+    </Authorized>
+</AuthorizeView>

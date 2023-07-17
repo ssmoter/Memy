@@ -26,9 +26,9 @@ DECLARE @myTable TABLE (id INT)
 --dodanie nazwy wysłanych plików 
 	INSERT INTO [dbo].[FileData]
 		(FileSimpleId,ObjName,ObjType,ObjOrder)
-		(SELECT @id,Name,Typ ,ObjOrder
+		(SELECT @id,ObjName,ObjTyp ,ObjOrder
 		FROM OPENJSON(@json,'$.FileUploadStatuses') 
-		WITH (Name NVARCHAR(MAX), Typ int,ObjOrder INT))
+		WITH (ObjName NVARCHAR(MAX), ObjTyp int,ObjOrder INT))
 
 -- tabela tymczasowa z tagami
     INSERT INTO @tagList(Value)
@@ -48,5 +48,6 @@ DECLARE @myTable TABLE (id INT)
     FROM @tagList t
     JOIN [dbo].[FileTagList] ftl ON t.Value = ftl.Value
 
+	EXEC dbo.InsertReactionFile @id,0,@token,0
 	select @id
 END

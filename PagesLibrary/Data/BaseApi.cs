@@ -4,8 +4,9 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
+using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Net;
-using System.Text;
 
 namespace PagesLibrary.Data
 {
@@ -15,13 +16,17 @@ namespace PagesLibrary.Data
         protected string UrlStringName { get; set; } = "https://localhost:7241/api/";
         private readonly ILocalStorageService _localStorageService;
         private readonly ISessionStorageService _sessionStorageService;
+        private readonly AuthenticationStateProvider authenticationStateProvider;
+
         public BaseApi(ILocalStorageService localStorageService,
-                       ISessionStorageService sessionStorageService)
+                       ISessionStorageService sessionStorageService,
+                       AuthenticationStateProvider authenticationStateProvider = null)
         {
             _HttpClient = new HttpClient();
             _HttpClient.BaseAddress = new Uri(UrlStringName);
             _localStorageService = localStorageService;
             _sessionStorageService = sessionStorageService;
+            this.authenticationStateProvider = authenticationStateProvider;
         }
         public HttpClient GetHttpClient()
         {
@@ -54,6 +59,10 @@ namespace PagesLibrary.Data
             {
                 await GetLocalStorage().RemoveItemAsync(Headers.Authorization);
                 await GetSessionStorage().RemoveItemAsync(Headers.Authorization);
+                if (authenticationStateProvider != null)
+                {
+                    await authenticationStateProvider.GetAuthenticationStateAsync();
+                }
             }
         }
         //pobranie danych użytkownika w zależności gdzie zostały zapisane

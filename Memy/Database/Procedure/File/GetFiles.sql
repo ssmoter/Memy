@@ -1,33 +1,26 @@
-﻿CREATE PROCEDURE [dbo].[GetFileByDate]
-@start INT = 1,
+﻿CREATE PROCEDURE [dbo].[GetFiles]
+@start INT = 0,
 @max INT = 10,
 @category NVARCHAR(MAX) = 'main',
 @banned bit = 0,
 @dateEnd NVARCHAR(MAX) = 'empty',
 @dateStart NVARCHAR(MAX) = 'today',
+@orderTyp int = 0,
 @token NVARCHAR(MAX) = '0'
 AS
 BEGIN	
 DECLARE @dateEndAsDate datetimeoffset(7)
 DECLARE @dateStartAsDate datetimeoffset(7)
-DECLARE @tableID table(Id int)
-DECLARE @type int
 DECLARE @userId INT
+DECLARE @admin bit = 0
 
-EXEC dbo.SelectUserId @token,@userid OUTPUT
 
---ustawienie start jako id ostatniego rekordu
-IF(@start <= 1)
-BEGIN
-	SET @start = (SELECT TOP(1) Id FROM FileSimple ORDER BY Id DESC)
-END
+EXEC dbo.GetAdminId @token, @userId OUTPUT
+IF @userId>0
+	SET @admin=1
 ELSE
-BEGIN
---ustawienie start jako id ostatniego rekordu odjąc zakres plus zasięg
-	 INSERT INTO @tableID
-	 SELECT TOP(@max * @start) Id FROM FileSimple ORDER BY Id DESC
-	 SET @start = (SELECT TOP(1) * FROM @tableID ORDER BY 1)
-END
+	EXEC dbo.SelectUserId @token,@userid OUTPUT
+
 
 --ustawienie zakresu dat
 --defoult cała tabela
@@ -50,23 +43,27 @@ BEGIN
 END
 
 --pobieranie podstawowych parametrów rekordu
-	SELECT TOP(@max) 
+	SELECT 
 	 FileModel.Id as'Id'
 	,FileModel.Title as'Title' 
 	,FileModel.Description as 'Description'
 	,FileModel.Date as 'CreatedDate'
+	,FileModel.Banned as 'Banned'
 
 --pobranie danych użytkownika
 	,(SELECT Nick AS 'Name' 
+			,Avatar AS 'Avatar'
 		FROM UserSimple 
+		JOIN UserData on UserSimple.Id = UserData.UserId
 		WHERE UserSimple.Id = FileModel.UserId
 		FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'User'
 
+
 --pobranie listy zdjęć
 	,(SELECT 
-	FileData.ObjName as 'Name'
-	,FileData.ObjType as'Typ'
-	,FileData.ObjOrder as 'Order'
+	FileData.ObjName as 'ObjName'
+	,FileData.ObjType as'ObjTyp'
+	,FileData.ObjOrder as 'ObjOrder'
 	FROM [FileData] 
 	WHERE [FileData].FileSimpleId=FileModel.Id
 	FOR JSON PATH) AS 'FileModel'
@@ -95,16 +92,30 @@ END
 	AND FilerReaction.Value > 0
 	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER)AS 'Reaction'
 
+	
+--pobranie ilości reportów i czy user zgłosił
+,(SELECT SUM(FileReported.Value) as'ValueSum'
+	,(SELECT FileReported.Value 
+	FROM FileReported
+	WHERE FileReported.FileSimpleId=FileModel.Id
+		AND FileReported.UserId=@userId) AS 'Value'
+	FROM FileReported
+	WHERE FileReported.FileSimpleId=FileModel.Id
+	AND @admin=1
+	FOR JSON PATH,WITHOUT_ARRAY_WRAPPER) AS 'Reported'
+
+
 	FROM [dbo].FileSimple AS FileModel
 
-	WHERE FileModel.Id <= @start 
-	AND FileModel.Category = @category 
+	WHERE FileModel.Category = @category 
 	AND FileModel.Banned = @banned
 	AND FileModel.Date BETWEEN @dateEndAsDate AND @dateStartAsDate
-	ORDER BY FileModel.Date DESC
-	--ORDER BY (SELECT SUM(FilerReaction.Value) FROM FilerReaction WHERE FilerReaction.FileSimpleId = FileModel.Id) DESC
 
-	--FOR JSON 
-	--PATH,ROOT('TaskModel')
+	ORDER BY
+	CASE WHEN @orderTyp = 0 THEN FileModel.Date END DESC
+	,CASE WHEN @orderTyp = 1 THEN FileModel.Date END ASC
+	,CASE WHEN @orderTyp = 2 THEN (SELECT SUM(FilerReaction.Value) FROM FilerReaction WHERE FilerReaction.FileSimpleId=FileModel.Id) END DESC
+	,CASE WHEN @orderTyp = 3 THEN (SELECT SUM(FilerReaction.Value) FROM FilerReaction WHERE FilerReaction.FileSimpleId=FileModel.Id) END ASC
+	OFFSET @start*@max ROWS FETCH NEXT @max ROWS ONLY
 
 	END

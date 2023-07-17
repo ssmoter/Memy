@@ -65,6 +65,7 @@
     <Folder Include="Procedure\File" />
     <Folder Include="Table\Comment" />
     <Folder Include="Procedure\Comment" />
+    <Folder Include="Procedure\Admin" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Table\User\UserSimple.sql" />
@@ -73,7 +74,7 @@
     <Build Include="Table\File\FileData.sql" />
     <Build Include="Table\File\FileTagList.sql" />
     <Build Include="Table\File\FileTagConnected.sql" />
-    <Build Include="Procedure\File\GetFileByDate.sql" />
+    <Build Include="Procedure\File\GetFiles.sql" />
     <Build Include="Procedure\File\InsertFullFile.sql" />
     <Build Include="Procedure\User\RegisterUser.sql" />
     <Build Include="Procedure\User\LogoutUser.sql" />
@@ -94,6 +95,28 @@
     <Build Include="Procedure\Comment\InsertAnswerComment.sql" />
     <Build Include="Procedure\Comment\InsertReactionAnswerComment.sql" />
     <Build Include="Procedure\Comment\GetAnswerComment.sql" />
+    <Build Include="Table\User\UserData.sql" />
+    <Build Include="Procedure\User\GetProfile.sql" />
+    <Build Include="Procedure\File\GetUserFiles.sql" />
+    <Build Include="Procedure\File\GetUserLikeFiles.sql" />
+    <Build Include="Procedure\Comment\GetUserLikeComment.sql" />
+    <Build Include="Procedure\Comment\GetUserComment.sql" />
+    <Build Include="Procedure\User\GetEmail.sql" />
+    <Build Include="Procedure\User\NameIsAvailable.sql" />
+    <Build Include="Procedure\User\EmailIsAvailable.sql" />
+    <Build Include="Procedure\User\UpdateProfilePassword.sql" />
+    <Build Include="Procedure\User\UpdateProfileName.sql" />
+    <Build Include="Procedure\User\UpdateProfileAvatar.sql" />
+    <Build Include="Procedure\Admin\GetAdminId.sql" />
+    <Build Include="Procedure\Admin\DeleteFileAsAdmin.sql" />
+    <Build Include="Table\File\FileReported.sql" />
+    <Build Include="Table\User\UserReportMessages.sql" />
+    <Build Include="Procedure\File\InsertReportFile.sql" />
+    <Build Include="Procedure\Admin\CheckAdminToken.sql" />
+    <Build Include="Procedure\Admin\InsertUserReportMessages.sql" />
+    <Build Include="Procedure\User\GetUserReportedMessages.sql" />
+    <Build Include="Procedure\User\UpdateUserReportedMessages.sql" />
+    <Build Include="Procedure\Admin\BanFileAsAdmin.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Database.refactorlog" />

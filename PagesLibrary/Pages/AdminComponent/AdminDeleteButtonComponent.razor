@@ -1,0 +1,38 @@
+﻿@using PagesLibrary.Data.Admin
+@using static Memy.Shared.Helper.MyEnums;
+
+@inject ILogger<AdminDeleteButtonComponent> _logger
+@inject PopupListService _popUp
+@inject ModalPopUpService _modal
+@inject AdminFileApi _AdminFile
+@inject AdminCommentApi _AdminComment
+@inject ModalAdminMessageService _adminModal
+
+@if (Id > 0)
+{
+    <AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+        <Authorized>
+            <span class="px-1">
+                <button class="btn btn-outline-primary text-white" @onclick="@(()=>Delete())">
+                    <span class="oi oi-delete"></span>
+                    <span class="hideTextInSmall">Usuń</span>
+                </button>
+            </span>
+        </Authorized>
+    </AuthorizeView>
+}
+
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string? Title{ get; set; }
+
+    [Parameter]
+    public AdminDeleteBanType Type { get; set; }
+
+    [Parameter]
+    public Func<Task>? Fucn { get; set; }
+
+}

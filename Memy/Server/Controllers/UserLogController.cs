@@ -17,11 +17,11 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class UserLogController : ControllerBase
     {
-        private readonly IUserData _userData;
+        private readonly ILoginData _userData;
         private readonly ITokenManager _tokenManager;
         private readonly LoginService _loginService;
         private readonly ILogger<UserLogController> _logger;
-        public UserLogController(IUserData userData, ITokenManager tokenManager, ILogger<UserLogController> logger)
+        public UserLogController(ILoginData userData, ITokenManager tokenManager, ILogger<UserLogController> logger)
         {
             this._userData = userData;
             _tokenManager = tokenManager;

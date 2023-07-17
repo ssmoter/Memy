@@ -84,4 +84,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ObjOrder" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="fb499701-e5d4-459d-841d-c0cf8e218e05" ChangeDateTime="07/12/2023 10:24:30">
+    <Property Name="ElementName" Value="[dbo].[UserReportMessages].[Created]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserReportMessages]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedDate" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5c1577ff-ab27-4f14-a490-31fd5b51bddb" ChangeDateTime="07/12/2023 10:28:50">
+    <Property Name="ElementName" Value="[dbo].[UserReportMessages].[WasRead]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[UserReportMessages]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BeenChecked" />
+  </Operation>
 </Operations>

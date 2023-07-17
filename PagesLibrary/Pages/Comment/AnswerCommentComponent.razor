@@ -10,8 +10,15 @@
 
 <div class="p-1 bg-gradient">
     <div class="m-auto">
-        <span class="">@AnswerCommentModel.User.Name &nbsp;</span>
-        <span>@CompareDate.GetDate(AnswerCommentModel.Date)</span>
+
+        <div class="d-inline-flex h-auto">
+            <AvatarComponent AvatarSize="@Memy.Shared.Helper.MyEnums.AvatarSize.Comment" ImgName="@AnswerCommentModel.User.Avatar" />
+            <div class="h-auto justify-content-center m-auto">
+                <div class="top-50">@AnswerCommentModel.User.Name</div>
+                <div class="top-50">@CompareDate.GetDate(AnswerCommentModel.Date)</div>
+            </div>
+        </div>
+
         <div class="float-end" style="transform:translateX(2.6rem);">
             <div class=" border border-1 border-primary form-check-inline float-end rounded-3" style="transform:scale(0.6);">
                 <AuthorizeView>

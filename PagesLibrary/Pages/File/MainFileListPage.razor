@@ -1,22 +1,35 @@
 ﻿@using PagesLibrary.Data.File
-@using PagesLibrary.Service;
+@using PagesLibrary.Service
 
 @inject ILogger<MainFileListPage> _logger
 @inject IFileManager _iFileManager
 @inject NavigationManager _navigation
 @inject PopupListService _popUp
-@inject IReaction _reaction
 @inject MainFilePopUpService _mainPopup
-
+@inject Blazored.SessionStorage.ISessionStorageService _seassionStorage
 
 
 <div>
+    <div class="m-auto d-flex justify-content-center">
+        <div class="justify-content-end h-auto m-auto">
+        </div>
+        <div class="float-end">
+            <div class="top-50">
+                <DropDownList List="_dateList" @bind-Value="@_dateLenght" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
+            </div>
+        </div>
+        <div class="float-end">
+            <div class="top-50">
+                <DropDownList List="_orderList" @bind-Value="@_orderTyp" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
+            </div>
+        </div>
+    </div>
     @if (TaskModels != null)
     {
         @for (int i = 0; i < TaskModels.Length; i++)
         {
             var index = i;
-            <MainFilePage TaskModel="@TaskModels[index]" />
+            <MainFilePage TaskModel="@TaskModels[index]" Func="@(()=>ChangePage(Start))" />
         }
     }
     else
@@ -24,46 +37,13 @@
         <p>Loading...</p>
     }
     <br />
-    <div class="m-auto d-sm-flex justify-content-sm-center">
-        @{
-            var EnableBack = false;
-            if (Start == null)
-            {
-                Start = 1;
-                EnableBack = false;
-            }
-            if (Start != null)
-            {
-                EnableBack = (int)Start == 1 ? true : false;
-            }
-        }
-        <dvi>
-            <span class="m-auto d-sm-flex justify-content-sm-center">
-                <button class="btn oi oi-arrow-thick-left btn-outline-primary text-white" disabled="@EnableBack" @onclick="@(()=>ChangePage((int)Start-1))">@((int)Start - 1)</button>
-                <button class="btn oi oi-arrow-thick-right btn-outline-primary text-white" @onclick="@(()=>ChangePage((int)Start+1))">@((int)Start + 1)</button>
-            </span>
-            <div>
-                @for (int i = (int)Start - 2; i < (int)Start + 5; i++)
-                {
-                    int index = i;
-                    if (Start == index)
-                    {
-                        continue;
-                    }
-                    if (i > 0)
-                    {
-                        <button class="btn btn-outline-primary text-white" @onclick="@(()=>ChangePage(index))">@i</button>
-                    }
-                }
-            </div>
-        </dvi>
-    </div>
+    <NextPageButtonsComponent Start="Start" OnClick="ChangePage" />
 </div>
 
 
 @code {
     [Parameter]
-    public int? Start { get; set; } = 1;
+    public int Start { get; set; } = 1;
     [Parameter]
     public int? Max { get; set; } = 10;
     [Parameter]
@@ -75,4 +55,27 @@
     [Parameter]
     public string? DateStart { get; set; }
 
+
+    static string _dateFormat = "yyyy-MM-dd HH:mm:ss";
+    (string?, string) _dateLenght = ("empty", "brak");
+    (string?, string)[] _dateList = new (string?, string)[]
+    {
+        ("empty","brak"),
+        (DateTimeOffset.Now.AddHours(-12).ToString(_dateFormat),"12 Godziń"),
+        (DateTimeOffset.Now.AddDays(-1).ToString(_dateFormat),"1 Dzień"),
+        (DateTimeOffset.Now.AddDays(-7).ToString(_dateFormat),"Tydzień"),
+        (DateTimeOffset.Now.AddMonths(-1).ToString(_dateFormat),"Miesiąc"),
+        (DateTimeOffset.Now.AddYears(-1).ToString(_dateFormat),"Rok"),
+    };
+
+
+    (string?, string) _orderTyp = (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateDESC).ToString(), "Najnowsze");
+    (string?, string)[] _orderList = new (string?, string)[]
+    {
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateDESC).ToString(),"Najnowsze"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateASC).ToString(),"Najstarsze"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionDESC).ToString(),"Popularne"),
+        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionASC).ToString(),"Niepopularne"),
+
+    };
 }

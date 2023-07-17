@@ -1,0 +1,33 @@
+﻿@{
+    var showClass = IsVisible ? "d-block" : "d-none";
+}
+
+<div class="modal @showClass bg-opacity-75 bg-dark" style="z-index:1077; ">
+    <div class="modal-dialog modal-dialog-centered" style="z-index:2066;">
+        <div class="toast-container p-1 bg-black @showClass" >
+            <div class="toast show " role="alert" aria-live="assertive" aria-atomic="true">
+                <Microsoft.AspNetCore.Components.Forms.EditForm Model="@message">
+                    <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator/>
+                    <div class="toast-header">
+                        <strong class="me-auto w-100">
+                            <span>Tytuł</span>
+                            <Microsoft.AspNetCore.Components.Forms.InputText @bind-Value="@message.Header" class="bg-black text-white w-100"></Microsoft.AspNetCore.Components.Forms.InputText>
+                            <Microsoft.AspNetCore.Components.Forms.ValidationMessage For="@(()=>message.Header)" />
+                        </strong>
+                        <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close(false))"></button>
+                    </div>
+
+                    <div class="toast-body text-black p-1">
+                        <DropDownList  Description="@("Poziom powiadomienia")" List="listLevel" @bind-Value="@message.messageLevel"></DropDownList>
+                        <span>Treść</span>
+                        <Microsoft.AspNetCore.Components.Forms.InputTextArea class="bg-black text-white w-100" @bind-Value="@message.Body"></Microsoft.AspNetCore.Components.Forms.InputTextArea>
+                        <Microsoft.AspNetCore.Components.Forms.ValidationMessage For="@(()=>message.Body)" />
+
+                    </div>
+                    <button class="m-1 btn btn-success float-start" @onclick="@(()=>Close(true))">@YesText</button>
+                    <button class="m-1 btn btn-danger float-end" @onclick="@(()=>Close(false))">@NoText</button>
+                </Microsoft.AspNetCore.Components.Forms.EditForm>
+            </div>
+        </div>
+    </div>
+</div>

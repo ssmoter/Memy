@@ -3,6 +3,8 @@ using Blazored.SessionStorage;
 
 using Memy.Shared.Helper;
 
+using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Net.Http.Json;
 using System.Text;
 
@@ -12,6 +14,16 @@ namespace PagesLibrary.Data.Comment
     {
         public CommentApi(ILocalStorageService localStorageService,
                           ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        {
+        }
+
+        public CommentApi(
+            ILocalStorageService localStorageService,
+            ISessionStorageService sessionStorageService,
+            AuthenticationStateProvider authenticationStateProvider = null) : base(
+                localStorageService,
+                sessionStorageService,
+                authenticationStateProvider)
         {
         }
 
@@ -102,6 +114,43 @@ namespace PagesLibrary.Data.Comment
             var local = this.GetLocalStorage();
             await local.SetItemAsync<int>("order",order);
         }
+
+        public async Task<HttpResponseMessage> GetUserCommentAsync(string? name, int? orderTyp)
+        {
+            try
+            {
+                var client = await SetAuthorizationHeader();
+                StringBuilder sb = new StringBuilder(Routes.Comment);
+
+                sb.Append("/");
+                sb.Append(Routes.User);
+
+                if (name != null  || orderTyp != null)
+                {
+                    sb.Append("?");
+                }
+                if (name != null)
+                {
+                    sb.Append("name=");
+                    sb.Append(name);
+                    sb.Append("&");
+                }
+                if (orderTyp != null)
+                {
+                    sb.Append("orderTyp=");
+                    sb.Append(orderTyp);
+                    sb.Append("&");
+                }
+                var result = await client.GetAsync(sb.ToString());
+                await IfUnauthorized(result);
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
     }
 }

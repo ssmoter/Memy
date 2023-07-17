@@ -11,16 +11,8 @@ namespace PagesLibrary.Pages.File
     public partial class MainFilePage : IDisposable
     {
         private int _descriptionLength = 300;
-        private string _date { get; set; }
+        private string? _date { get; set; }
         private int _maingImg { get; set; } = 0;
-
-        protected override void OnInitialized()
-        {
-
-#if DEBUG
-            _logger.LogInformation("Initialized page");
-#endif
-        }
 
 
         protected override async Task OnInitializedAsync()
@@ -39,9 +31,19 @@ namespace PagesLibrary.Pages.File
                 }
             }
 
-            _date = CompareDate.GetDate(TaskModel.CreatedDate);
+            if (TaskModel != null)
+            {
+                _date = CompareDate.GetDate(TaskModel.CreatedDate);
+            }
 #if DEBUG
-            _logger.LogInformation("InitializedAsync page");
+
+            int number = 0;
+            if (TaskModel != null)
+            {
+                number = TaskModel.Id;
+            }
+
+            _logger.LogInformation("InitializedAsync page {0}", number);
 #endif
         }
 

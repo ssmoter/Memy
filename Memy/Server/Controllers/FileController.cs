@@ -6,6 +6,10 @@ using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
 
+using System.Xml.Linq;
+
+using static Memy.Shared.Helper.MyEnums;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Memy.Server.Controllers
@@ -14,19 +18,17 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger<FileController> _logger;
-        private readonly IAddNewFileModel _fileData;
         private readonly FileService _fileService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public FileController(IWebHostEnvironment webHostEnvironment,
                               ILogger<FileController> logger,
                               IAddNewFileModel fileData)
         {
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
-            _fileData = fileData;
-            _fileService = new FileService(webHostEnvironment, _logger, _fileData);
+            _webHostEnvironment = webHostEnvironment;
+            _fileService = new FileService(webHostEnvironment, _logger, fileData);
         }
 
         // GET: api/<FileController>
@@ -35,13 +37,13 @@ namespace Memy.Server.Controllers
         [Route("")]
         [Route("{start}")]
         [Route("{category}/{start}")]
-        public async Task<IActionResult> Get(int? start = 1, string? category = "main", int? max = 10, bool? banned = false, string? dateEnd = "empty", string? dateStart = "today")
+        public async Task<IActionResult> Get(int? start = 1, string? category = "main", int? max = 10, bool? banned = false, string? dateEnd = "empty", string? dateStart = "today", int orderTyp = 0)
         {
             try
             {
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
 
-                var result = await _fileService.GetTaskModelsAsync(start, category, max, banned, dateEnd, dateStart, token);
+                var result = await _fileService.GetTaskModelsAsync(start, category, max, banned, dateEnd, dateStart, orderTyp, token);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -149,16 +151,61 @@ namespace Memy.Server.Controllers
             }
         }
 
+        //pobieranie plików poszczególnych user
+        [Route("User")]
+        [HttpGet]
+        public async Task<IActionResult> GetUserPost(string? name, int start = 0, int max = 10, int orderTyp = 0, bool banned = false)
+        {
+            try
+            {
+                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+
+                if (string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(token))
+                {
+                    if (string.IsNullOrWhiteSpace(token))
+                    {
+                        return Unauthorized();
+                    }
+                    var resultLike = await _fileService.GetLikeUserTasksModel(token, start, max, orderTyp);
+                    return Ok(resultLike);
+                }
+
+                var resultPost = await _fileService.GetUserTasksModel(name,start, max, orderTyp, banned);
+
+                if (resultPost == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(resultPost);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
         // PUT api/<FileController>/5
         [HttpPut("{id}")]
+        [TokenAuthenticationFilter]
         public void Put(int id, [FromBody] string value)
         {
         }
 
         // DELETE api/<FileController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        [TokenAuthenticationFilter]
+        public async Task<IActionResult> Delete(int id)
         {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

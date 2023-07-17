@@ -2,11 +2,21 @@
 
 namespace Memy.Server.Data.User
 {
-    public class LoginData : BaseData, IUserData
+    public class LoginData : BaseData, ILoginData
     {
         public LoginData(ISqlDataAccess sqlData) : base(sqlData)
         {
 
+        }
+        public async Task<bool> CheckAdminToken(Guid? value)
+        {
+            sql.Clear();
+            sql.Append("EXEC CheckAdminToken ");
+            sql.Append("'");
+            sql.Append(value.ToString());
+            sql.Append("'");
+
+            return await sqlData.LoadData<bool>(sql.ToString());
         }
 
         public async Task<bool> CheckToken(Guid? value)

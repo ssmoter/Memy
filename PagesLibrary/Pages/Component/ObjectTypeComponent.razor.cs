@@ -1,6 +1,6 @@
 ﻿using Memy.Shared.Helper;
 
-namespace PagesLibrary.Pages.File
+namespace PagesLibrary.Pages.Component
 {
     public partial class ObjectTypeComponent : IDisposable
     {
@@ -64,7 +64,7 @@ namespace PagesLibrary.Pages.File
 
         public void Dispose()
         {
-            this.fileModel = null;
+            fileModel = null;
         }
     }
 }

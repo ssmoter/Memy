@@ -13,10 +13,10 @@ namespace Memy.Server.TokenAuthentication
 
     public class TokenManager : ITokenManager
     {
-        private readonly IUserData IUser;
+        private readonly ILoginData IUser;
         private readonly List<Token?> TokenIds;
 
-        public TokenManager(IUserData iUser)
+        public TokenManager(ILoginData iUser)
         {
             IUser = iUser;
             TokenIds = new List<Token?>();

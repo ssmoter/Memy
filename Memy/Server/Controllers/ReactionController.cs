@@ -1,4 +1,5 @@
 ﻿using Memy.Server.Data.Reaction;
+using Memy.Server.Filtres;
 using Memy.Server.Service;
 using Memy.Shared.Model;
 
@@ -8,6 +9,8 @@ namespace Memy.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [TokenAuthenticationFilter]
+
     public class ReactionController : ControllerBase
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -45,7 +48,6 @@ namespace Memy.Server.Controllers
             {
                 return BadRequest(ex.Message);
             }
-
         }
 
     }

@@ -10,10 +10,9 @@
 
 @if (TaskModel != null)
 {
-    <div class="modal @showClass bg-opacity-75 bg-dark" @onclick="MouseClose" @onmouseout="@MouseOut">
+    <div class="modal @showClass bg-opacity-75 bg-dark overflow-hidden" @onclick="MouseClose" @onmouseout="@MouseOut">
         <div class=" modal-dialog modal-dialog-centered " style="z-index:1066; max-width:800px;" @onmousemove="@MouseEnter">
-            <div class="toast-container p-1 bg-black w-100">
-
+            <div class="toast-container p-1 bg-black w-100 ">
                 <div class="toast show w-100 bg-dark " role="application">
                     <div class="toast-header ">
                         <strong class="me-auto">
@@ -23,68 +22,77 @@
                         </strong>
                         <button type="button" class="btn-close" aria-label="Close" @onclick="@(()=>Close())"></button>
                     </div>
-                    <div class="toast-body">
-                        <strong class="me-auto">
-                            @TaskModel.User.Name &nbsp;
-                            <span>@_date</span>
-                        </strong>
-                    </div>
+                    <div class="" style="max-height:87vh; overflow-y:scroll;">
 
-                    <div class="toast-body">
-                        <div class="">
-                            @TaskModel.Description
-                        </div>
-                        @if (TaskModel.FileModel != null)
-                        {
-                            if (TaskModel.FileModel.Length > 1)
-                            {
-                                <div class="m-auto d-flex justify-content-center">
-                                    <div class="float-start ">
-                                        @for (int j = 0; j < TaskModel.FileModel.Length; j++)
-                                        {
-                                            var img = j;
-                                            <button class="btn p-1 " @onclick="@(()=>ChangeImg(img))">
-                                                @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[j].ObjName))
-                                                {
-                                                    <span class="smallObj">
-                                                        <ObjectTypeComponent IsSmall="true" fileModel="TaskModel.FileModel[j]"></ObjectTypeComponent>
-                                                    </span>
-                                                }
-                                            </button>
-                                        }
+                        <div class="toast-body">
+                            <strong class="me-auto">
+                                <div class="d-inline-flex h-auto">
+                                    <AvatarComponent AvatarSize="@Memy.Shared.Helper.MyEnums.AvatarSize.File" ImgName="@TaskModel.User.Avatar" />
+                                    <div class="h-auto justify-content-center m-auto">
+                                        <div class="top-50">@TaskModel.User.Name</div>
+                                        <div class="top-50">@_date</div>
                                     </div>
                                 </div>
-                            }
-                            <div class="position-relative m-auto justify-content-center d-flex">
+                            </strong>
+                        </div>
 
-                                @if (TaskModel.FileModel.Length > 1)
-                                {
-                                    <span class="arrow-left swip-arrow">
-                                        <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-left px-1 arrow-size-2 rounded-circle top-50" @onclick="@(ImgLeft)"></button>
-                                    </span>
-                                }
-                                @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[_maingImg].ObjName))
-                                {
-                                    <ObjectTypeComponent fileModel="TaskModel.FileModel[_maingImg]"></ObjectTypeComponent>
-                                }
-
-                                @if (TaskModel.FileModel.Length > 1)
-                                {
-                                    <span class="arrow-right swip-arrow">
-                                        <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-right px-1  arrow-size-2 rounded-circle top-50" @onclick="@(ImgRight)"></button>
-                                    </span>
-                                }
-
+                        <div class="toast-body">
+                            <div class="">
+                                @TaskModel.Description
                             </div>
-                        }
+                            @if (TaskModel.FileModel != null)
+                            {
+                                if (TaskModel.FileModel.Length > 1)
+                                {
+                                    <div class="m-auto d-flex justify-content-center">
+                                        <div class="float-start ">
+                                            @for (int j = 0; j < TaskModel.FileModel.Length; j++)
+                                            {
+                                                var img = j;
+                                                <button class="btn p-1 " @onclick="@(()=>ChangeImg(img))">
+                                                    @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[j].ObjName))
+                                                    {
+                                                        <span class="smallObj">
+                                                            <ObjectTypeComponent IsSmall="true" fileModel="TaskModel.FileModel[j]"></ObjectTypeComponent>
+                                                        </span>
+                                                    }
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                <div class="position-relative m-auto justify-content-center d-flex">
+
+                                    @if (TaskModel.FileModel.Length > 1)
+                                    {
+                                        <span class="arrow-left swip-arrow">
+                                            <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-left px-1 arrow-size-2 rounded-circle top-50" @onclick="@(ImgLeft)"></button>
+                                        </span>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(TaskModel.FileModel[_maingImg].ObjName))
+                                    {
+                                        <ObjectTypeComponent fileModel="TaskModel.FileModel[_maingImg]"></ObjectTypeComponent>
+                                    }
+
+                                    @if (TaskModel.FileModel.Length > 1)
+                                    {
+                                        <span class="arrow-right swip-arrow">
+                                            <button class="btn btn-outline-primary border-0 oi oi-arrow-thick-right px-1  arrow-size-2 rounded-circle top-50" @onclick="@(ImgRight)"></button>
+                                        </span>
+                                    }
+
+                                </div>
+                            }
+                        </div>
+                        <div class="toast-body">
+                            <CommentComponentList Id="@TaskModel.Id"></CommentComponentList>
+                            <span class="m-auto d-flex justify-content-end ">
+                                <button disabled type="button" class=" oi oi-arrow-circle-top btn btn-outline-primary"
+                                        aria-label="Close"></button>
+                            </span>
+                        </div>
                     </div>
-                    <div class="toast-body ">
-                        <CommentComponentList Id="@TaskModel.Id"></CommentComponentList>
-                        <span class="m-auto d-flex justify-content-end ">
-                            <button disabled type="button" class=" oi oi-arrow-circle-top btn btn-outline-primary"
-                                    aria-label="Close"></button>
-                        </span>
-                    </div>
+
                 </div>
             </div>
         </div>

@@ -1,0 +1,47 @@
+﻿
+<div>
+    <table class="table text-white text-center">
+        <tr>
+            <th>
+                <div class="nav-item px-3">
+                    <button class="btn btn-outline-primary text-white border-0" @onclick=@(() => selectedOptions = 0)>
+                        <span class="" aria-hidden="true"></span> Profil
+                    </button>
+                </div>
+            </th>
+            <th>
+                <div class="px-3">
+                    <button class="btn btn-outline-primary text-white border-0" @onclick=@(() => selectedOptions = 1)>
+                        <span class="" aria-hidden="true"></span> Bezpieczeństwo
+                    </button>
+                </div>
+            </th>
+            <th class="d-none">
+                <div class="px-3">
+                    <button class="btn btn-outline-primary text-white border-0" @onclick=@(() => selectedOptions = 2)>
+                        <span class="" aria-hidden="true"></span> 
+                    </button>
+                </div>
+            </th>
+        </tr>
+
+    </table>
+    @if (selectedOptions == 0)
+    {
+        <ProfileEditComponent Func="Func"/>
+    }
+    else if (selectedOptions == 1)
+    {
+        <ProfileSecurityComponent />
+    }
+
+</div>
+
+
+
+
+@code {
+    int selectedOptions = 0;
+    [Parameter]
+    public Func<string?,Task>? Func{ get; set; }
+}

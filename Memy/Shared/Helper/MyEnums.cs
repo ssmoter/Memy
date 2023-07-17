@@ -27,6 +27,28 @@
             video,
             YouTube,
         }
+        public enum AvatarSize
+        {
+            AnswerComment = 1,
+            Comment,
+            File,
+            Profile
+        }
+        public enum UpdateProfile
+        {
+            Password=0,
+            Name,
+            Avatar,
+            Email,
+        }
+
+        public enum AdminDeleteBanType
+        {
+            AnswerComment = 1,
+            Comment,
+            File,
+            Profile
+        }
 
     }
 }

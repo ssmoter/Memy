@@ -1,15 +1,15 @@
 ﻿using Memy.Server.Data.SqlDataAccess;
+using Memy.Shared.Model;
 
 namespace Memy.Server.Data.File
 {
     public interface IAddNewFileModel
     {
-        Task<bool> AddFileData(int FileSimpleId, string ImgName, string ImgType);
-        Task<bool> AddFileTag(int FileSimpleId, string Value);
-        Task<int> CreateNewFile(string token, string title, string description);
+        Task<T[]> GetLikeUserTasksModel<T>(string token, int start, int max, int orderTyp);
         Task<IList<string>> GetTagList();
         Task<T> GetTaskAsync<T>(int id, string? token);
-        Task<T[]> GetTasksAsync<T>(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart, string? token);
+        Task<T[]> GetTasksAsync<T>(int? start, string? mcategoryain, int? max, bool? banned, string? dateEnd, string? dateStart, int orderTyp, string? token);
+        Task<T[]> GetUserTasksModel<T>(string name, int start, int max, int orderTyp, bool banned);
         Task<int> InsertFullFile(string json, string token);
     }
 
@@ -32,90 +32,35 @@ namespace Memy.Server.Data.File
 
             return await sqlData.LoadData<int>(sql.ToString());
         }
-        public async Task<int> CreateNewFile(string token, string title, string description)
+        public async Task<T[]> GetTasksAsync<T>(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, int orderTyp, string? token)
         {
             sql.Clear();
-            sql.Append("EXEC [CreateNewFile] ");
-            sql.Append("N'");
-            sql.Append(token);
-            sql.Append("', ");
-            sql.Append("N'");
-            sql.Append(title);
-            sql.Append("' ");
-            if (!string.IsNullOrWhiteSpace(description))
-            {
-                sql.Append(",N'");
-                sql.Append(description);
-                sql.Append("'");
-            }
+            sql.Append("EXEC [GetFiles] ");
 
-            return await sqlData.LoadData<int>(sql.ToString());
-        }
-        public async Task<bool> AddFileData(int FileSimpleId, string ImgName, string ImgType)
-        {
-            sql.Clear();
-            sql.Append("EXEC [AddFileData] ");
-            sql.Append("");
-            sql.Append(FileSimpleId);
-            sql.Append(", ");
-            sql.Append("N'");
-            sql.Append(ImgName);
-            sql.Append("', ");
-            sql.Append("N'");
-            sql.Append(ImgType);
-            sql.Append("' ");
+            sql.Append(start);
 
-            return await sqlData.LoadData<bool>(sql.ToString());
-        }
-        public async Task<bool> AddFileTag(int FileSimpleId, string Value)
-        {
-            sql.Clear();
-            sql.Append("EXEC [AddTag] ");
-            sql.Append("");
-            sql.Append(FileSimpleId);
             sql.Append(", ");
-            sql.Append("N'");
-            sql.Append(Value);
+            sql.Append(max);
+
+            sql.Append(", '");
+            sql.Append(category);
             sql.Append("'");
 
-            return await sqlData.LoadData<bool>(sql.ToString());
-        }
-        public async Task<T[]> GetTasksAsync<T>(int? start, string? category, int? max, bool? banned, string? dateEnd, string? dateStart, string? token)
-        {
-            sql.Clear();
-            sql.Append("EXEC [GetFileByDate] ");
-            if (start != null)
-            {
-                sql.Append(start);
-            }
-            if (max != null)
-            {
-                sql.Append(", ");
-                sql.Append(max);
-            }
-            if (category != null)
-            {
-                sql.Append(", '");
-                sql.Append(category);
-                sql.Append("'");
-            }
-            if (banned != null)
-            {
-                sql.Append(", ");
-                sql.Append(banned);
-            }
-            if (dateEnd != null)
-            {
-                sql.Append(", '");
-                sql.Append(dateEnd);
-                sql.Append("'");
-            }
-            if (dateStart != null)
-            {
-                sql.Append(", '");
-                sql.Append(dateStart);
-                sql.Append("'");
-            }
+            sql.Append(", ");
+            sql.Append(banned);
+
+            sql.Append(", '");
+            sql.Append(dateEnd);
+            sql.Append("'");
+
+            sql.Append(", '");
+            sql.Append(dateStart);
+            sql.Append("'");
+
+
+            sql.Append(", ");
+            sql.Append(orderTyp);
+
             if (token != null)
             {
                 sql.Append(", '");
@@ -148,6 +93,15 @@ namespace Memy.Server.Data.File
             return await sqlData.LoadDataList<string>(sql.ToString());
         }
 
-
+        public async Task<T[]> GetUserTasksModel<T>(string name, int start, int max, int orderTyp, bool banned)
+        {
+            var result = await this.ExecProcedureList<T>("GetUserFiles", name, start, max, orderTyp, banned);
+            return result.ToArray();
+        }
+        public async Task<T[]> GetLikeUserTasksModel<T>(string token, int start, int max, int orderTyp )
+        {
+            var result = await this.ExecProcedureList<T>("GetUserLikeFiles", token, start, max, orderTyp);
+            return result.ToArray();
+        }
     }
 }

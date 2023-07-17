@@ -87,6 +87,14 @@ namespace PagesLibrary.Pages.File
                 });
                 _moreText = "";
             }
+            if (_fileUploadStatuses.Count > 0)
+            {
+                if (_fileUploadStatuses[0].ObjOrder < 1)
+                {
+                    _fileUploadStatuses[0].ObjOrder = 1;
+                }
+            }
+
         }
         private void RemoveAt(int index)
         {
