@@ -1,5 +1,4 @@
 ﻿using Memy.Server.Data.Admin;
-using Memy.Server.Data.File;
 using Memy.Server.Filtres;
 using Memy.Server.Service;
 using Memy.Shared.Model;
@@ -29,8 +28,8 @@ namespace Memy.Server.Controllers
 
 
         [HttpPut]
-        [Route("{id}/Category")]
-        public async Task<IActionResult> Category(int id, [FromBody] ReportedMessagesModel? reportedMessagesModel)
+        [Route("{id}/category")]
+        public async Task<IActionResult> Category(int id, string category, [FromBody] ReportedMessagesModel? reportedMessagesModel)
         {
             try
             {
@@ -43,7 +42,7 @@ namespace Memy.Server.Controllers
                     return NoContent();
                 }
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-                await _fileAdminService.CategoryFile(id, token, reportedMessagesModel);
+                await _fileAdminService.UpdateCategoryFile(id, category, token, reportedMessagesModel);
 
                 return Ok();
             }
@@ -54,7 +53,7 @@ namespace Memy.Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}/Ban")]
+        [Route("{id}/ban")]
         public async Task<IActionResult> Ban(int id, [FromBody] ReportedMessagesModel? reportedMessagesModel)
         {
             try
@@ -79,7 +78,7 @@ namespace Memy.Server.Controllers
         }
 
         [HttpPut]
-        [Route("{id}/Delete")]
+        [Route("{id}/delete")]
         public async Task<IActionResult> Delete(int id, [FromBody] ReportedMessagesModel? reportedMessagesModel)
         {
             try

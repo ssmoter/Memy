@@ -19,5 +19,9 @@ namespace Memy.Server.Data.Admin
             return result.ToArray();
         }
 
+        public async Task UpdateCategoryFileByAdmin(int id, string category, string token, string? header, string? body, int level)
+        {
+            await ExecProcedure<bool>("UpdateCategoryFileByAdmin", id, category, token, header, body, level);
+        }
     }
 }

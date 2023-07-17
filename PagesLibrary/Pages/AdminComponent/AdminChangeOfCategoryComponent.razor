@@ -1,22 +1,59 @@
-﻿<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
+﻿@using PagesLibrary.Data.Admin
+@using static Memy.Shared.Helper.MyEnums;
+
+@inject ILogger<AdminChangeOfCategoryComponent> _logger
+@inject PopupListService _popUp
+@inject ModalPopUpService _modal
+@inject AdminFileApi _AdminFile
+@inject AdminCommentApi _AdminComment
+@inject ModalAdminMessageService _adminModal
+
+
+<AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
     <Authorized>
+        @if (Model != null)
+        {
+            <span class="px-1">
+                <button class="btn btn-outline-primary text-white" @onclick="BtnMain">
+                    <span class="oi oi-star"></span>
+                    <span class="hideTextInSmall">Główna</span>
+                </button>
+            </span>
 
-        <span class="px-1">
-            <button class="btn btn-outline-primary text-white">
-                <span class="oi oi-star"></span>
-                <span class="hideTextInSmall">Główna</span>
-            </button>
-        </span>
-
-        <span class="px-1">
-            <button class="btn btn-outline-primary text-white">
-                <span class="oi oi-cog"></span>
-                <span class="hideTextInSmall">Zmiana kategori</span>
-            </button>
-        </span>
+            <span class="px-1">
+                <button class="btn btn-outline-primary text-white" @onclick="@(()=> isVisibleCategory =! isVisibleCategory)">
+                    <span class="oi oi-cog"></span>
+                    <span class="hideTextInSmall">Zmiana kategori</span>
+                </button>
+                @if (isVisibleCategory)
+                {
+                    <DropDownList List="categoriesTable" Func="@(()=>BtnCategory())" @bind-Value="categories" />
+                }
+            </span>
+        }
     </Authorized>
 </AuthorizeView>
 @code {
+
+    [Parameter]
+    public TaskModel? Model { get; set; }
+
+    [Parameter]
+    public Func<Task>? Fucn { get; set; }
+
+    [Parameter]
+    public AdminDeleteBanType Type { get; set; }
+
+    bool isVisibleCategory;
+    private string selectedValue { get; set; } = "1";
+
+    (string?, string?) categories { get; set; } = (Memy.Shared.Helper.Categories.Waiting, "Brak");
+
+    (string, string)[] categoriesTable = new (string, string)[]
+    {
+        (Memy.Shared.Helper.Categories.Waiting,"Brak"),
+        (Memy.Shared.Helper.Categories.Main,"Główna"),
+    };
 
 
 }

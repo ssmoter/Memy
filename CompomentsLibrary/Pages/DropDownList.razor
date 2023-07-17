@@ -23,7 +23,7 @@
     public IList<(string?, string?)> List { get; set; }
 
     [Parameter]
-    public Func<Task> Func { get; set; }
+    public Func<Task>? Func { get; set; }
 
     (string?, string?) _value;
     [Parameter]
@@ -39,12 +39,16 @@
                 ValueChanged.InvokeAsync(Value);
                 if (bInitialized)
                 {
-                    Func?.Invoke();
+                    if (Func != null)
+                    {
+                        Func?.Invoke();
+                    }
                 }
                 bInitialized = true;
             }
         }
     }
+
 
     bool bInitialized = false;
 

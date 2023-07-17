@@ -7,5 +7,6 @@ namespace PagesLibrary.Data.Admin
     {
         Task<HttpResponseMessage> Ban(int id, ReportedMessagesModel reported);
         Task<HttpResponseMessage> Delete(int id, ReportedMessagesModel reported);
+        Task<HttpResponseMessage> UpdateCategory(int id, string category, ReportedMessagesModel reported);
     }
 }

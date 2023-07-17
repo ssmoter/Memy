@@ -56,7 +56,7 @@ namespace CompomentsLibrary.Pages
                                      string yesText = "Ok",
                                      string noText = "Cancel")
         {
-            message = new ModalMessage(headerText, bodyText, (((int)PopupLevel.Level.None).ToString(), level2));
+            message = new ModalMessage(headerText, bodyText, (((int)level).ToString(), level2));
 
 
             HeaderText = headerText;

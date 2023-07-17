@@ -52,11 +52,11 @@ namespace Memy.Server.Service
             }
         }
 
-        internal async Task CategoryFile(int id, string token, ReportedMessagesModel reportedMessagesModel)
+        internal async Task UpdateCategoryFile(int id,string category, string token, ReportedMessagesModel reportedMessagesModel)
         {
             try
             {
-                await _adminData.BanFileByAdmin(id, token, reportedMessagesModel.Header, reportedMessagesModel.Body, reportedMessagesModel.Level);
+                await _adminData.UpdateCategoryFileByAdmin(id,category, token, reportedMessagesModel.Header, reportedMessagesModel.Body, reportedMessagesModel.Level);
             }
             catch (Exception ex)
             {

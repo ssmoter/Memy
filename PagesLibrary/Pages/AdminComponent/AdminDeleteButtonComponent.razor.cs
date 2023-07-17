@@ -37,7 +37,7 @@ namespace PagesLibrary.Pages.AdminComponent
         {
             try
             {
-                var result = await _adminModal.ShowPopup(Title,
+                var result = await _adminModal.ShowPopup(Model.Title,
                                                          "Post został usunięty",
                                                          PopupLevel.Level.Warning,
                                                          PopupLevel.Level.Warning.ToString(),
@@ -57,7 +57,7 @@ namespace PagesLibrary.Pages.AdminComponent
 
 
 
-                var response = await _adminApi.Delete(Id, repored);
+                var response = await _adminApi.Delete(Model.Id, repored);
                 var json = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {

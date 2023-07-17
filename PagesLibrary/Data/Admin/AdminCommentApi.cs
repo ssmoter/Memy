@@ -50,5 +50,18 @@ namespace PagesLibrary.Data.Admin
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="category"></param>
+        /// <param name="reported"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Task<HttpResponseMessage> UpdateCategory(int id, string category, ReportedMessagesModel reported)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

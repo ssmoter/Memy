@@ -36,12 +36,22 @@ namespace PagesLibrary.Pages.AdminComponent
         {
             try
             {
-                var result = await _adminModal.ShowPopup(Title,
-                                                         "Post zostal zbanowany zapoznaj sie z regulaminem w celu jego przywrócenia",
-                                                         PopupLevel.Level.Warning,
-                                                         PopupLevel.Level.Warning.ToString(),
-                                                         "Ban",
-                                                         "Anuluj");
+                string? body = "";
+                if (Model.Banned)
+                {
+                    body = "Post został odbanowany";
+                }
+                else
+                {
+                    body = "Post zostal zbanowany zapoznaj sie z regulaminem w celu jego przywrócenia";
+                }
+
+                var result = await _adminModal.ShowPopup(Model.Title,
+                                                         bodyText: body,
+                                                         level1: PopupLevel.Level.Warning,
+                                                         level2: PopupLevel.Level.Warning.ToString(),
+                                                         yesText: "Ban",
+                                                         noText: "Anuluj");
 
                 if (string.IsNullOrWhiteSpace(result.Value.Item1))
                 {
@@ -54,7 +64,7 @@ namespace PagesLibrary.Pages.AdminComponent
                     Level = (int)result.Value.Item3
                 };
 
-                var response = await _adminApi.Ban(Id, repored);
+                var response = await _adminApi.Ban(Model.Id, repored);
                 var json = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {

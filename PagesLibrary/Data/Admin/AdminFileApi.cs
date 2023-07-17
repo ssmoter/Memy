@@ -48,6 +48,23 @@ namespace PagesLibrary.Data.Admin
                 throw;
             }
         }
+        public async Task<HttpResponseMessage> UpdateCategory(int id, string category, ReportedMessagesModel reported)
+        {
+            try
+            {
+                var client = await this.SetAuthorizationHeader();
+
+                var result = await client.PutAsJsonAsync($"{Routes.FileAdmin}/{id}/{Routes.Category}?category={category}", reported);
+                await IfUnauthorized(result);
+
+                return result;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
     }
 }

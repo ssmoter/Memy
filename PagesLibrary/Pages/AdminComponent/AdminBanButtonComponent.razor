@@ -9,14 +9,21 @@
 @inject ModalAdminMessageService _adminModal
 
 
-@if (Id > 0)
+@if (Model != null)
 {
     <AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
         <Authorized>
             <span class="px-1">
                 <button class="btn btn-outline-primary text-white" @onclick="Ban">
                     <span class="oi oi-ban"></span>
-                    <span class="hideTextInSmall">Zbanuj</span>
+                    @if (Model.Banned)
+                    {
+                        <span class="hideTextInSmall">Odbanuj</span>
+                    }
+                    else
+                    {
+                        <span class="hideTextInSmall">Zbanuj</span>
+                    }
                 </button>
             </span>
         </Authorized>
@@ -24,11 +31,8 @@
 }
 
 @code {
-
     [Parameter]
-    public int Id { get; set; }
-    [Parameter]
-    public string? Title { get; set; }
+    public TaskModel? Model { get; set; }
     [Parameter]
     public AdminDeleteBanType Type { get; set; }
 

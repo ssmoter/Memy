@@ -8,7 +8,7 @@
 @inject AdminCommentApi _AdminComment
 @inject ModalAdminMessageService _adminModal
 
-@if (Id > 0)
+@if (Model != null)
 {
     <AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
         <Authorized>
@@ -25,9 +25,7 @@
 @code {
 
     [Parameter]
-    public int Id { get; set; }
-    [Parameter]
-    public string? Title{ get; set; }
+    public TaskModel? Model { get; set; }
 
     [Parameter]
     public AdminDeleteBanType Type { get; set; }
