@@ -12,7 +12,7 @@ namespace PagesLibrary.Data.Admin
 {
     public class AdminFileApi : BaseApi, IAdminApi
     {
-        public AdminFileApi(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
+        public AdminFileApi(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 

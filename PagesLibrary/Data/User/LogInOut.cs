@@ -21,11 +21,7 @@ namespace PagesLibrary.Data.User
 
     public class LogInOut : BaseApi, ILogInOut
     {
-        public LogInOut(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
-        {
-        }
-
-        public LogInOut(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
+        public LogInOut(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 

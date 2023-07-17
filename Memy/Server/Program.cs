@@ -9,6 +9,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddMyService();
 
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

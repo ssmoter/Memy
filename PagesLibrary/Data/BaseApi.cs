@@ -13,17 +13,17 @@ namespace PagesLibrary.Data
     public class BaseApi
     {
         private static HttpClient _HttpClient;
-        protected string UrlStringName { get; set; } = "https://localhost:7241/api/";
         private readonly ILocalStorageService _localStorageService;
         private readonly ISessionStorageService _sessionStorageService;
         private readonly AuthenticationStateProvider authenticationStateProvider;
 
-        public BaseApi(ILocalStorageService localStorageService,
+        public BaseApi(HttpClient httpClient,
+                       ILocalStorageService localStorageService,
                        ISessionStorageService sessionStorageService,
-                       AuthenticationStateProvider authenticationStateProvider = null)
+                       AuthenticationStateProvider authenticationStateProvider)
         {
             _HttpClient = new HttpClient();
-            _HttpClient.BaseAddress = new Uri(UrlStringName);
+            _HttpClient.BaseAddress = new Uri(httpClient.BaseAddress, "/api/");
             _localStorageService = localStorageService;
             _sessionStorageService = sessionStorageService;
             this.authenticationStateProvider = authenticationStateProvider;

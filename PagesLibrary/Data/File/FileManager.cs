@@ -24,13 +24,10 @@ namespace PagesLibrary.Data.File
 
     public class FileManager : BaseApi, IFileManager
     {
-        public FileManager(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        public FileManager(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 
-        public FileManager(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
-        {
-        }
 
         //wysyłanie modelu
         public async Task<HttpResponseMessage> PostFileAsync(FileUploadModel file)
@@ -49,7 +46,7 @@ namespace PagesLibrary.Data.File
             }
         }
         //pobieranie listy modelów do wyświetlenia
-        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart,int? orderTyp)
+        public async Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart, int? orderTyp)
         {
             try
             {
@@ -134,12 +131,12 @@ namespace PagesLibrary.Data.File
         //ustawianie adresu z img
         public string GetImg(string name)
         {
-            string url = $"{UrlStringName}{Routes.File}/{Routes.Img}/{name}";
+            string url = $"{GetHttpClient().BaseAddress.AbsolutePath}{Routes.File}/{Routes.Img}/{name}";
             return url;
         }
         public string GetVideo(string name)
         {
-            string url = $"{UrlStringName}{Routes.File}/{Routes.Video}/{name}";
+            string url = $"{GetHttpClient().BaseAddress.AbsolutePath}{Routes.File}/{Routes.Video}/{name}";
             return url;
         }
         //pobieranie tagów

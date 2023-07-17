@@ -18,7 +18,7 @@ namespace PagesLibrary.Data.User
 
     public class ReportedMessagesApi : BaseApi, IReportedMessagesApi
     {
-        public ReportedMessagesApi(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
+        public ReportedMessagesApi(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 

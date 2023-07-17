@@ -12,7 +12,7 @@ namespace PagesLibrary.Data.Admin
 {
     public class AdminCommentApi : BaseApi, IAdminApi
     {
-        public AdminCommentApi(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService, sessionStorageService, authenticationStateProvider)
+        public AdminCommentApi(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 

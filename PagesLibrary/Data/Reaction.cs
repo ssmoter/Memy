@@ -4,6 +4,8 @@ using Blazored.SessionStorage;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
+using Microsoft.AspNetCore.Components.Authorization;
+
 using System.Net.Http.Json;
 
 namespace PagesLibrary.Data
@@ -15,9 +17,10 @@ namespace PagesLibrary.Data
 
     public class Reaction : BaseApi, IReaction
     {
-        public Reaction(ILocalStorageService localStorageService, ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        public Reaction(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
+
         public async Task<ReactionModel?> SetReaction(int reactionId, int value, MyEnums.TypOfReaction typOfReaction)
         {
             try

@@ -10,11 +10,7 @@ namespace PagesLibrary.Data.User
 {
     public class ProfileData : BaseApi, IProfileData
     {
-        public ProfileData(ILocalStorageService localStorageService,
-                           ISessionStorageService sessionStorageService,
-                           AuthenticationStateProvider authenticationStateProvider = null) : base(localStorageService,
-                                                                                                  sessionStorageService,
-                                                                                                  authenticationStateProvider)
+        public ProfileData(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 

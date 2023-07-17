@@ -1,9 +1,7 @@
 ﻿@page "/fetchdata"
-@using Memy.Shared
-@using PagesLibrary.Data.User;
-@using PagesLibrary.Data;
+@using Memy.Shared;
 @inject HttpClient Http
-@inject BaseApi _base
+
 
 <PageTitle>Weather forecast</PageTitle>
 
@@ -14,7 +12,6 @@
 @if (forecasts.Length == 0)
 {
     <p><em>Loading...</em></p>
-    <p><em>@error.Message</em></p>
 }
 else
 {
@@ -44,27 +41,9 @@ else
 
 @code {
     private WeatherForecast[]? forecasts = new WeatherForecast[0];
-    private Memy.Shared.Model.Error? error = new Memy.Shared.Model.Error();
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await _base.GetUserStorage();
-        if (token != null)
-        {
-            Http.DefaultRequestHeaders.Clear();
-            Http.DefaultRequestHeaders.Add(Memy.Shared.Helper.Headers.Authorization, token.Token);
-        }
-
-        var result = await Http.GetAsync("WeatherForecast");
-        if (result.IsSuccessStatusCode)
-        {
-            forecasts = await result.Content.ReadFromJsonAsync<WeatherForecast[]>();
-        }
-        else
-        {
-            error = await result.Content.ReadFromJsonAsync<Memy.Shared.Model.Error>();
-        }
-
-        //forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
+        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("WeatherForecast");
     }
 }

@@ -28,13 +28,6 @@ namespace Memy.Server.Controllers
         }
 
 
-        // GET: api/<UserController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
         // GET api/<UserController>/5
         [HttpGet("{name}")]
         public async Task<IActionResult> Get(string name)

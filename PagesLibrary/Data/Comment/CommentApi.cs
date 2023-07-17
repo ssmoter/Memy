@@ -12,20 +12,10 @@ namespace PagesLibrary.Data.Comment
 {
     internal class CommentApi : BaseApi, ICommentApi
     {
-        public CommentApi(ILocalStorageService localStorageService,
-                          ISessionStorageService sessionStorageService) : base(localStorageService, sessionStorageService)
+        public CommentApi(HttpClient httpClient, ILocalStorageService localStorageService, ISessionStorageService sessionStorageService, AuthenticationStateProvider authenticationStateProvider) : base(httpClient, localStorageService, sessionStorageService, authenticationStateProvider)
         {
         }
 
-        public CommentApi(
-            ILocalStorageService localStorageService,
-            ISessionStorageService sessionStorageService,
-            AuthenticationStateProvider authenticationStateProvider = null) : base(
-                localStorageService,
-                sessionStorageService,
-                authenticationStateProvider)
-        {
-        }
 
         // pobieranie i wysyłanie komentarzy
         public async Task<HttpResponseMessage> GetCommentAsync(int id, int orderTyp = 0)
