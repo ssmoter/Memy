@@ -1,6 +1,4 @@
-﻿using CompomentsLibrary.Helper;
-
-using Memy.Shared.Model;
+﻿using Memy.Shared.Model;
 
 using Microsoft.Extensions.Logging;
 
@@ -34,19 +32,25 @@ namespace PagesLibrary.Pages.User
         }
         private async Task BtnRemoveMessages(int index)
         {
-            if (messages[index].BeenDelete == false)
+            if (messages is not null)
             {
-                messages[index].BeenDelete = true;
-                await UpdateMessages(messages[index]);
+                if (messages[index].BeenDelete == false)
+                {
+                    messages[index].BeenDelete = true;
+                    await UpdateMessages(messages[index]);
+                }
             }
         }
 
         private async Task IsChecked(int index)
         {
-            if (messages[index].BeenChecked == false)
+            if (messages is not null)
             {
-                messages[index].BeenChecked = true;
-                await UpdateMessages(messages[index]);
+                if (messages[index].BeenChecked == false)
+                {
+                    messages[index].BeenChecked = true;
+                    await UpdateMessages(messages[index]);
+                }
             }
         }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
 
-namespace PagesLibrary.Pages.User
+namespace PagesLibrary.Pages.User.Register
 {
     public partial class RegisterPage
     {
@@ -21,6 +21,7 @@ namespace PagesLibrary.Pages.User
             StateHasChanged();
         }
 
+
         private async Task HandleValidSubmit()
         {
             _ilogger.LogInformation("Valid Submit");
@@ -28,28 +29,31 @@ namespace PagesLibrary.Pages.User
             {
                 try
                 {
-                    var result = await _logInOut.LogIn(_user.Email, _user.Password, false);
-                    if (result.Item2 == System.Net.HttpStatusCode.OK)
+                    ArgumentNullException.ThrowIfNull(_user);
+                    ArgumentNullException.ThrowIfNullOrEmpty(_user.Nick);
+                    ArgumentNullException.ThrowIfNullOrEmpty(_user.Email);
+                    ArgumentNullException.ThrowIfNullOrEmpty(_user.Password);
+
+                    var result = await _registerApi.PostRegister(_user.Nick, _user.Email, _user.Password);
+                    var json = await result.Content.ReadAsStringAsync();
+                    if (result.IsSuccessStatusCode)
                     {
+                        _registerPass = true;
+                        _email = _user.Email;
                         _user = new RegisterUser();
-                        await _authStateProvider.GetAuthenticationStateAsync();
                     }
-                    else if (result.Item2 != System.Net.HttpStatusCode.OK)
+                    else
                     {
-                        _ilogger.LogError(result.Item1);
+                        _ilogger.LogError(json);
                         _user.Password = "";
-                    }
-                    if (result.Item2 == System.Net.HttpStatusCode.NoContent)
-                    {
-                        error = result.Item1;
-                    }
-                    if (result.Item2 == System.Net.HttpStatusCode.NotFound)
-                    {
-                        error = result.Item1;
-                    }
-                    if (result.Item2 == System.Net.HttpStatusCode.BadRequest)
-                    {
-                        error = "Wystąpił inny błąd";
+                        if (json == "email")
+                        {
+                            _error = "Dany email został już wykorzystany";
+                        }
+                        if (json == "name")
+                        {
+                            _error = "Dana nazwa użytkownika już istnieje";
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -66,6 +70,7 @@ namespace PagesLibrary.Pages.User
             {
                 _editContext.OnFieldChanged -= HandleFieldChanged;
             }
+            _user = new RegisterUser();
         }
 
         private class RegisterUser

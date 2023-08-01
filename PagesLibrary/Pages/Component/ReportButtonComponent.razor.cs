@@ -8,6 +8,11 @@ namespace PagesLibrary.Pages.Component
         {
             try
             {
+                if (Reported is null)
+                {
+                    return;
+                }
+
                 Reported.Id = Id;
                 if (Reported.Value == 1)
                 {

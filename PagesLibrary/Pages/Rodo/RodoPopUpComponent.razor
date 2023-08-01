@@ -1,24 +1,38 @@
-﻿
-<div class="position-fixed bottom-0 w-100 bg-primary d-none">
-    <div class="w-100 ">
-        <div class="">
-            <span class="text-black">
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
-                Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+﻿@inject BaseApi api;
 
-            </span>
-            <span class="p-2 d-flex justify-content-end float-end">
-                <button class="btn p-1 btn-outline-dark top-50 ">Zaakceptuj pliki cookie</button>
-            </span>
+
+@if (!RodoAvailable.AcceptedCookieNotice)
+{
+    <div class="position-fixed bottom-0 w-100 bg-white">
+        <div class="w-100 ">
+            <div class="">
+                <span class="text-black">
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+                    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+
+                </span>
+                <span class="p-2 d-flex justify-content-end float-end">
+                    <button class="btn p-1 btn-outline-dark top-50 " @onclick="@BtnSetRodo">Zaakceptuj pliki cookie</button>
+                </span>
+            </div>
         </div>
     </div>
-</div>
-
+}
 
 @code {
+    protected override async Task OnInitializedAsync()
+    {
+        await api.GetAcceptedCookie();
+    }
+
+    private async Task BtnSetRodo()
+    {
+        RodoAvailable.AcceptedCookieNotice = true;
+        await api.SetAcceptedCookie();
+    }
 
 }

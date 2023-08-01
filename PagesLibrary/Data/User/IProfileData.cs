@@ -4,6 +4,6 @@
     {
         Task<string> GetEmailAsync();
         Task<HttpResponseMessage> GetProfileAsync(string name);
-        Task<HttpResponseMessage> UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile id, object value);
+        Task<HttpResponseMessage> UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile id, object? value);
     }
 }

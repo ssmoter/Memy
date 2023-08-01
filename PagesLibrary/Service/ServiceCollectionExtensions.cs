@@ -33,6 +33,8 @@ namespace PagesLibrary.Service
             services.AddScoped<IProfileData, ProfileData>();
             services.AddScoped<IReported, Reported>();
             services.AddScoped<IReportedMessagesApi, ReportedMessagesApi>();
+            services.AddScoped<IRegisterUserApi, RegisterUserApi>();
+
 
 
             services.AddScoped<AdminFileApi>();

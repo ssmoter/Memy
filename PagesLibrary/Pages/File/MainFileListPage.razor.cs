@@ -8,7 +8,6 @@ namespace PagesLibrary.Pages.File
     {
         public TaskModel[]? TaskModels { get; set; }
 
-
         protected override async Task OnInitializedAsync()
         {
             await GetTaskAsync();
@@ -47,12 +46,12 @@ namespace PagesLibrary.Pages.File
         {
             try
             {
-                if (Start == null)
-                {
-                    Start = 0;
-                }
                 DateEnd = _dateLenght.Item1;
-                int order = int.Parse(_orderTyp.Item1);
+                int order = 0;
+                if (!string.IsNullOrWhiteSpace(_orderTyp.Item1))
+                {
+                    order = int.Parse(_orderTyp.Item1);
+                }
                 var result = await _iFileManager.GetTaskModelsAsync(Start, Categories, Max, Banned, DateEnd, DateStart, order);
                 if (result.IsSuccessStatusCode)
                 {

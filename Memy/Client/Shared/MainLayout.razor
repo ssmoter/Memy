@@ -1,9 +1,7 @@
-﻿@using CompomentsLibrary.Pages
-@using PagesLibrary.Data.File;
+﻿@using PagesLibrary.Data;
+
 @inherits LayoutComponentBase
-@inject PopupListService _popUp
-@inject ModalPopUpService _modal
-@inject IFileManager _iFileManager
+
 @inject ILogger<MainLayout> _logger
 
 <AllPopUp />
@@ -27,4 +25,5 @@
 </div>
 
 @code {
+
 }

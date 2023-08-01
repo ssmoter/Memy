@@ -32,31 +32,36 @@ namespace PagesLibrary.Pages.AdminComponent
         }
 
 
-        ReportedMessagesModel repored;
+        ReportedMessagesModel? repored;
         public async Task Delete()
         {
             try
             {
-                var result = await _adminModal.ShowPopup(Model.Title,
+                string title = "";
+                ArgumentNullException.ThrowIfNull(Model);
+                if (!string.IsNullOrWhiteSpace(Model.Title))
+                {
+                    title = Model.Title;
+                }
+                var result = await _adminModal.ShowPopup(title,
                                                          "Post został usunięty",
                                                          PopupLevel.Level.Warning,
                                                          PopupLevel.Level.Warning.ToString(),
                                                          "Usuń",
                                                          "Anuluj");
-
-                if (string.IsNullOrWhiteSpace(result.Value.Item1))
+                if (result is null)
                 {
                     return;
                 }
                 repored = new ReportedMessagesModel
                 {
-                    Header = result.Value.Item1,
-                    Body = result.Value.Item2,
-                    Level = (int)result.Value.Item3
+                    Header = result.Header,
+                    Body = result.Body,
+                    Level = (int)result.Level
                 };
 
 
-
+                ArgumentNullException.ThrowIfNull(_adminApi);
                 var response = await _adminApi.Delete(Model.Id, repored);
                 var json = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)

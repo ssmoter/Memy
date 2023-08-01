@@ -5,11 +5,11 @@ using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.Extensions.Logging;
+
+using PagesLibrary.Helper;
 
 using System.Net;
 using System.Net.Http.Json;
-using System.Text;
 
 namespace PagesLibrary.Data.User
 {
@@ -25,38 +25,6 @@ namespace PagesLibrary.Data.User
         {
         }
 
-        public async Task<(string, HttpStatusCode)> Register(string name,string email,string password)
-        {
-            try
-            {
-                var _httpClient = GetHttpClient();
-                var newUser = new UserSimple()
-                {
-                };
-                //przesłanie hasła w postaci byte zapisanych jako string
-                newUser.Password = System.BitConverter.ToString(System.Text.Encoding.UTF8.GetBytes(password));
-                var result = await _httpClient.PostAsJsonAsync(Routes.UserLog, newUser);
-                var content = await result.Content.ReadAsStringAsync();
-                if (result.IsSuccessStatusCode)
-                {
-                    if (newUser.Token.DoNotLogOut)
-                    {
-                        //zapisać do local storage
-                        await GetLocalStorage().SetItemAsStringAsync(Headers.Authorization, content);
-                    }
-                    else
-                    {
-                        //zapisać do seasion storage
-                        await GetSessionStorage().SetItemAsStringAsync(Headers.Authorization, content);
-                    }
-                }
-                return (content, result.StatusCode);
-            }
-            catch (Exception )
-            {
-                throw;
-            }
-        }
 
         //zalogowanie użytkownia
         public async Task<(string, HttpStatusCode)> LogIn(string? email, string? password, bool doNotLogOut)
@@ -79,6 +47,8 @@ namespace PagesLibrary.Data.User
                 var content = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
                 {
+                    RodoAvailable.AcceptedCookieNotice = true;
+                    await SetAcceptedCookie();
                     if (newUser.Token.DoNotLogOut)
                     {
                         //zapisać do local storage
@@ -103,24 +73,43 @@ namespace PagesLibrary.Data.User
         {
             try
             {
+
                 var _httpClient = await base.SetAuthorizationHeader();
                 UserStorage? userStorage = await GetUserStorage();
 
                 if (token.Value == null)
                 {
+                    ArgumentNullException.ThrowIfNull(userStorage);
+                    ArgumentNullException.ThrowIfNullOrEmpty(userStorage.Token);
                     token.Value = Guid.Parse(userStorage.Token);
                 }
 
-                var result = await _httpClient.DeleteAsync($"{Routes.UserLog}/{token.Value.ToString().ToUpper()}");
+                var requestToken = token.Value.ToString();
+                ArgumentNullException.ThrowIfNullOrEmpty(requestToken);
+                var url = $"{Routes.UserLog}/{requestToken.ToUpper()}";
+
+                var result = await _httpClient.DeleteAsync(url);
 
                 var content = await result.Content.ReadAsStringAsync();
-                if (result.IsSuccessStatusCode
-                    && userStorage.Token.ToUpper() == token.Value.ToString().ToUpper())
+                if (result.IsSuccessStatusCode)
                 {
-                    //usunać do local storage
-                    await GetLocalStorage().RemoveItemAsync(Headers.Authorization);
-                    //usunąć do seasion storage
-                    await GetSessionStorage().RemoveItemAsync(Headers.Authorization);
+                    if (userStorage is not null)
+                    {
+                        if (!string.IsNullOrWhiteSpace(userStorage.Token))
+                        {
+                           var strToken = token.Value.ToString();
+                            if (!string.IsNullOrWhiteSpace(strToken))
+                            {
+                                if (userStorage.Token.ToUpper() == strToken.ToUpper())
+                                {
+                                    //usunać do local storage
+                                    await GetLocalStorage().RemoveItemAsync(Headers.Authorization);
+                                    //usunąć do seasion storage
+                                    await GetSessionStorage().RemoveItemAsync(Headers.Authorization);
+                                }
+                            }
+                        }
+                    }
                 }
 
                 await IfUnauthorized(result);

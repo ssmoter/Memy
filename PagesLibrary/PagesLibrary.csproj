@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Memy\Shared\Memy.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Data\Logger\" />
+  </ItemGroup>
+
 </Project>

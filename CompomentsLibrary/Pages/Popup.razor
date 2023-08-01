@@ -32,7 +32,7 @@
     [Parameter]
     public PopupLevel.Level Level { get; set; } = PopupLevel.Level.None;
 
-    private System.Timers.Timer timer;
+    private System.Timers.Timer? timer;
 
     protected override void OnInitialized()
     {
@@ -50,19 +50,12 @@
             _ms = 0;
         }
     }
-    private string BackgroundCssClass="";
+    private string BackgroundCssClass = "";
     private void ToatsLevel(PopupLevel.Level? level)
     {
         if (level == null)
         {
-            if (Level != null)
-            {
-                level = Level;
-            }
-            else
-            {
-                level = PopupLevel.Level.None;
-            }
+            level = PopupLevel.Level.None;
         }
         switch (level)
         {
@@ -94,19 +87,25 @@
         }
     }
 
-    public async Task Show(string bodyText, string headerText = "", PopupLevel.Level? level = null)
+    public void Show(string bodyText, string headerText = "", PopupLevel.Level? level = null)
     {
         ToatsLevel(level);
         HeaderText = headerText;
         BodyText = bodyText;
         IsVisible = true;
         StateHasChanged();
-        timer.Start();
+        if (timer is not null)
+        {
+            timer.Start();
+        }
     }
 
     private void Close()
     {
-        timer.Stop();
+        if (timer is not null)
+        {
+            timer.Stop();
+        }
         HeaderText = string.Empty;
         BodyText = string.Empty;
         IsVisible = false;

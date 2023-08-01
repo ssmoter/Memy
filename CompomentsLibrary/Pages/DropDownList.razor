@@ -1,13 +1,18 @@
-﻿@if (List != null)
+﻿@using CompomentsLibrary.Model;
+@if (List is not null)
 {
     <div class="w-100">
         <div class="dropdown-header ">
             <h6>@Description </h6>
             <select class="dropdown form-select bg-black text-white" name="@nameof(List)"
-            @onchange="@(EventCallback.Factory.Create(this,e=>Value = (((ChangeEventArgs)e).Value.ToString(),Value.Item2.ToString())))">
+            @onchange="@(EventCallback.Factory.Create(this,e => Value = new ValueInDropDownList(((ChangeEventArgs)e).Value.ToString(),GetItem2(((ChangeEventArgs)e).Value.ToString()))))">
                 @for (int i = 0; i < List.Count; i++)
                 {
-                    <option class="dropdown-item text-white" value="@List[i].Item1">@List[i].Item2</option>
+                    if (List[i] is not null)
+                    {
+                        <option class="dropdown-item text-white" value="@List[i].Item1">@List[i].Item2</option>
+                    }
+
                 }
             </select>
         </div>
@@ -15,28 +20,30 @@
 }
 
 @code {
+
     [Parameter]
     public string? Theme { get; set; }
     [Parameter]
     public string? Description { get; set; }
     [Parameter]
-    public IList<(string?, string?)> List { get; set; }
+    public IList<ValueInDropDownList>? List { get; set; }
 
     [Parameter]
     public Func<Task>? Func { get; set; }
 
-    (string?, string?) _value;
+    ValueInDropDownList? _value;
+
     [Parameter]
-    public (string?, string?) Value
+    public ValueInDropDownList? Value
     {
         get => _value;
+
         set
         {
             if (_value != value)
             {
                 _value = value;
-                _value.Item2 = List.FirstOrDefault(x => x.Item1 == value.Item1).Item2;
-                ValueChanged.InvokeAsync(Value);
+                ValueChanged.InvokeAsync(_value);
                 if (bInitialized)
                 {
                     if (Func != null)
@@ -50,10 +57,21 @@
     }
 
 
+    string? GetItem2(string? item1)
+    {
+        string? result = "";
+        if (List is not null)
+        {
+            result = List.First(x => x.Item1 == item1).Item2;
+        }
+
+        return result;
+    }
+
     bool bInitialized = false;
 
     [Parameter]
-    public EventCallback<(string, string)> ValueChanged { get; set; }
+    public EventCallback<ValueInDropDownList> ValueChanged { get; set; }
 
 }
 

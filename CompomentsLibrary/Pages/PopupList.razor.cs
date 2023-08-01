@@ -9,12 +9,14 @@ namespace CompomentsLibrary.Pages
     {
         private System.Timers.Timer? timer;
         private List<Toasts>? toasts;
-        private int _ms = 0;
-        [Inject] PopupListService popupListService { get; set; }
+        [Inject] PopupListService? popupListService { get; set; }
 
         protected override void OnInitialized()
         {
-            popupListService.OnShow += Show;
+            if (popupListService is not null)
+            {
+                popupListService.OnShow += Show;
+            }
 
             if (toasts == null)
             {
@@ -23,23 +25,31 @@ namespace CompomentsLibrary.Pages
             if (timer == null)
             {
                 timer = new System.Timers.Timer(1000);
-                timer.Elapsed += ElapsedTimer;
+                timer.Elapsed += (sender, args) => ElapsedTimer(sender, args);
             }
         }
-        private void ElapsedTimer(object source, System.Timers.ElapsedEventArgs e)
+        private void ElapsedTimer(object? source, System.Timers.ElapsedEventArgs e)
         {
-            for (int i = 0; i < toasts.Count; i++)
+            if (toasts is not null)
             {
-                toasts[i].Time--;
-                if (toasts[i].Time == 0)
+                for (int i = 0; i < toasts.Count; i++)
                 {
-                    Close(i);
+                    toasts[i].Time--;
+                    if (toasts[i].Time == 0)
+                    {
+                        Close(i);
+                    }
                 }
             }
         }
 
-        public void Show(string bodyText, string headerText = "", PopupLevel.Level? level = null, int time = 5)
+        public void Show(string bodyText = "", string headerText = "", PopupLevel.Level level = PopupLevel.Level.None, int time = 5)
         {
+            if (toasts is null)
+            {
+                toasts = new List<Toasts>();
+            }
+
             toasts.Add(new Toasts()
             {
                 BodyText = bodyText,
@@ -50,17 +60,28 @@ namespace CompomentsLibrary.Pages
             });
 
             ToatsLevel(level);
+            if (timer is null)
+            {
+                timer = new System.Timers.Timer(1000);
+            }
             timer.Start();
             StateHasChanged();
         }
 
         private void Close(int index = 0)
         {
-            if (toasts.Count <= 0)
+            if (toasts is not null)
             {
-                timer.Stop();
+
+                if (toasts.Count <= 0)
+                {
+                    if (timer is not null)
+                    {
+                        timer.Stop();
+                    }
+                }
+                toasts.RemoveAt(index);
             }
-            toasts.RemoveAt(index);
             StateHasChanged();
         }
         private void ToatsLevel(PopupLevel.Level? level)
@@ -69,31 +90,34 @@ namespace CompomentsLibrary.Pages
             {
                 level = PopupLevel.Level.None;
             }
+            if (toasts is null)
+                toasts = new List<Toasts>();
+
             switch (level)
             {
                 case PopupLevel.Level.None:
                     {
-                        toasts.LastOrDefault().BackgroundCssClass = $"bg-primary";
+                        toasts.Last().BackgroundCssClass = $"bg-primary";
                     }
                     break;
                 case PopupLevel.Level.Info:
                     {
-                        toasts.LastOrDefault().BackgroundCssClass = $"bg-info";
+                        toasts.Last().BackgroundCssClass = $"bg-info";
                     }
                     break;
                 case PopupLevel.Level.Success:
                     {
-                        toasts.LastOrDefault().BackgroundCssClass = $"bg-success";
+                        toasts.Last().BackgroundCssClass = $"bg-success";
                     }
                     break;
                 case PopupLevel.Level.Warning:
                     {
-                        toasts.LastOrDefault().BackgroundCssClass = $"bg-warning";
+                        toasts.Last().BackgroundCssClass = $"bg-warning";
                     }
                     break;
                 case PopupLevel.Level.Error:
                     {
-                        toasts.LastOrDefault().BackgroundCssClass = "bg-danger";
+                        toasts.Last().BackgroundCssClass = "bg-danger";
                     }
                     break;
             }

@@ -28,7 +28,7 @@ namespace Memy.Server.Controllers
 
         [TokenAuthenticationFilter]
         [HttpGet]
-        public async Task<IEnumerable<WeatherForecast>> Get()
+        public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

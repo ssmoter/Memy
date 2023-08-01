@@ -12,11 +12,10 @@ namespace PagesLibrary.Pages.File
     {
 
         private bool _isInside { get; set; }
-        private string _date { get; set; }
+        private string? _date { get; set; }
         private int _maingImg { get; set; } = 0;
 
         [Inject] MainFilePopUpService? mainFilePopUpService { get; set; }
-        private CancellationTokenSource FinishConfirm;
 
         protected override void OnInitialized()
         {
@@ -32,7 +31,10 @@ namespace PagesLibrary.Pages.File
         {
             TaskModel = taskModel;
             IsVisible = true;
-            _date = CompareDate.GetDate(taskModel.CreatedDate);
+            if (taskModel is not null)
+            {
+                _date = CompareDate.GetDate(taskModel.CreatedDate);
+            }
             StateHasChanged();
         }
 
@@ -42,17 +44,34 @@ namespace PagesLibrary.Pages.File
         }
         private void ImgLeft()
         {
+            if (TaskModel is null)
+            {
+                return;
+            }
+            if (TaskModel.FileModel is null)
+            {
+                return;
+            }
             if (_maingImg > 0)
             {
                 _maingImg--;
             }
             else
             {
+
                 _maingImg = TaskModel.FileModel.Length - 1;
             }
         }
         private void ImgRight()
         {
+            if (TaskModel is null)
+            {
+                return;
+            }
+            if (TaskModel.FileModel is null)
+            {
+                return;
+            }
             if (_maingImg < TaskModel.FileModel.Length - 1)
             {
                 _maingImg++;
@@ -69,7 +88,8 @@ namespace PagesLibrary.Pages.File
         private void Close()
         {
 #if DEBUG
-            _logger.LogInformation("Close {0}", TaskModel.Id);
+            if(TaskModel is not null) 
+                _logger.LogInformation("Close {0}", TaskModel.Id);
 #endif
             TaskModel = null;
             IsVisible = false;

@@ -1,4 +1,5 @@
 ﻿using Memy.Server.Data.Admin;
+using Memy.Server.Data.Error;
 using Memy.Server.Filtres;
 using Memy.Server.Service;
 using Memy.Shared.Model;
@@ -14,15 +15,16 @@ namespace Memy.Server.Controllers
     [AdminAuthenticationFilter]
     public class FileAdminController : ControllerBase
     {
-        private readonly ILogger<FileAdminController> _logger;
         private readonly FileAdminService _fileAdminService;
+        private readonly Log _logger;
 
         public FileAdminController(IWebHostEnvironment webHostEnvironment,
                               ILogger<FileAdminController> logger,
+                              ILogData data,
                               IAdminData adminData)
         {
-            _logger = logger;
-            _fileAdminService = new FileAdminService(webHostEnvironment, _logger, adminData);
+            _logger = new Log(logger, data);
+            _fileAdminService = new FileAdminService(webHostEnvironment, adminData);
         }
 
 
@@ -48,6 +50,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -67,12 +70,16 @@ namespace Memy.Server.Controllers
                     return NoContent();
                 }
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-                await _fileAdminService.BanFile(id, token, reportedMessagesModel);
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    await _fileAdminService.BanFile(id, token, reportedMessagesModel);
+                }
 
                 return Ok();
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -92,12 +99,16 @@ namespace Memy.Server.Controllers
                     return NoContent();
                 }
                 var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-                await _fileAdminService.DeleteFile(id, token, reportedMessagesModel);
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    await _fileAdminService.DeleteFile(id, token, reportedMessagesModel);
+                }
 
                 return Ok();
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }

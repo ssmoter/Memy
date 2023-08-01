@@ -9,7 +9,6 @@ AS
 	DECLARE @objectId int
 	DECLARE @commentId int
 	DECLARE @InsertedRows TABLE (id INT)
-	DECLARE @jj TABLE(json NVARCHAR(MAX))
 BEGIN
 
 	EXEC [dbo].[SelectUserId] @token,@userId OUTPUT

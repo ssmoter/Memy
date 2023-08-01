@@ -30,13 +30,19 @@ namespace PagesLibrary.Pages.AdminComponent
                     break;
             }
         }
-        ReportedMessagesModel repored;
+        ReportedMessagesModel? repored;
 
         public async Task Ban()
         {
             try
             {
                 string? body = "";
+
+                if (Model is null)
+                {
+                    Model = new TaskModel();
+                }
+
                 if (Model.Banned)
                 {
                     body = "Post został odbanowany";
@@ -45,25 +51,33 @@ namespace PagesLibrary.Pages.AdminComponent
                 {
                     body = "Post zostal zbanowany zapoznaj sie z regulaminem w celu jego przywrócenia";
                 }
+                string title = "";
+                if (!string.IsNullOrWhiteSpace(Model.Title))
+                {
+                    title = Model.Title;
+                }
 
-                var result = await _adminModal.ShowPopup(Model.Title,
+
+                var result = await _adminModal.ShowPopup(title,
                                                          bodyText: body,
                                                          level1: PopupLevel.Level.Warning,
                                                          level2: PopupLevel.Level.Warning.ToString(),
                                                          yesText: "Ban",
                                                          noText: "Anuluj");
 
-                if (string.IsNullOrWhiteSpace(result.Value.Item1))
+                ArgumentNullException.ThrowIfNull(result);
+                if (string.IsNullOrWhiteSpace(result.Header))
                 {
                     return;
                 }
                 repored = new ReportedMessagesModel
                 {
-                    Header = result.Value.Item1,
-                    Body = result.Value.Item2,
-                    Level = (int)result.Value.Item3
+                    Header = result.Header,
+                    Body = result.Body,
+                    Level = (int)result.Level
                 };
 
+                ArgumentNullException.ThrowIfNull(_adminApi);
                 var response = await _adminApi.Ban(Model.Id, repored);
                 var json = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)

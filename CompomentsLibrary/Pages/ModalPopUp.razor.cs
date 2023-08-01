@@ -18,11 +18,15 @@ namespace CompomentsLibrary.Pages
         public string? YesText { get; set; }
         [Parameter]
         public string? NoText { get; set; }
-        private CancellationTokenSource FinishConfirm;
+        private CancellationTokenSource? FinishConfirm;
         private bool IsInside { get; set; }
-        [Inject] ModalPopUpService PopupService { get; set; }
+        [Inject] ModalPopUpService? PopupService { get; set; }
         protected override void OnInitialized()
         {
+            if (PopupService is null)
+            {
+                PopupService = new ModalPopUpService();
+            }
             PopupService.OnShow += Show;
         }
         public bool Result { get; set; }
@@ -60,9 +64,12 @@ namespace CompomentsLibrary.Pages
             BodyText = string.Empty;
             IsVisible = false;
             StateHasChanged();
-            if (FinishConfirm.Token.CanBeCanceled)
+            if (FinishConfirm is not null)
             {
-                FinishConfirm.Cancel();
+                if (FinishConfirm.Token.CanBeCanceled)
+                {
+                    FinishConfirm.Cancel();
+                }
             }
         }
 

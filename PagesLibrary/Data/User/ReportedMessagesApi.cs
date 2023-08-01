@@ -33,7 +33,9 @@ namespace PagesLibrary.Data.User
                 var json = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReportedMessagesModel>>(json);
+                    var reportedMessagesModel = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReportedMessagesModel>>(json);
+                    ArgumentNullException.ThrowIfNull(reportedMessagesModel);
+                    return reportedMessagesModel;
                 }
                 throw new Exception(json);
             }
@@ -54,7 +56,9 @@ namespace PagesLibrary.Data.User
                 var json = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReportedMessagesModel>>(json);
+                    var reportedMessagesModel = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ReportedMessagesModel>>(json);
+                    ArgumentNullException.ThrowIfNull(reportedMessagesModel);
+                    return reportedMessagesModel;
                 }
                 throw new Exception(json);
             }

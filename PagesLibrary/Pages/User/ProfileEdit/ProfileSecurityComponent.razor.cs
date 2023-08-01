@@ -10,6 +10,10 @@ namespace PagesLibrary.Pages.User.ProfileEdit
         {
             try
             {
+                if (_user is null)
+                {
+                    _user = new EditUser();
+                }
                 _user.Email = await _profileData.GetEmailAsync();
             }
             catch (Exception ex)
@@ -26,11 +30,13 @@ namespace PagesLibrary.Pages.User.ProfileEdit
         {
             try
             {
-                var password = new Memy.Shared.Model.Password()
-                {
-                    New = _editPassword.Password,
-                    Old = _editPassword.OldPassword,
-                };
+                var password = new Memy.Shared.Model.Password();
+                ArgumentNullException.ThrowIfNull(_editPassword);
+                ArgumentNullException.ThrowIfNullOrEmpty(_editPassword.Password);
+                password.New = _editPassword.Password;
+                ArgumentNullException.ThrowIfNullOrEmpty(_editPassword.OldPassword);
+                password.Old = _editPassword.OldPassword;
+
 
                 var strBytes = ConvertByteString.ConvertToString(password);
 
@@ -61,6 +67,9 @@ namespace PagesLibrary.Pages.User.ProfileEdit
         {
             try
             {
+                ArgumentNullException.ThrowIfNull(_user);
+                ArgumentNullException.ThrowIfNullOrEmpty(_user.Email);
+
                 var result = await _profileData.UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile.Email, _user.Email);
                 var json = await result.Content.ReadAsStringAsync();
 

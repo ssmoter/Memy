@@ -6,7 +6,6 @@ using Memy.Shared.Model;
 using Microsoft.AspNetCore.Components.Authorization;
 
 using System.Security.Claims;
-using System.Text;
 
 namespace PagesLibrary.Authorization
 {
@@ -33,12 +32,16 @@ namespace PagesLibrary.Authorization
                 if (user != null)
                 {
                     //jeżeli jest model zostaje utworzene nowy model z danymi użytkowniak
-                    var identity = new ClaimsIdentity(new[]
-                    {
-                    new Claim(ClaimTypes.Name,user.UserName),
-                    new Claim(ClaimTypes.SerialNumber,user.Token)
-                }, "Memy");
+                    var identity = new ClaimsIdentity("Memy");
 
+                    if (!string.IsNullOrWhiteSpace(user.UserName))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+                    }
+                    if (!string.IsNullOrWhiteSpace(user.Token))
+                    {
+                        identity.AddClaim(new Claim(ClaimTypes.Authentication, user.Token));
+                    }
                     if (!string.IsNullOrWhiteSpace(user.Role))
                     {
                         identity.AddClaim(new Claim(ClaimTypes.Role, user.Role));

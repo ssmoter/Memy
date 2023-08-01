@@ -1,4 +1,5 @@
-﻿using Memy.Server.Data.Reported;
+﻿using Memy.Server.Data;
+using Memy.Server.Data.Reported;
 using Memy.Shared.Model;
 
 namespace Memy.Server.Service
@@ -6,12 +7,10 @@ namespace Memy.Server.Service
     public class ReportedService
     {
         private readonly IReportedDataBase _reportedData;
-        private readonly ILogger _logger;
 
-        public ReportedService(IReportedDataBase reportedData, ILogger logger)
+        public ReportedService(IReportedDataBase reportedData)
         {
             _reportedData = reportedData;
-            _logger = logger;
         }
 
         public async Task<ReportedModel> SetReactionToFile(ReportedModel reported, string token)
@@ -23,9 +22,8 @@ namespace Memy.Server.Service
 
                 return reported;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }

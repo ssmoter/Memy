@@ -1,4 +1,6 @@
 ﻿@using PagesLibrary.Service;
+@using PagesLibrary.Pages.Rodo
+
 @inject LoginPopUpService _loginPopUp
 @inject CategoriesPopUpServie _categoriesPopUp
 
@@ -52,12 +54,15 @@
                         <span class="oi oi-file" aria-hidden="true"></span> Dodaj
                     </NavLink>
                 </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="@($"profile/{@context.User.Identity.Name}")">
-                        <span class="oi oi-person" aria-hidden="true"></span> @context.User.Identity.Name
-                    </NavLink>
-                </div>
- 
+                @if (context.User.Identity is not null)
+                {
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="@($"profile/{@context.User.Identity.Name}")">
+                            <span class="oi oi-person" aria-hidden="true"></span> @context.User.Identity.Name
+                        </NavLink>
+                    </div>
+                }
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="logout">
                         <span class="oi oi-account-logout" aria-hidden="true"></span> Wyloguj
@@ -65,6 +70,12 @@
                 </div>
             </Authorized>
         </AuthorizeView>
+
+        <div class="bottom-0 px-3 ">
+            <NavLink class="" href="@($"/privacy/{nameof(Cookie)}")">@nameof(Cookie)</NavLink> &bull;
+            <NavLink class="" href="@($"/privacy/{nameof(Statue)}")">@nameof(Statue)</NavLink> &bull;
+            <NavLink class="" href="@($"/privacy/{nameof(PrivacyPolicy)}")">@nameof(PrivacyPolicy)</NavLink>
+        </div>
     </nav>
 </div>
 

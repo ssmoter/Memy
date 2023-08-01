@@ -1,10 +1,6 @@
-﻿using Memy.Shared.Helper;
-using Memy.Shared.Model;
+﻿using Memy.Shared.Model;
 
 using Microsoft.Extensions.Logging;
-
-using static Memy.Shared.Helper.MyEnums;
-using System.Xml.Linq;
 
 namespace PagesLibrary.Pages.User
 {
@@ -21,13 +17,13 @@ namespace PagesLibrary.Pages.User
 
         private async Task CalculateProfile(string? name)
         {
-            if (name==null)
+            if (name == null)
             {
                 name = Name;
             }
             _userPublicModel = await GetProfil(name);
 
-            if (_userPublicModel != null)
+            if (_userPublicModel is not null)
             {
                 decimal like = _userPublicModel.SumTaskLike;
                 decimal unlike = _userPublicModel.SumTaskUnLike;
@@ -38,7 +34,10 @@ namespace PagesLibrary.Pages.User
                 Name = name;
 
                 _percentLike = Math.Abs(Math.Round((like / unlike), 2));
-                _createdDate = _userPublicModel.CreatedDate.Value.ToString("dd.MM.yyyy");
+                if (_userPublicModel.CreatedDate is not null)
+                {
+                    _createdDate = _userPublicModel.CreatedDate.Value.ToString("dd.MM.yyyy");
+                }
             }
             await _authStateProvider.GetAuthenticationStateAsync();
             StateHasChanged();
@@ -47,15 +46,17 @@ namespace PagesLibrary.Pages.User
         #region API
 
 
-        private async Task<Memy.Shared.Model.UserPublicModel> GetProfil(string name)
+        private async Task<Memy.Shared.Model.UserPublicModel?> GetProfil(string? name)
         {
             try
             {
+                ArgumentNullException.ThrowIfNullOrEmpty(name);
                 var result = await _profile.GetProfileAsync(name);
                 var json = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<UserPublicModel>(json);
+                    var userModel = Newtonsoft.Json.JsonConvert.DeserializeObject<UserPublicModel>(json);
+                    return userModel;
                 }
                 if (result.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
@@ -77,7 +78,7 @@ namespace PagesLibrary.Pages.User
             }
         }
 
-        private async Task<TaskModel[]> GetTasksAsync(string name, int start = 0, int max = 10, int orderTyp = 0, bool banned = false)
+        private async Task<TaskModel[]?> GetTasksAsync(string? name, int start = 0, int max = 10, int orderTyp = 0, bool banned = false)
         {
             try
             {
@@ -104,7 +105,7 @@ namespace PagesLibrary.Pages.User
             }
         }
 
-        private async Task<CommentModel[]> GetCommentAsync(string? name, int? orderTyp)
+        private async Task<CommentModel[]?> GetCommentAsync(string? name, int? orderTyp)
         {
             try
             {
@@ -151,7 +152,9 @@ namespace PagesLibrary.Pages.User
                     banned = true;
                 }
             }
+
             _taskModels = await GetTasksAsync(Name, _start, _max, int.Parse(_orderTyp.Item1), banned);
+
 
             StateHasChanged();
         }

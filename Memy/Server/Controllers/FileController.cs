@@ -1,14 +1,11 @@
-﻿using Memy.Server.Data.File;
+﻿using Memy.Server.Data.Error;
+using Memy.Server.Data.File;
 using Memy.Server.Filtres;
 using Memy.Server.Service;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
-
-using System.Xml.Linq;
-
-using static Memy.Shared.Helper.MyEnums;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -18,17 +15,17 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        private readonly ILogger<FileController> _logger;
         private readonly FileService _fileService;
         private readonly IWebHostEnvironment _webHostEnvironment;
-
+        private readonly Log _logger;
         public FileController(IWebHostEnvironment webHostEnvironment,
                               ILogger<FileController> logger,
+                              ILogData data,
                               IAddNewFileModel fileData)
         {
-            _logger = logger;
+            _logger = new Log(logger, data);
             _webHostEnvironment = webHostEnvironment;
-            _fileService = new FileService(webHostEnvironment, _logger, fileData);
+            _fileService = new FileService(webHostEnvironment, fileData);
         }
 
         // GET: api/<FileController>
@@ -48,6 +45,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -59,16 +57,17 @@ namespace Memy.Server.Controllers
             {
                 if (id <= 0)
                 {
-                    return NotFound();
+                    return NoContent();
                 }
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
 
                 var result = await _fileService.GetTaskModelAsync(id, token);
-
                 return Ok(result);
+
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -92,7 +91,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest();
             }
         }
@@ -114,7 +113,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest();
             }
         }
@@ -138,15 +137,19 @@ namespace Memy.Server.Controllers
                     model.FileUploadStatuses = await _fileService.SaveFile(model.FileUploadStatuses);
                 }
 
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
 
-                var id = await _fileService.InsertIntoDataBase(model, token);
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    var id = await _fileService.InsertIntoDataBase(model, token);
+                    return Ok(id);
+                }
 
-                return Ok(id);
+                return NotFound();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -154,23 +157,20 @@ namespace Memy.Server.Controllers
         //pobieranie plików poszczególnych user
         [Route("User")]
         [HttpGet]
-        public async Task<IActionResult> GetUserPost(string? name, int start = 0, int max = 10, int orderTyp = 0, bool banned = false)
+        public async Task<IActionResult> GetUserPost(string name, int start = 0, int max = 10, int orderTyp = 0, bool banned = false)
         {
             try
             {
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Headers.Authorization).Value;
+
 
                 if (string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(token))
                 {
-                    if (string.IsNullOrWhiteSpace(token))
-                    {
-                        return Unauthorized();
-                    }
                     var resultLike = await _fileService.GetLikeUserTasksModel(token, start, max, orderTyp);
                     return Ok(resultLike);
                 }
 
-                var resultPost = await _fileService.GetUserTasksModel(name,start, max, orderTyp, banned);
+                var resultPost = await _fileService.GetUserTasksModel(name, start, max, orderTyp, banned);
 
                 if (resultPost == null)
                 {
@@ -181,6 +181,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -200,6 +201,7 @@ namespace Memy.Server.Controllers
         {
             try
             {
+                await Task.Run(() => { Task.Delay(1); });
                 return Ok();
             }
             catch (Exception ex)

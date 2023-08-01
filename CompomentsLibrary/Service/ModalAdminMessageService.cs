@@ -1,18 +1,13 @@
 ﻿using CompomentsLibrary.Helper;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CompomentsLibrary.Model;
 
 namespace CompomentsLibrary.Service
 {
     public class ModalAdminMessageService
     {
-        public event Func<string?, string?, PopupLevel.Level, string?, string?, string?, Task<(string?, string?, int?)?>> OnShow;
+        public event Func<string, string, PopupLevel.Level, string, string, string, Task<AdminModalResult?>>? OnShow;
 
-        public async Task<(string?, string?, int?)?>? ShowPopup(string headerText = "",
+        public async Task<AdminModalResult?>? ShowPopup(string headerText = "",
                                      string bodyText = "",
                                      PopupLevel.Level level1 = PopupLevel.Level.None,
                                      string level2 = "none",

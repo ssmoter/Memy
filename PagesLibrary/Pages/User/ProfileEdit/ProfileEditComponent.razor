@@ -9,17 +9,20 @@
 
         <div class="bg-gradient rounded-3">
             <span class="ps-3">Edytuj nazwę użytkownika</span>
-            <EditForm Model="_user" OnValidSubmit="HandleValidSubmitName">
-                <DataAnnotationsValidator />
+            @if (_user is not null)
+            {
+                <EditForm Model="_user" OnValidSubmit="HandleValidSubmitName">
+                    <DataAnnotationsValidator />
 
-                <div class="input-group p-1">
-                    <InputText class="w-100 bg-black text-white" id="name" @bind-Value="@_user.Nick" placeholder="Nazwa użytkownika"></InputText>
-                    <ValidationMessage For="@(()=>_user.Nick)" />
-                </div>
-                <div class="m-auto d-flex justify-content-end">
-                    <button class="btn btn-primary " type="submit">Zapisz</button>
-                </div>
-            </EditForm>
+                    <div class="input-group p-1">
+                        <InputText class="w-100 bg-black text-white" id="name" @bind-Value="@_user.Nick" placeholder="Nazwa użytkownika"></InputText>
+                        <ValidationMessage For="@(()=>_user.Nick)" />
+                    </div>
+                    <div class="m-auto d-flex justify-content-end">
+                        <button class="btn btn-primary " type="submit">Zapisz</button>
+                    </div>
+                </EditForm>
+            }
         </div>
         <div class="bg-gradient rounded-3">
             <span class="ps-3">Edytuj avatar użytkownika</span>

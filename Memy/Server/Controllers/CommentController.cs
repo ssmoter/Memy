@@ -1,4 +1,5 @@
 ﻿using Memy.Server.Data.Comment;
+using Memy.Server.Data.Error;
 using Memy.Server.Filtres;
 using Memy.Server.Helper;
 using Memy.Server.Service;
@@ -12,14 +13,12 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class CommentController : ControllerBase
     {
-        private readonly ILogger<CommentController> _logger;
         private readonly CommentService _commentService;
-        private readonly ICommentData _commentData;
-        public CommentController(ILogger<CommentController> logger, ICommentData commentData)
+        private readonly Log _logger;
+        public CommentController(ILogger<CommentController> logger, ICommentData commentData, ILogData logData)
         {
-            this._logger = logger;
-            _commentData = commentData;
-            _commentService = new CommentService(logger, commentData);
+            _logger = new Log(logger, logData);
+            _commentService = new CommentService(commentData);
         }
         #region comment
 
@@ -39,7 +38,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -61,7 +60,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -85,7 +84,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -107,7 +106,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -134,7 +133,7 @@ namespace Memy.Server.Controllers
 
                 var resultPost = await _commentService.GetUserComment(name, orderTyp);
 
-                if (resultPost==null)
+                if (resultPost == null)
                 {
                     return NotFound();
                 }
@@ -143,7 +142,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }

@@ -1,0 +1,10 @@
+﻿@page "/registration-confirmation/{Token}"
+
+<PagesLibrary.Pages.User.Register.RegisterConfirmPage Token="@Token"></PagesLibrary.Pages.User.Register.RegisterConfirmPage>
+
+@code {
+
+    [Parameter]
+    public string? Token { get; set; }
+
+}

@@ -6,13 +6,15 @@ using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Components.Authorization;
 
+using PagesLibrary.Helper;
+
 using System.Net;
 
 namespace PagesLibrary.Data
 {
     public class BaseApi
     {
-        private static HttpClient _HttpClient;
+        private static HttpClient? _HttpClient;
         private readonly ILocalStorageService _localStorageService;
         private readonly ISessionStorageService _sessionStorageService;
         private readonly AuthenticationStateProvider authenticationStateProvider;
@@ -23,29 +25,42 @@ namespace PagesLibrary.Data
                        AuthenticationStateProvider authenticationStateProvider)
         {
             _HttpClient = new HttpClient();
-            _HttpClient.BaseAddress = new Uri(httpClient.BaseAddress, "/api/");
+            if (httpClient is not null && httpClient.BaseAddress is not null)
+            {
+                _HttpClient.BaseAddress = new Uri(httpClient.BaseAddress, "/api/");
+            }
             _localStorageService = localStorageService;
             _sessionStorageService = sessionStorageService;
             this.authenticationStateProvider = authenticationStateProvider;
         }
-        public HttpClient GetHttpClient()
+        public static HttpClient GetHttpClient()
         {
-            return _HttpClient;
+            if (_HttpClient is not null)
+            {
+                return _HttpClient;
+            }
+            return new HttpClient();
         }
         public ILocalStorageService GetLocalStorage()
         {
-            return _localStorageService;
+            if (RodoAvailable.AcceptedCookieNotice)
+                return _localStorageService;
+            else
+                return null;
         }
         public ISessionStorageService GetSessionStorage()
         {
-            return _sessionStorageService;
+            if (RodoAvailable.AcceptedCookieNotice)
+                return _sessionStorageService;
+            else
+                return null;
         }
         public async Task<HttpClient> SetAuthorizationHeader()
         {
             UserStorage? userStorage = await GetUserStorage();
             var client = GetHttpClient();
             client.DefaultRequestHeaders.Clear();
-            if (userStorage != null)
+            if (userStorage is not null && !string.IsNullOrWhiteSpace(userStorage.Token))
             {
                 client.DefaultRequestHeaders.Add(Headers.Authorization, userStorage.Token.ToUpper());
             }
@@ -57,27 +72,41 @@ namespace PagesLibrary.Data
         {
             if (result.StatusCode == HttpStatusCode.Unauthorized)
             {
-                await GetLocalStorage().RemoveItemAsync(Headers.Authorization);
-                await GetSessionStorage().RemoveItemAsync(Headers.Authorization);
-                if (authenticationStateProvider != null)
-                {
-                    await authenticationStateProvider.GetAuthenticationStateAsync();
-                }
+                await Unauthorized();
             }
         }
+
+        private async Task Unauthorized()
+        {
+            await GetLocalStorage().RemoveItemAsync(Headers.Authorization);
+            await GetSessionStorage().RemoveItemAsync(Headers.Authorization);
+            if (authenticationStateProvider != null)
+            {
+                await authenticationStateProvider.GetAuthenticationStateAsync();
+            }
+        }
+
         //pobranie danych użytkownika w zależności gdzie zostały zapisane
         public async Task<UserStorage?> GetUserStorage()
         {
             UserStorage? user = null;
 
             var result = await GetUserSession();
-            if (result == null)
+            if (result is null)
             {
                 result = await GetUserLocal();
             }
-            if (result != null)
+            if (result is not null)
             {
-                user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(result);
+                try
+                {
+                    user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(result);
+                }
+                catch (Exception)
+                {
+                    await Unauthorized();
+                    throw;
+                }
             }
 
             return user;
@@ -85,24 +114,51 @@ namespace PagesLibrary.Data
         //pobranie danych zapisanych w local storage
         private async Task<string?> GetUserLocal()
         {
-            var resultRav = await _localStorageService.GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
-            if (resultRav != null)
+            try
             {
-                return resultRav;
+                var resultRav = await GetLocalStorage().GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
+                if (resultRav != null)
+                {
+                    return resultRav;
+                }
+                return null;
             }
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
         //pobranie danych zapisanych w seasion storage
         private async Task<string?> GetUserSession()
         {
-            var resultRav = await _sessionStorageService.GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
-            if (resultRav != null)
+            try
             {
-                return resultRav;
+                var resultRav = await GetSessionStorage().GetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization);
+                if (resultRav != null)
+                {
+                    return resultRav;
+                }
+                return null;
             }
-            return null;
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
+        public async Task GetAcceptedCookie()
+        {
+            if (!RodoAvailable.AcceptedCookieNotice)
+            {
+                var response = await _localStorageService.GetItemAsync<bool>(nameof(RodoAvailable.AcceptedCookieNotice));
+                RodoAvailable.AcceptedCookieNotice = response;
+            }
+        }
+        public async Task SetAcceptedCookie()
+        {
+            await _localStorageService.SetItemAsync<bool>(nameof(RodoAvailable.AcceptedCookieNotice), RodoAvailable.AcceptedCookieNotice);
+        }
 
     }
 }

@@ -1,4 +1,5 @@
-﻿using Memy.Server.Data.User;
+﻿using Memy.Server.Data.Error;
+using Memy.Server.Data.User;
 using Memy.Server.Filtres;
 using Memy.Server.Helper;
 using Memy.Server.Service;
@@ -6,8 +7,6 @@ using Memy.Server.TokenAuthentication;
 using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
-
-using System.Text;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -17,16 +16,22 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class UserLogController : ControllerBase
     {
-        private readonly ILoginData _userData;
-        private readonly ITokenManager _tokenManager;
+        private const string SubjectRegister = "Rejestracja";
         private readonly LoginService _loginService;
-        private readonly ILogger<UserLogController> _logger;
-        public UserLogController(ILoginData userData, ITokenManager tokenManager, ILogger<UserLogController> logger)
+        private readonly Log _logger;
+        private readonly SmtpService _smtpService;
+        private readonly IConfiguration _configuration;
+
+        public UserLogController(ILoginData userData,
+                                 ITokenManager tokenManager,
+                                 ILogData logData,
+                                 ILogger<UserLogController> logger,
+                                 IConfiguration configuration)
         {
-            this._userData = userData;
-            _tokenManager = tokenManager;
-            _logger = logger;
-            _loginService = new LoginService(userData, tokenManager, logger);
+            _logger = new Log(logger, logData);
+            _configuration = configuration;
+            _loginService = new LoginService(userData, tokenManager);
+            _smtpService = new SmtpService(configuration);
         }
 
         // POST api/<UserLogController>
@@ -42,20 +47,31 @@ namespace Memy.Server.Controllers
                 var result = await _loginService.SetToken(value);
                 if (result != null)
                 {
-                    if (string.IsNullOrWhiteSpace(result.Role))
-                    {
-                        result.Role = null;
-                    }
-
-                    var jsonBytes = Memy.Shared.Helper.ConvertByteString.ConvertToString(result);
-
-                    return Ok(jsonBytes);
+                    return Ok(result);
                 }
                 return NotFound("Nie znaleziono konta");
             }
+            catch (ArgumentNullException)
+            {
+                return NotFound("Nie znaleziono konta");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                if (value != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(value.Email))
+                    {
+                        await _smtpService.SendEmail(value.Email,
+                        SubjectRegister,
+                                                         EmailBodySchema.Register($"{_configuration.GetValue<string>("UrlPage")}registration-confirmation/{ex.Message}"));
+                    }
+                }
+                return Unauthorized($"W celu zalogowania się potwierdź maila{Environment.NewLine}Wiadomość z potwierdzeniem została przesłana na podanego maila");
+
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -80,7 +96,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }

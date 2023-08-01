@@ -18,35 +18,40 @@ namespace Memy.Server.Data.File
                     ObjTyp = file.ObjTyp,
                     ObjOrder = file.ObjOrder,
                 };
-                using (MemoryStream ms = new MemoryStream(file.Data))
+
+                if (file.Data is not null)
                 {
-                    //spawdzanie czy plik nie jest za duży
-                    if (ms.Length >= FileRequirements.MaxSizeOfFile)
+                    using (MemoryStream ms = new MemoryStream(file.Data))
                     {
-                        //status.Error = "Za duży rozmiar pliku";
-                        return status;
+                        //spawdzanie czy plik nie jest za duży
+                        if (ms.Length >= FileRequirements.MaxSizeOfFile)
+                        {
+                            //status.Error = "Za duży rozmiar pliku";
+                            return status;
+                        }
+                        //sprawdzanie czy rozszerzenia pliku
+                        if (!FileRequirements.FileTypAccess.Any(x => x == GetType(status.ObjName).ToString()))
+                        {
+                            //status.Error = "Nie poprawne rozszerzenie pliku";
+                            return status;
+                        }
+                        //bezpieczna nazwa
+                        var trustedFileName = ToStringFromGuid(Guid.NewGuid()) + "." + GetType(status.ObjName).ToString();
+                        //ścieżka do folderu
+                        var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName);
+                        //tworzenie folderu
+                        CreateFolder(path);
+                        //ścieżka do pliku
+                        path = Path.Combine(path, trustedFileName);
+                        //zapisanie pliku
+                        using (FileStream fs = new FileStream(path, FileMode.Create))
+                        {
+                            await ms.CopyToAsync(fs);
+                        }
+                        status.ObjName = trustedFileName;
                     }
-                    //sprawdzanie czy rozszerzenia pliku
-                    if (!FileRequirements.FileTypAccess.Any(x => x == GetType(status.ObjName).ToString()))
-                    {
-                        //status.Error = "Nie poprawne rozszerzenie pliku";
-                        return status;
-                    }
-                    //bezpieczna nazwa
-                    var trustedFileName = ToStringFromGuid(Guid.NewGuid()) + "." + GetType(status.ObjName).ToString();
-                    //ścieżka do folderu
-                    var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName);
-                    //tworzenie folderu
-                    CreateFolder(path);
-                    //ścieżka do pliku
-                    path = Path.Combine(path, trustedFileName);
-                    //zapisanie pliku
-                    using (FileStream fs = new FileStream(path, FileMode.Create))
-                    {
-                        await ms.CopyToAsync(fs);
-                    }
-                    status.ObjName = trustedFileName;
                 }
+
                 return status;
             }
             catch (Exception)
@@ -88,12 +93,15 @@ namespace Memy.Server.Data.File
             }
         }
         //usuwanie plikow
-        public static void DeleteFile(string name, IWebHostEnvironment webHost)
+        public static void DeleteFile(string? name, IWebHostEnvironment webHost)
         {
-            var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName, name);
-            if (System.IO.File.Exists(path))
+            if (!string.IsNullOrWhiteSpace(name))
             {
-                System.IO.File.Delete(path);
+                var path = Path.Combine(webHost.ContentRootPath, webHost.EnvironmentName, FileRequirements.PatchFolderName, name);
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
             }
         }
 
@@ -128,6 +136,26 @@ namespace Memy.Server.Data.File
 
             return new string(finalChars);
         }
+
+
+        public static void AddWatermark(MemoryStream sourceFile, string? watermarkFile, string outputFilePath)
+        {
+            if (!string.IsNullOrWhiteSpace(watermarkFile))
+            {
+
+            }
+            //var sourceImage = Image.FromStream(sourceFile);
+            //var watermarkImage = Image.FromStream(new MemoryStream(watermarkFileBytes));
+            //var watermarkBitmap = new Bitmap(watermarkImage);
+            //var x = (sourceImage.Width - watermarkBitmap.Width) / 2;
+            //var y = (sourceImage.Height - watermarkBitmap.Height) / 2;
+            //var canvas = new PictureCanvas(sourceImage);
+            //canvas.DrawImage(watermarkBitmap, x, y);
+            //sourceImage.Save(outputFilePath);
+        }
+
+
+
 
     }
 }

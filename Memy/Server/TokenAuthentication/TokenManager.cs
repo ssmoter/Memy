@@ -14,12 +14,12 @@ namespace Memy.Server.TokenAuthentication
     public class TokenManager : ITokenManager
     {
         private readonly ILoginData IUser;
-        private readonly List<Token?> TokenIds;
+        private readonly List<Token> TokenIds;
 
-        public TokenManager(ILoginData iUser)
+        public TokenManager(ILoginData iUser,TokenList tokenList)
         {
             IUser = iUser;
-            TokenIds = new List<Token?>();
+            TokenIds = tokenList.TokenIds;
         }
 
         public bool Authenticate(object token)
@@ -53,13 +53,13 @@ namespace Memy.Server.TokenAuthentication
                 return false;
             }
             ////w pierwszej kolejności sprawdzana jest lista
-            //if (TokenIds.FirstOrDefault(
-            //    x => x.Value == token
-            //    && !x.DoNotLogOut
-            //    | x.ExpiryDate > DateTimeOffset.Now) != null)
-            //{
-            //    return true;
-            //}
+            if (TokenIds.FirstOrDefault(
+                x => x.Value == token
+                && !x.DoNotLogOut
+                | x.ExpiryDate > DateTimeOffset.Now) != null)
+            {
+                return true;
+            }
             //w innym przypadku sprawdzana jest baza danych
             if (IUser.CheckToken(token).Result)
             {

@@ -31,7 +31,9 @@ namespace PagesLibrary.Data
                 var json = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
                 {
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<ReportedModel>(json);
+                    var reportedModel = Newtonsoft.Json.JsonConvert.DeserializeObject<ReportedModel>(json);
+                    ArgumentNullException.ThrowIfNull(reportedModel);
+                    return reportedModel;
                 }
                 throw new System.NullReferenceException(json);
             }

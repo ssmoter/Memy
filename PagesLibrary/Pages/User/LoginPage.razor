@@ -6,6 +6,7 @@
 @inject PopupListService _popUp
 @inject PagesLibrary.Service.LoginPopUpService _loginPopUp
 
+
 <EditForm EditContext="_editContext" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     @*<ValidationSummary />*@
@@ -37,7 +38,6 @@
         <div class="alert alert-danger">@error</div>
     }
 </EditForm>
-
 
 
 

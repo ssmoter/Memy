@@ -5,9 +5,9 @@ namespace PagesLibrary.Pages.Component
     public partial class ObjectTypeComponent : IDisposable
     {
         private int _descriptionLength = 300;
-        private string _descriptionFirst;
-        private string _descriptionLast;
-        private string _descriptionSmall;
+        private string _descriptionFirst = "";
+        private string _descriptionLast = "";
+        private string _descriptionSmall = "";
         protected override void OnInitialized()
         {
             SetDescription();
@@ -19,11 +19,14 @@ namespace PagesLibrary.Pages.Component
 
         private void SetDescription()
         {
-            if (fileModel.ObjTyp == (int)MyEnums.FileTyp.text)
+            if (fileModel is not null)
             {
-                _descriptionFirst = GetFirstSegment(fileModel.ObjName).ToString();
-                _descriptionLast = GetRestSegment(fileModel.ObjName).ToString();
-                _descriptionSmall = GetSmall(fileModel.ObjName).ToString();
+                if (fileModel.ObjTyp == (int)MyEnums.FileTyp.text)
+                {
+                    _descriptionFirst = GetFirstSegment(fileModel.ObjName).ToString();
+                    _descriptionLast = GetRestSegment(fileModel.ObjName).ToString();
+                    _descriptionSmall = GetSmall(fileModel.ObjName).ToString();
+                }
             }
         }
         private ReadOnlySpan<char> GetSmall(ReadOnlySpan<char> value)

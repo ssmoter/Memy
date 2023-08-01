@@ -1,6 +1,6 @@
 ﻿@inject IFileManager _iFileManager
 
-@if (fileModel != null)
+@if (fileModel is not null)
 {
     @if (!IsSmall)
     {
@@ -24,8 +24,11 @@
             }
             else
             {
-                <img src="@(_iFileManager.GetImg(fileModel.ObjName))"
-                     alt="@fileModel.ObjName" class="w-100" loading="lazy" />
+                if (!string.IsNullOrWhiteSpace(fileModel.ObjName))
+                {
+                    <img src="@(_iFileManager.GetImg(fileModel.ObjName))"
+                         alt="@fileModel.ObjName" class="w-100" loading="lazy" />
+                }
             }
         }
         if (fileModel.ObjTyp == (int)Memy.Shared.Helper.MyEnums.FileTyp.video)
@@ -39,10 +42,13 @@
             }
             else
             {
-                <video controls class="w-100">
-                    <source src="@(_iFileManager.GetVideo(fileModel.ObjName))" type="video/mp4">
-                    Twoja przeglądarka nie obsługuje tagu video.
-                </video>
+                if (!string.IsNullOrWhiteSpace(fileModel.ObjName))
+                {
+                    <video controls class="w-100">
+                        <source src="@(_iFileManager.GetVideo(fileModel.ObjName))" type="video/mp4">
+                        Twoja przeglądarka nie obsługuje tagu video.
+                    </video>
+                }
             }
         }
         if (fileModel.ObjTyp == (int)Memy.Shared.Helper.MyEnums.FileTyp.YouTube)
@@ -67,8 +73,11 @@
             }
             else
             {
-                <img src="@(_iFileManager.GetImg(fileModel.ObjName))" width="80"
-                     alt="@fileModel.ObjName" loading="lazy" />
+                if (!string.IsNullOrWhiteSpace(fileModel.ObjName))
+                {
+                    <img src="@(_iFileManager.GetImg(fileModel.ObjName))" width="80"
+                         alt="@fileModel.ObjName" loading="lazy" />
+                }
             }
         }
         if (fileModel.ObjTyp == (int)Memy.Shared.Helper.MyEnums.FileTyp.video)
@@ -82,10 +91,13 @@
             }
             else
             {
-                <video width="80">
-                    <source src="@(_iFileManager.GetVideo(fileModel.ObjName))" type="video/mp4">
-                    Twoja przeglądarka nie obsługuje tagu video.
-                </video>
+                if (!string.IsNullOrWhiteSpace(fileModel.ObjName))
+                {
+                    <video width="80">
+                        <source src="@(_iFileManager.GetVideo(fileModel.ObjName))" type="video/mp4">
+                        Twoja przeglądarka nie obsługuje tagu video.
+                    </video>
+                }
             }
         }
         if (fileModel.ObjTyp == (int)Memy.Shared.Helper.MyEnums.FileTyp.YouTube)
@@ -93,7 +105,6 @@
             <span class="text-white">
                 YT
             </span>
-            @* <iframe width="80" height="80" src="@($"https://www.youtube.com/embed/{fileModel.ObjName}")" frameborder="0" allowfullscreen></iframe>*@
         }
     }
 }

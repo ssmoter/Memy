@@ -1,9 +1,6 @@
 ﻿using Memy.Server.Data.SqlDataAccess;
 using Memy.Shared.Model;
 
-using Newtonsoft.Json.Linq;
-
-using System.Security.Cryptography;
 using System.Xml.Linq;
 
 namespace Memy.Server.Data.User
@@ -41,6 +38,11 @@ namespace Memy.Server.Data.User
             var result = await ExecProcedure<bool>("NameIsAvailable", value);
             return result;
         }
+        public async Task<bool> EmailIsAvailable(string value)
+        {
+            var result = await ExecProcedure<bool>("EmailIsAvailable", value);
+            return result;
+        }
 
         public async Task UpdateName(string token, string value)
         {
@@ -56,5 +58,15 @@ namespace Memy.Server.Data.User
             await ExecProcedure<bool>("UpdateProfileAvatar", avatar, token);
         }
 
+        public async Task<T> RegisterUser<T>(string email, string name, string password)
+        {
+            var result = await ExecProcedure<T>("RegisterUser", email, name, password);
+            return result;
+        }
+        public async Task<T> RegisterUserConfirm<T>(string value)
+        {
+            var result = await ExecProcedure<T>("RegisterUserConfirm", value);
+            return result;
+        }
     }
 }

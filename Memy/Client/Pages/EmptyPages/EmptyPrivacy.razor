@@ -1,0 +1,19 @@
+﻿@using PagesLibrary.Pages.Rodo
+@page "/privacy/{RodoTyp}"
+
+@if (RodoTyp == nameof(Cookie))
+{
+    <Cookie></Cookie>
+}
+else if (RodoTyp == nameof(PrivacyPolicy))
+{
+    <PrivacyPolicy></PrivacyPolicy>
+}
+else if (RodoTyp == nameof(Statue))
+{
+    <Statue></Statue>
+}
+@code {
+    [Parameter]
+    public string? RodoTyp { get; set; }
+}

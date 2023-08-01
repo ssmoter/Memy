@@ -1,4 +1,5 @@
 ﻿@page "/register"
+@using PagesLibrary.Pages.User.Register
 
 <AuthorizeView>
     <NotAuthorized>
@@ -9,7 +10,13 @@
     <Authorized>
         <div>
             <p>
-                Jesteś już zalogowany @context.User.Identity.Name
+                @if (context.User.Identity is not null)
+                    @if (!string.IsNullOrWhiteSpace(context.User.Identity.Name))
+                    {
+                        <span>
+                            Jesteś już zalogowany @context.User.Identity.Name
+                        </span>
+                    }
             </p>
         </div>
     </Authorized>

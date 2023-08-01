@@ -1,0 +1,34 @@
+﻿@inject NavigationManager _nav;
+@inject AuthenticationStateProvider _auth
+@inject IRegisterUserApi _register
+@inject PopupListService _popUp
+@inject ILogger<RegisterConfirmPage> _logger
+
+
+@code {
+    [Parameter]
+    public string? Token { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            ArgumentNullException.ThrowIfNullOrEmpty(Token);
+
+            var result = await _register.PostRegisterConfirm(Token);
+
+            if (result.IsSuccessStatusCode)
+            {
+                _popUp.ShowToats("Zostałeś zalogowany", "Status logowania", PopupLevel.Level.Success);
+                await _auth.GetAuthenticationStateAsync();
+                _nav.NavigateTo("/");
+            }
+        }
+        catch (Exception ex)
+        {
+            _popUp.ShowToats("", "Wystąpił błąd", PopupLevel.Level.Error);
+            _logger.LogError(ex.Message);
+            _nav.NavigateTo("/");
+        }
+    }
+}

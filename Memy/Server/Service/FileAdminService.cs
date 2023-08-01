@@ -2,65 +2,80 @@
 using Memy.Server.Data.File;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Primitives;
-
-using PagesLibrary.Data;
-
 namespace Memy.Server.Service
 {
     public class FileAdminService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger _logger;
         private readonly IAdminData _adminData;
 
-        public FileAdminService(IWebHostEnvironment webHostEnvironment, ILogger logger, IAdminData adminData)
+        public FileAdminService(IWebHostEnvironment webHostEnvironment, IAdminData adminData)
         {
             _webHostEnvironment = webHostEnvironment;
-            _logger = logger;
             _adminData = adminData;
         }
 
-        public async Task DeleteFile(int id, string token, ReportedMessagesModel reported)
+        public async Task DeleteFile(int id, string? token, ReportedMessagesModel reported)
         {
             try
             {
-                var result = await _adminData.DeleteFileByAdmin<string>(id, token, reported.Header, reported.Body, reported.Level);
+                ArgumentNullException.ThrowIfNullOrEmpty(token);
+                string head = "";
+                string body = "";
+                if (!string.IsNullOrWhiteSpace(reported.Header))
+                {
+                    head = reported.Header;
+                }
+                if (!string.IsNullOrWhiteSpace(reported.Body))
+                {
+                    body = reported.Body;
+                }
+
+                var result = await _adminData.DeleteFileByAdmin<string>(id, token, head, body, reported.Level);
+
 
                 for (int i = 0; i < result.Length; i++)
                 {
                     CheckingFile.DeleteFile(result[i], _webHostEnvironment);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
 
-        internal async Task BanFile(int id, string token, ReportedMessagesModel reported)
+        internal async Task BanFile(int id, string? token, ReportedMessagesModel reported)
         {
             try
             {
-                await _adminData.BanFileByAdmin(id, token, reported.Header, reported.Body, reported.Level);
+                ArgumentNullException.ThrowIfNullOrEmpty(token);
+                string head = "";
+                string body = "";
+                if (!string.IsNullOrWhiteSpace(reported.Header))
+                {
+                    head = reported.Header;
+                }
+                if (!string.IsNullOrWhiteSpace(reported.Body))
+                {
+                    body = reported.Body;
+                }
+                await _adminData.BanFileByAdmin(id, token, head, body, reported.Level);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
 
-        internal async Task UpdateCategoryFile(int id,string category, string token, ReportedMessagesModel reportedMessagesModel)
+        internal async Task UpdateCategoryFile(int id, string category, string token, ReportedMessagesModel reportedMessagesModel)
         {
             try
             {
-                await _adminData.UpdateCategoryFileByAdmin(id,category, token, reportedMessagesModel.Header, reportedMessagesModel.Body, reportedMessagesModel.Level);
+                await _adminData.UpdateCategoryFileByAdmin(id, category, token, reportedMessagesModel.Header, reportedMessagesModel.Body, reportedMessagesModel.Level);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }

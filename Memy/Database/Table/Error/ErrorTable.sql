@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[ErrorTable]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [Date] DATETIMEOFFSET NULL, 
+    [Track] NVARCHAR(MAX) NULL, 
+    [Message] NVARCHAR(MAX) NULL
+)

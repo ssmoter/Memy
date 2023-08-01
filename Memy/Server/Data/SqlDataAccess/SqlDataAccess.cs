@@ -15,7 +15,12 @@ namespace Memy.Server.Data.SqlDataAccess
         }
         public string GetConnectionString()
         {
-            return _config.GetConnectionString(ConnectionStringName);
+            var result = _config.GetConnectionString(ConnectionStringName);
+            if (result is not null)
+            {
+                return result;
+            }
+            return "";
         }
 
         public async Task<T> LoadData<T>(string sql)

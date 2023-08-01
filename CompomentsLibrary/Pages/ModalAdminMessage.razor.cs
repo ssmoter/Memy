@@ -1,4 +1,5 @@
 ﻿using CompomentsLibrary.Helper;
+using CompomentsLibrary.Model;
 using CompomentsLibrary.Service;
 
 using Microsoft.AspNetCore.Components;
@@ -27,21 +28,25 @@ namespace CompomentsLibrary.Pages
 
 
 
-        private CancellationTokenSource FinishConfirm;
+        private CancellationTokenSource? FinishConfirm;
         private ModalMessage message = new ModalMessage();
-        private (string, string)[] listLevel = new (string, string)[]
+        private ValueInDropDownList[] listLevel = new ValueInDropDownList[]
         {
-            (((int)PopupLevel.Level.None).ToString(),PopupLevel.Level.None.ToString()),
-            (((int)PopupLevel.Level.Info).ToString(),PopupLevel.Level.Info.ToString()),
-            (((int) PopupLevel.Level.Success).ToString(),PopupLevel.Level.Success.ToString()),
-            (((int) PopupLevel.Level.Warning).ToString(),PopupLevel.Level.Warning.ToString()),
-            (((int) PopupLevel.Level.Error).ToString(),PopupLevel.Level.Error.ToString()),
+            new ValueInDropDownList(((int)PopupLevel.Level.None).ToString(),PopupLevel.Level.None.ToString()),
+            new ValueInDropDownList(((int)PopupLevel.Level.Info).ToString(),PopupLevel.Level.Info.ToString()),
+            new ValueInDropDownList(((int)PopupLevel.Level.Success).ToString(),PopupLevel.Level.Success.ToString()),
+            new ValueInDropDownList(((int)PopupLevel.Level.Warning).ToString(),PopupLevel.Level.Warning.ToString()),
+            new ValueInDropDownList(((int)PopupLevel.Level.Error).ToString(),PopupLevel.Level.Error.ToString()),
         };
 
 
-        [Inject] ModalAdminMessageService PopupService { get; set; }
+        [Inject] ModalAdminMessageService? PopupService { get; set; }
         protected override void OnInitialized()
         {
+            if (PopupService is null)
+            {
+                PopupService = new ModalAdminMessageService();
+            }
             PopupService.OnShow += Show;
         }
 
@@ -49,15 +54,14 @@ namespace CompomentsLibrary.Pages
         {
             await OnStateChanged.InvokeAsync();
         }
-        public async Task<(string?, string?, int?)?> Show(string headerText = "",
+        public async Task<AdminModalResult?> Show(string headerText = "",
                                      string bodyText = "",
                                      PopupLevel.Level level = PopupLevel.Level.None,
                                      string level2 = "none",
                                      string yesText = "Ok",
                                      string noText = "Cancel")
         {
-            message = new ModalMessage(headerText, bodyText, (((int)level).ToString(), level2));
-
+            message = new ModalMessage(headerText, bodyText, new ValueInDropDownList(((int)level).ToString(), level2));
 
             HeaderText = headerText;
             BodyText = bodyText;
@@ -75,7 +79,12 @@ namespace CompomentsLibrary.Pages
             }
             catch (TaskCanceledException)
             { }
-            return (message.Header, message.Body, message.Level);
+            return new AdminModalResult()
+            {
+                Header = message.Header,
+                Body = message.Body,
+                Level = (PopupLevel.Level)message.Level
+            };
         }
 
         private void Close(bool value)
@@ -88,15 +97,18 @@ namespace CompomentsLibrary.Pages
             }
             IsVisible = false;
             StateHasChanged();
-            if (FinishConfirm.Token.CanBeCanceled)
+            if (FinishConfirm is not null)
             {
-                FinishConfirm.Cancel();
+                if (FinishConfirm.Token.CanBeCanceled)
+                {
+                    FinishConfirm.Cancel();
+                }
             }
         }
 
         private class ModalMessage
         {
-            public ModalMessage(string? header, string? body, (string, string) level)
+            public ModalMessage(string? header, string? body, ValueInDropDownList level)
             {
                 Header = header;
                 Body = body;
@@ -104,17 +116,14 @@ namespace CompomentsLibrary.Pages
             }
             public ModalMessage()
             {
-
+                messageLevel = new ValueInDropDownList("", "");
             }
             [Required(ErrorMessage = "Tytuł jest wymagany")]
             public string? Header { get; set; }
             [Required(ErrorMessage = "Treść jest wymagana")]
             public string? Body { get; set; }
 
-            /// <summary>
-            /// (string,string) pierszy string jest int opisującym poziom popUp a drugi jego opisem
-            /// </summary>
-            public (string, string) messageLevel { get; set; }
+            public ValueInDropDownList messageLevel { get; set; }
             public int Level
             {
                 get

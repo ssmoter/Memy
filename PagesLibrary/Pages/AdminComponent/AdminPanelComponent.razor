@@ -13,14 +13,14 @@
                 var showClass = IsVisible ? "d-block" : "d-none";
             }
 
-            @if (Model != null)
+            @if (Model is not null)
             {
                 <div class="p-1 bg-black bg-opacity-75 dropdown-menu  @showClass">
                     <div class="text-center ">
 
-                        <AdminChangeOfCategoryComponent Model="@Model" Type="Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="Func" />
-                        <AdminBanButtonComponent Model="@Model" Type="Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="Func" />
-                        <AdminDeleteButtonComponent Model="@Model" Type="Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="Func"/>
+                        <AdminChangeOfCategoryComponent Model="@Model" Type="@Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="@Func" />
+                        <AdminBanButtonComponent Model="@Model" Type="@Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="@Func" />
+                        <AdminDeleteButtonComponent Model="@Model" Type="@Memy.Shared.Helper.MyEnums.AdminDeleteBanType.File" Fucn="@Func"/>
 
                     </div>
                 </div>

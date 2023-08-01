@@ -7,6 +7,7 @@
 @inject AdminFileApi _AdminFile
 @inject AdminCommentApi _AdminComment
 @inject ModalAdminMessageService _adminModal
+@inject NavigationManager _navigationManager
 
 
 <AuthorizeView Roles="@Memy.Shared.Helper.Roles.Admin">
@@ -27,7 +28,7 @@
                 </button>
                 @if (isVisibleCategory)
                 {
-                    <DropDownList List="categoriesTable" Func="@(()=>BtnCategory())" @bind-Value="categories" />
+                    <DropDownList List="ListInDropDown.CategoriesTablePlusMain" Func="@(()=>BtnCategory())" @bind-Value="categories" />
                 }
             </span>
         }
@@ -47,13 +48,9 @@
     bool isVisibleCategory;
     private string selectedValue { get; set; } = "1";
 
-    (string?, string?) categories { get; set; } = (Memy.Shared.Helper.Categories.Waiting, "Brak");
+    ValueInDropDownList categories { get; set; } = ListInDropDown.CategoriesTablePlusMain[0];
 
-    (string, string)[] categoriesTable = new (string, string)[]
-    {
-        (Memy.Shared.Helper.Categories.Waiting,"Brak"),
-        (Memy.Shared.Helper.Categories.Main,"Główna"),
-    };
+
 
 
 }

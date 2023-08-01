@@ -15,12 +15,12 @@
         </div>
         <div class="float-end">
             <div class="top-50">
-                <DropDownList List="_dateList" @bind-Value="@_dateLenght" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
+                <DropDownList List="@PagesLibrary.Helper.ListInDropDown.DateTable" @bind-Value="@_dateLenght" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
             </div>
         </div>
         <div class="float-end">
             <div class="top-50">
-                <DropDownList List="_orderList" @bind-Value="@_orderTyp" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
+                <DropDownList List="@PagesLibrary.Helper.ListInDropDown.OrderTable" @bind-Value="@_orderTyp" Func="@(()=>ChangeDateOrOrder())"></DropDownList>
             </div>
         </div>
     </div>
@@ -55,27 +55,8 @@
     [Parameter]
     public string? DateStart { get; set; }
 
+    ValueInDropDownList _dateLenght = PagesLibrary.Helper.ListInDropDown.DateTable[0];
 
-    static string _dateFormat = "yyyy-MM-dd HH:mm:ss";
-    (string?, string) _dateLenght = ("empty", "brak");
-    (string?, string)[] _dateList = new (string?, string)[]
-    {
-        ("empty","brak"),
-        (DateTimeOffset.Now.AddHours(-12).ToString(_dateFormat),"12 Godziń"),
-        (DateTimeOffset.Now.AddDays(-1).ToString(_dateFormat),"1 Dzień"),
-        (DateTimeOffset.Now.AddDays(-7).ToString(_dateFormat),"Tydzień"),
-        (DateTimeOffset.Now.AddMonths(-1).ToString(_dateFormat),"Miesiąc"),
-        (DateTimeOffset.Now.AddYears(-1).ToString(_dateFormat),"Rok"),
-    };
+    ValueInDropDownList _orderTyp = PagesLibrary.Helper.ListInDropDown.OrderTable[0];
 
-
-    (string?, string) _orderTyp = (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateDESC).ToString(), "Najnowsze");
-    (string?, string)[] _orderList = new (string?, string)[]
-    {
-        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateDESC).ToString(),"Najnowsze"),
-        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.DateASC).ToString(),"Najstarsze"),
-        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionDESC).ToString(),"Popularne"),
-        (((int)Memy.Shared.Helper.MyEnums.OrderTyp.ReactionASC).ToString(),"Niepopularne"),
-
-    };
 }

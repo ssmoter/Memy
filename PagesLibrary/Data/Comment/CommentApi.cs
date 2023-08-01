@@ -96,13 +96,20 @@ namespace PagesLibrary.Data.Comment
         public async Task<int> GetOrderTyp()
         {
             var local = this.GetLocalStorage();
-            var order = await local.GetItemAsync<int>("order");
+            int order = 0;
+            if (local is not null)
+            {
+                order = await local.GetItemAsync<int>("order");
+            }
             return order;
         }
         public async Task SetOrderTyp(int order)
         {
             var local = this.GetLocalStorage();
-            await local.SetItemAsync<int>("order",order);
+            if (local is not null)
+            {
+                await local.SetItemAsync<int>("order", order);
+            }
         }
 
         public async Task<HttpResponseMessage> GetUserCommentAsync(string? name, int? orderTyp)
@@ -115,7 +122,7 @@ namespace PagesLibrary.Data.Comment
                 sb.Append("/");
                 sb.Append(Routes.User);
 
-                if (name != null  || orderTyp != null)
+                if (name != null || orderTyp != null)
                 {
                     sb.Append("?");
                 }

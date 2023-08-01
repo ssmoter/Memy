@@ -1,4 +1,5 @@
-﻿using Memy.Server.Data.User;
+﻿using Memy.Server.Data.Error;
+using Memy.Server.Data.User;
 using Memy.Server.Filtres;
 using Memy.Server.Service;
 using Memy.Shared.Model;
@@ -16,10 +17,14 @@ namespace Memy.Server.Controllers
     {
 
         private readonly ReportedMessagesService _messagesService;
+        private readonly Log _logger;
 
-        public ReportedMessagesController(ILogger<ReportedMessagesController> logger, IReportedMessagesData messages)
+        public ReportedMessagesController(ILogger<ReportedMessagesController> logger,
+                                          ILogData logData,
+                                          IReportedMessagesData messages)
         {
-            _messagesService = new ReportedMessagesService(logger, messages);
+            _logger = new Log(logger, logData);
+            _messagesService = new ReportedMessagesService(messages);
         }
 
         // GET: api/<MessagesController>
@@ -28,13 +33,18 @@ namespace Memy.Server.Controllers
         {
             try
             {
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-                var result = await _messagesService.GetMessages(token);
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    var result = await _messagesService.GetMessages(token);
+                    return Ok(result);
+                }
 
-                return Ok(result);
+                return NoContent();
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -44,13 +54,18 @@ namespace Memy.Server.Controllers
         {
             try
             {
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
-                var result = await _messagesService.UpdateMessages(token, messagesModel);
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    var result = await _messagesService.UpdateMessages(token, messagesModel);
+                    return Ok(result);
+                }
+                return NoContent();
 
-                return Ok(result);
             }
             catch (Exception ex)
             {
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }

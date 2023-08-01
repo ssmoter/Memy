@@ -2,45 +2,48 @@
 <div class="m-auto d-sm-flex justify-content-sm-center">
     @{
         var EnableBack = false;
-        if (Start == null)
+        if (Start is null)
         {
             Start = 0;
             EnableBack = false;
         }
-        if (Start != null)
+        if (Start is not null)
         {
             EnableBack = (int)Start == 0 ? true : false;
         }
     }
-    <dvi>
-        <span class="m-auto d-sm-flex justify-content-sm-center">
-            <button class="btn oi oi-arrow-thick-left btn-outline-primary text-white" disabled="@EnableBack" @onclick="@(()=>ChangePage((int)Start-1))">@((int)Start - 1)</button>
-            <button class="btn oi oi-arrow-thick-right btn-outline-primary text-white" @onclick="@(()=>ChangePage((int)Start+1))">@((int)Start + 1)</button>
-        </span>
-        <div>
-            @for (int i = (int)Start - 2; i < (int)Start + 5; i++)
-            {
-                int index = i;
-                if (Start == index)
+    @if (Start is not null)
+    {
+        <dvi>
+            <span class="m-auto d-sm-flex justify-content-sm-center">
+                <button class="btn oi oi-arrow-thick-left btn-outline-primary text-white" disabled="@EnableBack" @onclick="@(()=>ChangePage((int)Start-1))">@((int)Start - 1)</button>
+                <button class="btn oi oi-arrow-thick-right btn-outline-primary text-white" @onclick="@(()=>ChangePage((int)Start+1))">@((int)Start + 1)</button>
+            </span>
+            <div>
+                @for (int i = (int)Start - 2; i < (int)Start + 5; i++)
                 {
-                    continue;
+                    int index = i;
+                    if (Start == index)
+                    {
+                        continue;
+                    }
+                    if (i >= 0)
+                    {
+                        <button class="btn btn-outline-primary text-white" @onclick="@(()=>ChangePage(index))">@i</button>
+                    }
                 }
-                if (i >= 0)
-                {
-                    <button class="btn btn-outline-primary text-white" @onclick="@(()=>ChangePage(index))">@i</button>
-                }
-            }
-        </div>
-    </dvi>
+            </div>
+        </dvi>
+    }
 </div>
 
 
 
 @code {
     [Parameter]
-    public int Start { get; set; } = 0;
+    public int? Start { get; set; } = 0;
 
     [Parameter]
-    public Func<int,Task> OnClick { get; set; }
+    public Func<int, Task>? OnClick { get; set; }
 
 }

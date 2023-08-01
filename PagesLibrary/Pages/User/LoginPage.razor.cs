@@ -42,6 +42,8 @@ namespace PagesLibrary.Pages.User
                         _user = new LoginUser();
                         await _authStateProvider.GetAuthenticationStateAsync();
                         _popUp.ShowToats("Zostałeś zalogowany", "Status logowania", PopupLevel.Level.Success);
+                        _popUp.ShowToats("Logując się akceptujesz RODO", "Status logowania", PopupLevel.Level.Info);
+
                         _loginPopUp.HidePopUp();
                     }
                     else if (result.Item2 != System.Net.HttpStatusCode.OK)
@@ -56,6 +58,11 @@ namespace PagesLibrary.Pages.User
                         error = result.Item1;
                     }
                     if (result.Item2 == System.Net.HttpStatusCode.NotFound)
+                    {
+                        _ilogger.LogError(result.Item1);
+                        error = result.Item1;
+                    }
+                    if (result.Item2 == System.Net.HttpStatusCode.Unauthorized)
                     {
                         _ilogger.LogError(result.Item1);
                         error = result.Item1;
@@ -81,8 +88,7 @@ namespace PagesLibrary.Pages.User
             {
                 _editContext.OnFieldChanged -= HandleFieldChanged;
             }
-            _editContext = null;
-            _user = null;
+            _user = new LoginUser();
             error = "";
 #if DEBUG
             _ilogger.LogInformation("Dispose");

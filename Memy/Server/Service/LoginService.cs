@@ -1,4 +1,5 @@
-﻿using Memy.Server.Data.User;
+﻿using Memy.Server.Data;
+using Memy.Server.Data.User;
 using Memy.Server.TokenAuthentication;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
@@ -9,38 +10,55 @@ namespace Memy.Server.Service
     {
         private readonly ILoginData _userData;
         private readonly ITokenManager _tokenManager;
-        private readonly ILogger _logger;
 
-        public LoginService(ILoginData userData, ITokenManager tokenManager, ILogger logger)
+        public LoginService(ILoginData userData, ITokenManager tokenManager)
         {
             _userData = userData;
             _tokenManager = tokenManager;
-            _logger = logger;
         }
 
         //tworzenie i dodanie tokena przy logowaniu
-        public async Task<UserStorage> SetToken(UserSimple value)
+        public async Task<string?> SetToken(UserSimple value)
         {
             try
             {
-                var user = await _userData.LogIn<LoginUser>(value.Email, ConvertByteString.ConvertToObject<string>(value.Password), value.Token.DoNotLogOut);
-                if (user.Id == 0)
+                LoginUser? user = null;
+                if (!string.IsNullOrWhiteSpace(value.Email) && !string.IsNullOrWhiteSpace(value.Password))
                 {
-                    return null;
+                    var pass = ConvertByteString.ConvertToObject<string>(value.Password);
+                    ArgumentNullException.ThrowIfNullOrEmpty(pass);
+                    user = await _userData.LogIn<LoginUser>(value.Email, pass, value.Token.DoNotLogOut);
                 }
+
+                ArgumentNullException.ThrowIfNull(user);
+                ArgumentNullException.ThrowIfNull(user.Value);
+
+                if (!user.EmailConfirm)
+                {
+                    var token = Memy.Shared.Helper.ConvertByteString.ConvertToString(user.Value);
+                    throw new UnauthorizedAccessException(token);
+                }
+
                 var result = new UserStorage();
                 LoginUser.UserSimpleParse(user, result);
-                //_tokenManager.NewToken(new Token()
-                //{
-                //    Value = user.Value,
-                //    ExpiryDate = user.ExpiryDate
-                //});
 
-                return result;
+                _tokenManager.NewToken(new Token()
+                {
+                    Value = user.Value,
+                    ExpiryDate = user.ExpiryDate
+                });
+
+                if (string.IsNullOrWhiteSpace(result.Role))
+                {
+                    result.Role = null;
+                }
+
+                var jsonBytes = Memy.Shared.Helper.ConvertByteString.ConvertToString(result);
+
+                return jsonBytes;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -57,9 +75,8 @@ namespace Memy.Server.Service
 
                 return "Success";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -74,11 +91,15 @@ namespace Memy.Server.Service
             public DateTimeOffset? ExpiryDate { get; set; }
             public bool? DoNotLogOut { get; set; }
             public string? Role { get; set; }
+            public bool EmailConfirm { get; set; }
             public static void UserSimpleParse(LoginUser? loginUser, UserStorage? storage)
             {
-                storage.UserName = loginUser.Nick;
-                storage.Token = loginUser.Value.ToString();
-                storage.Role = loginUser.Role;
+                if (storage is not null && loginUser is not null)
+                {
+                    storage.UserName = loginUser.Nick;
+                    storage.Token = loginUser.Value.ToString();
+                    storage.Role = loginUser.Role;
+                }
             }
         }
     }

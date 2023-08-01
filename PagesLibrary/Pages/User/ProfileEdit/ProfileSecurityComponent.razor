@@ -8,56 +8,60 @@
 
         <div class="bg-gradient rounded-3">
             <span class="ps-3">Edytuj email użytkownika</span>
+            @if (_user is not null)
+            {
+                <EditForm Model="_user" OnValidSubmit="HandleValidSubmitEmail">
+                    <DataAnnotationsValidator />
 
-            <EditForm Model="_user" OnValidSubmit="HandleValidSubmitEmail">
-                <DataAnnotationsValidator />
-
-                <div class="input-group p-1">
-                    <InputText class="w-100 bg-black text-white " id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
-                    <ValidationMessage For="@(()=>_user.Email)" />
-                </div>
-                <div class="m-auto d-flex justify-content-end">
-                    <button class="btn btn-primary " type="submit">Zapisz</button>
-                </div>
-            </EditForm>
+                    <div class="input-group p-1">
+                        <InputText class="w-100 bg-black text-white " id="email" @bind-Value="@_user.Email" placeholder="Email"></InputText>
+                        <ValidationMessage For="@(()=>_user.Email)" />
+                    </div>
+                    <div class="m-auto d-flex justify-content-end">
+                        <button class="btn btn-primary " type="submit">Zapisz</button>
+                    </div>
+                </EditForm>
+            }
 
         </div>
 
         <div class="bg-gradient rounded-3">
             <span class="ps-3">Edytuj hasło użytkownika</span>
+            @if (_editPassword is not null)
+            {
+                <EditForm Model="_editPassword" OnValidSubmit="HandleValidSubmitPassword">
+                    <DataAnnotationsValidator />
+                    @{
+                        var password = showPassword ? "" : "password";
+                    }
 
-            <EditForm Model="_editPassword" OnValidSubmit="HandleValidSubmitPassword" >
-                <DataAnnotationsValidator />
-                @{
-                    var password = showPassword ? "" : "password";
-                }
+                    <div class="input-group p-1">
+                        <InputText class="w-100 bg-black text-white" id="OldPassword" type="@password" @bind-Value="@_editPassword.OldPassword" placeholder="Stare hasło"></InputText>
+                        <ValidationMessage For="@(()=>_editPassword.OldPassword)" />
+                    </div>
 
-                <div class="input-group p-1">
-                    <InputText class="w-100 bg-black text-white" id="OldPassword" type="@password" @bind-Value="@_editPassword.OldPassword" placeholder="Stare hasło"></InputText>
-                    <ValidationMessage For="@(()=>_editPassword.OldPassword)" />
-                </div>
+                    <div class="input-group p-1">
+                        <InputText class="w-100 bg-black text-white" id="password" type="@password" @bind-Value="@_editPassword.Password" placeholder="Nowe hasło"></InputText>
+                        <ValidationMessage For="@(()=>_editPassword.Password)" />
+                    </div>
 
-                <div class="input-group p-1">
-                    <InputText class="w-100 bg-black text-white" id="password" type="@password" @bind-Value="@_editPassword.Password" placeholder="Nowe hasło"></InputText>
-                    <ValidationMessage For="@(()=>_editPassword.Password)" />
-                </div>
+                    <div class="input-group p-1">
+                        <InputText class="w-100 bg-black text-white" id="password2" type="@password" @bind-Value="@_editPassword.PasswordConfirm" placeholder="Potwierdź hasło"></InputText>
+                    </div>
 
-                <div class="input-group p-1">
-                    <InputText class="w-100 bg-black text-white" id="password2" type="@password" @bind-Value="@_editPassword.PasswordConfirm" placeholder="Potwierdź hasło"></InputText>
-                </div>
+                    <div class="d-block">
+                        <span class="">
+                            <InputCheckbox @bind-Value="@showPassword"></InputCheckbox>
+                            <span>Pokaż hasła</span>
+                        </span>
+                        <ValidationMessage For="@(()=>_editPassword.PasswordConfirm)" />
+                    </div>
 
-                <div class="d-block">
-                    <span class="">
-                        <InputCheckbox @bind-Value="@showPassword"></InputCheckbox>
-                        <span>Pokaż hasła</span>
-                    </span>
-                    <ValidationMessage For="@(()=>_editPassword.PasswordConfirm)" />
-                </div>
-
-                <div class="m-auto d-flex justify-content-end">
-                    <button class="btn btn-primary" type="submit">Zapisz</button>
-                </div>
-            </EditForm>
+                    <div class="m-auto d-flex justify-content-end">
+                        <button class="btn btn-primary" type="submit">Zapisz</button>
+                    </div>
+                </EditForm>
+            }
         </div>
 
     </div>

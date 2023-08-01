@@ -3,7 +3,7 @@
 @inject ILogger<ReportButtonComponent> _logger
 
 
-@if (Reported != null)
+@if (Reported is not null)
 {    
      var reported = Reported.IsChecked ? "btn-outline-warning" : "btn-outline-primary";   
 
@@ -23,7 +23,7 @@
 
 @code {
     [Parameter]
-    public ReportedModel Reported { get; set; }
+    public ReportedModel? Reported { get; set; }
     [Parameter]
     public int Id { get; set; }
 }

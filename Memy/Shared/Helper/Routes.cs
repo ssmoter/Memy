@@ -13,11 +13,13 @@
         public static string ReportedMessages { get => "ReportedMessages"; }
 
 
+
         //Routes
         public static string Img { get => "img"; }
         public static string Video { get => "video"; }
         public static string Register { get => "register"; }
         public static string Email { get => "email"; }
+        public static string RegistrationConfirmation { get => "registration-confirmation"; }
 
 
         //AdminController

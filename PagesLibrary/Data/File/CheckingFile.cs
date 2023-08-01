@@ -21,6 +21,10 @@ namespace PagesLibrary.Data.File
                     using (MemoryStream ms = new MemoryStream())
                     {
                         await fileStream.CopyToAsync(ms);
+                        if (status is null)
+                        {
+                            status = new FileUploadStatus();
+                        }
                         status.Data = new byte[ms.Length];
                         status.Data = ms.ToArray();
                         status.ImgUrl = $"data:image/{file.Name};base64,{Convert.ToBase64String(status.Data)}";

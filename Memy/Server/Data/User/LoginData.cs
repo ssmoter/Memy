@@ -5,9 +5,7 @@ namespace Memy.Server.Data.User
     public class LoginData : BaseData, ILoginData
     {
         public LoginData(ISqlDataAccess sqlData) : base(sqlData)
-        {
-
-        }
+        {        }
         public async Task<bool> CheckAdminToken(Guid? value)
         {
             sql.Clear();

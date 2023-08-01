@@ -1,11 +1,12 @@
-﻿using Memy.Server.Data.User;
+﻿using Memy.Server.Data.Error;
+using Memy.Server.Data.User;
 using Memy.Server.Filtres;
+using Memy.Server.Helper;
 using Memy.Server.Service;
+using Memy.Shared.Helper;
+using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-
-using System.Text.Json;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,16 +16,24 @@ namespace Memy.Server.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-
-        private readonly ILogger<UserController> _logger;
+        private const string SubjectRegister = "Rejestracja";
         private readonly RegisterService _registerService;
         private readonly UserService _userService;
+        private readonly SmtpService _smtpService;
+        private readonly IConfiguration _configuration;
+        private readonly Log _logger;
 
-        public UserController(ILogger<UserController> logger, IUserData userData, IWebHostEnvironment webHostEnvironment)
+        public UserController(ILogger<UserController> logger,
+                              IUserData userData,
+                              IWebHostEnvironment webHostEnvironment,
+                              ILogData data,
+                              IConfiguration config)
         {
-            _logger = logger;
-            _registerService = new RegisterService(logger);
-            _userService = new UserService(logger, userData, webHostEnvironment);
+            _logger = new Log(logger, data);
+            _configuration = config;
+            _registerService = new RegisterService(userData);
+            _userService = new UserService(userData, webHostEnvironment);
+            _smtpService = new SmtpService(config);
         }
 
 
@@ -48,7 +57,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -60,18 +69,21 @@ namespace Memy.Server.Controllers
         {
             try
             {
-                var token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
+                string? token = Request.Headers.FirstOrDefault(x => x.Key == Shared.Helper.Headers.Authorization).Value;
 
-                var result = await _userService.GetEmail(token);
-                if (result != null)
+                if (!string.IsNullOrWhiteSpace(token))
                 {
-                    return Ok(result);
+                    var result = await _userService.GetEmail(token);
+                    if (result is not null)
+                    {
+                        return Ok(result);
+                    }
                 }
                 return NotFound();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
@@ -79,7 +91,7 @@ namespace Memy.Server.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] string value)
+        public async Task<IActionResult> PostRegister([FromBody] UserSimple value)
         {
             try
             {
@@ -88,16 +100,53 @@ namespace Memy.Server.Controllers
                     return NoContent();
                 }
 
+                value.Password = ConvertByteString.ConvertToObject<string>(value.Password);
 
+                var result = await _registerService.RegisterUser(value);
+                if (!string.IsNullOrWhiteSpace(result))
+                {
+                    ArgumentNullException.ThrowIfNullOrEmpty(value.Email);
+                    await _smtpService.SendEmail(value.Email,
+                                                 SubjectRegister,
+                                                 EmailBodySchema.Register($"{_configuration.GetValue<string>("UrlPage")}registration-confirmation/{result}"));
+                    return Ok();
+                }
 
-                return Ok();
+                return NoContent();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("registration-confirmation/{value}")]
+        public async Task<IActionResult> PostRegisterConfirm(string value)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    return NoContent();
+                }
+
+                var result = await _registerService.RegisterUserConfirm(value);
+                if (result is not null)
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                await _logger.SaveLogError(ex);
+                return BadRequest(ex.Message);
+            }
+        }
+
+
 
         // PUT api/<UserController>/5
         [TokenAuthenticationFilter]
@@ -126,7 +175,7 @@ namespace Memy.Server.Controllers
                         }
                     case Shared.Helper.MyEnums.UpdateProfile.Avatar:
                         {
-                             await _userService.UpdateAvatar(token, strValue);
+                            await _userService.UpdateAvatar(token, strValue);
                             return Ok();
                         }
                     case Shared.Helper.MyEnums.UpdateProfile.Email:
@@ -141,7 +190,7 @@ namespace Memy.Server.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                await _logger.SaveLogError(ex);
                 return BadRequest(ex.Message);
             }
         }

@@ -19,7 +19,7 @@ namespace PagesLibrary.Data.File
         Task<HttpResponseMessage> GetTaskModelAsync(int id);
         Task<HttpResponseMessage> GetTaskModelsAsync(int? start, string? categories, int? max, bool? banned, string? dateEnd, string? dateStart, int? orderTyp);
         Task<HttpResponseMessage> PostFileAsync(FileUploadModel file);
-        Task<HttpResponseMessage> GetUserTaskModelsAsync(string name, int? start, int? max, int? orderTyp, bool? banned);
+        Task<HttpResponseMessage> GetUserTaskModelsAsync(string? name, int? start, int? max, int? orderTyp, bool? banned);
     }
 
     public class FileManager : BaseApi, IFileManager
@@ -131,12 +131,28 @@ namespace PagesLibrary.Data.File
         //ustawianie adresu z img
         public string GetImg(string name)
         {
-            string url = $"{GetHttpClient().BaseAddress.AbsolutePath}{Routes.File}/{Routes.Img}/{name}";
+            var client = GetHttpClient();
+            string url = "";
+            if (client is not null)
+            {
+                if (client.BaseAddress is not null)
+                {
+                    url = $"{client.BaseAddress.AbsolutePath}{Routes.File}/{Routes.Img}/{name}";
+                }
+            }
             return url;
         }
         public string GetVideo(string name)
         {
-            string url = $"{GetHttpClient().BaseAddress.AbsolutePath}{Routes.File}/{Routes.Video}/{name}";
+            var client = GetHttpClient();
+            string url = "";
+            if (client is not null)
+            {
+                if (client.BaseAddress is not null)
+                {
+                    url = $"{client.BaseAddress.AbsolutePath}{Routes.File}/{Routes.Video}/{name}";
+                }
+            }
             return url;
         }
         //pobieranie tagów

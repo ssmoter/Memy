@@ -42,7 +42,7 @@ namespace PagesLibrary.Data.User
             }
         }
 
-        public async Task<HttpResponseMessage> UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile id, object value)
+        public async Task<HttpResponseMessage> UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile id, object? value)
         {
             try
             {
@@ -57,7 +57,10 @@ namespace PagesLibrary.Data.User
 
                 if (result.IsSuccessStatusCode && id == MyEnums.UpdateProfile.Name)
                 {
-                    await UpdateStorege((string)value);
+                    if (value is not null)
+                    {
+                        await UpdateStorege((string)value);
+                    }
                 }
 
                 return result;
@@ -73,6 +76,10 @@ namespace PagesLibrary.Data.User
                 if (local != null)
                 {
                     var user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(local);
+                    if (user is null)
+                    {
+                        user = new UserStorage();
+                    }
                     user.UserName = name;
                     await this.GetLocalStorage()
                         .SetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization
@@ -82,6 +89,10 @@ namespace PagesLibrary.Data.User
                 if (session != null)
                 {
                     var user = Memy.Shared.Helper.ConvertByteString.ConvertToObject<UserStorage>(local);
+                    if (user is null)
+                    {
+                        user = new UserStorage();
+                    }
                     user.UserName = name;
                     await this.GetLocalStorage()
                         .SetItemAsStringAsync(Memy.Shared.Helper.Headers.Authorization,

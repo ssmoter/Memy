@@ -7,9 +7,17 @@ namespace Memy.Server.Filtres
 {
     public class TokenAuthenticationFilter : Attribute, IAuthorizationFilter
     {
-        public async void OnAuthorization(AuthorizationFilterContext context)
+        public void OnAuthorization(AuthorizationFilterContext context)
         {
-            ITokenManager? tokenManager = (ITokenManager)context.HttpContext.RequestServices.GetService(typeof(ITokenManager));
+            var tokenManagerObj = context.HttpContext.RequestServices.GetService(typeof(ITokenManager));
+            ITokenManager? tokenManager = null;
+            if (tokenManagerObj is ITokenManager)
+            {
+                tokenManager = (ITokenManager)tokenManagerObj;
+            }
+
+
+
 
             bool result = true;
             if (!context.HttpContext.Request.Headers.ContainsKey(Shared.Helper.Headers.Authorization))
@@ -25,10 +33,15 @@ namespace Memy.Server.Filtres
                 {
                     result = false;
                 }
-                bool CheckToken = tokenManager.VerifyToken(token);
-                if (!CheckToken)
+
+                if (tokenManager is not null)
                 {
-                    result = false;
+                    bool CheckToken = tokenManager.VerifyToken(token);
+
+                    if (!CheckToken)
+                    {
+                        result = false;
+                    }
                 }
             }
             if (!result)

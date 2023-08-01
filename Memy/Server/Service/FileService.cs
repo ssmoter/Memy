@@ -1,44 +1,37 @@
 ﻿using Memy.Server.Data.File;
-using Memy.Server.Helper;
 using Memy.Shared.Helper;
 using Memy.Shared.Model;
-
-using Newtonsoft.Json.Linq;
-
-using System.Runtime.CompilerServices;
 
 namespace Memy.Server.Service
 {
     public class FileService
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ILogger _logger;
         private readonly IAddNewFileModel _fileData;
 
-        public FileService(IWebHostEnvironment webHostEnvironment, ILogger logger, IAddNewFileModel fileData)
+        public FileService(IWebHostEnvironment webHostEnvironment, IAddNewFileModel fileData)
         {
             _webHostEnvironment = webHostEnvironment;
-            _logger = logger;
             _fileData = fileData;
         }
 
         //Zapisywanie plików na dysku
-        public async Task<FileUploadStatus[]> SaveFile(FileUploadStatus[] model)
+        public async Task<FileUploadStatus[]?> SaveFile(FileUploadStatus[] model)
         {
             try
             {
-                if (model != null)
+                if (model is not null)
                 {
-                    if (model.Length != 0)
+                    var status = new FileUploadStatus();
+                    for (int i = 0; i < model.Length; i++)
                     {
-                        var status = new FileUploadStatus();
-                        for (int i = 0; i < model.Length; i++)
+                        if (model[i].ObjTyp == (int)MyEnums.FileTyp.image || model[i].ObjTyp == (int)MyEnums.FileTyp.video)
                         {
-                            if (model[i].ObjTyp == (int)MyEnums.FileTyp.image || model[i].ObjTyp == (int)MyEnums.FileTyp.video)
+                            if (i >= Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
+                                break;
+                            status = await CheckingFile.CorrectData(model[i], _webHostEnvironment);
+                            if (status is not null)
                             {
-                                if (i >= Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
-                                    break;
-                                status = await CheckingFile.CorrectData(model[i], _webHostEnvironment);
                                 model[i] = status;
                             }
                         }
@@ -46,9 +39,8 @@ namespace Memy.Server.Service
                 }
                 return model;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
 
@@ -72,16 +64,18 @@ namespace Memy.Server.Service
 
                 return id;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                if (model.FileUploadStatuses != null)
+                if (model is not null)
                 {
-                    for (int i = 0; i < model.FileUploadStatuses.Length; i++)
+                    if (model.FileUploadStatuses is not null)
                     {
-                        CheckingFile.DeleteFile(model.FileUploadStatuses[i].ObjName, _webHostEnvironment);
+                        for (int i = 0; i < model.FileUploadStatuses.Length; i++)
+                        {
+                            CheckingFile.DeleteFile(model.FileUploadStatuses[i].ObjName, _webHostEnvironment);
+                        }
                     }
                 }
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -101,13 +95,12 @@ namespace Memy.Server.Service
                 }
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
-        public async Task<TaskModel?> GetTaskModelAsync(int id, string token)
+        public async Task<TaskModel?> GetTaskModelAsync(int id, string? token)
         {
             try
             {
@@ -120,9 +113,8 @@ namespace Memy.Server.Service
 
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -141,9 +133,8 @@ namespace Memy.Server.Service
                 }
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
 
@@ -162,9 +153,8 @@ namespace Memy.Server.Service
                 }
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
 
@@ -183,7 +173,7 @@ namespace Memy.Server.Service
             public string? Reaction { get; set; }
             public string? Reported { get; set; }
 
-            public static T? GetValue<T>(string value)
+            public static T? GetValue<T>(string? value)
             {
                 if (!string.IsNullOrWhiteSpace(value))
                 {
@@ -204,12 +194,11 @@ namespace Memy.Server.Service
                 result.CreatedDate = task.CreatedDate;
                 result.Banned = task.Banned;
 
-
                 result.User = GetTask.GetValue<User?>(task.User);
                 result.FileModel = GetTask.GetValue<FileModel[]?>(task.FileModel);
                 result.Tag = GetTask.GetValue<Tag[]?>(task.Tag);
                 result.Reaction = GetTask.GetValue<ReactionModel?>(task.Reaction);
-                result.Reported=GetTask.GetValue<ReportedModel?>(task.Reported);
+                result.Reported = GetTask.GetValue<ReportedModel?>(task.Reported);
                 return result;
             }
 

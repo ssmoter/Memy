@@ -5,6 +5,7 @@ using Memy.Shared.Model;
 using Microsoft.Extensions.Logging;
 
 using PagesLibrary.Data.Admin;
+using PagesLibrary.Helper;
 
 namespace PagesLibrary.Pages.AdminComponent
 {
@@ -29,54 +30,100 @@ namespace PagesLibrary.Pages.AdminComponent
                 default:
                     break;
             }
-        }
-        ReportedMessagesModel repored;
 
+            var url = _navigationManager.Uri;
+
+            for (int i = 0; i < ListInDropDown.CategoriesTablePlusMain.Length; i++)
+            {
+                if (url.Contains(ListInDropDown.CategoriesTablePlusMain[i].Item1))
+                {
+                    categories = ListInDropDown.CategoriesTablePlusMain[i];
+                    break;
+                }
+            }
+        }
+
+
+        ReportedMessagesModel? repored;
+        string title = "";
         private async Task BtnMain()
         {
-            var result = await _adminModal.ShowPopup(Model.Title,
-                                         "Post został dodany do głównej",
-                                         PopupLevel.Level.Success,
-                                         PopupLevel.Level.Success.ToString(),
-                                         "Przenieś",
-                                         "Anuluj");
-
-            if (string.IsNullOrWhiteSpace(result.Value.Item1))
+            try
             {
-                return;
+                ArgumentNullException.ThrowIfNull(Model);
+                if (!string.IsNullOrWhiteSpace(Model.Title))
+                {
+                    title = Model.Title;
+                }
+
+
+                var result = await _adminModal.ShowPopup(title,
+                                             "Post został dodany do głównej",
+                                             PopupLevel.Level.Success,
+                                             PopupLevel.Level.Success.ToString(),
+                                             "Przenieś",
+                                             "Anuluj");
+
+                ArgumentNullException.ThrowIfNull(result);
+                if (string.IsNullOrWhiteSpace(result.Header))
+                {
+                    return;
+                }
+                repored = new ReportedMessagesModel
+                {
+                    Header = result.Header,
+                    Body = result.Body,
+                    Level = (int)result.Level
+                };
+
+                await UpdateCategory(Memy.Shared.Helper.Categories.Main);
             }
-            repored = new ReportedMessagesModel
+            catch (Exception ex)
             {
-                Header = result.Value.Item1,
-                Body = result.Value.Item2,
-                Level = (int)result.Value.Item3
-            };
-
-            await UpdateCategory(Memy.Shared.Helper.Categories.Main);
+                _popUp.ShowToats(ex.Message, "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error);
+                _logger.LogError(ex.Message);
+            }
         }
 
         private async Task BtnCategory()
         {
-            var category = categories.Item1;
-            var result = await _adminModal.ShowPopup(Model.Title,
-                                         $"Post został przeniesiony na: {categories.Item2}",
-                                         PopupLevel.Level.Success,
-                                         PopupLevel.Level.Success.ToString(),
-                                         "Przenieś",
-                                         "Anuluj");
-
-            if (string.IsNullOrWhiteSpace(result.Value.Item1))
+            try
             {
-                return;
+                ArgumentNullException.ThrowIfNull(Model);
+                if (!string.IsNullOrWhiteSpace(Model.Title))
+                {
+                    title = Model.Title;
+                }
+
+                var category = categories.Item1;
+                var result = await _adminModal.ShowPopup(title,
+                                             $"Post został przeniesiony na: {categories.Item2}",
+                                             PopupLevel.Level.Success,
+                                             PopupLevel.Level.Success.ToString(),
+                                             "Przenieś",
+                                             "Anuluj");
+
+                ArgumentNullException.ThrowIfNull(result);
+                if (string.IsNullOrWhiteSpace(result.Header))
+                {
+                    return;
+                }
+                repored = new ReportedMessagesModel
+                {
+                    Header = result.Header,
+                    Body = result.Body,
+                    Level = (int)result.Level
+                };
+                if (!string.IsNullOrWhiteSpace(category))
+                {
+                    await UpdateCategory(category);
+                }
             }
-            repored = new ReportedMessagesModel
+            catch (Exception ex)
             {
-                Header = result.Value.Item1,
-                Body = result.Value.Item2,
-                Level = (int)result.Value.Item3
-            };
-
-            await UpdateCategory(category);
+                _popUp.ShowToats(ex.Message, "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error);
+                _logger.LogError(ex.Message);
+            }
         }
 
 
@@ -84,11 +131,15 @@ namespace PagesLibrary.Pages.AdminComponent
         {
             try
             {
+                ArgumentNullException.ThrowIfNull(Model);
+                ArgumentNullException.ThrowIfNull(_adminApi);
+                ArgumentNullException.ThrowIfNull(repored);
+
                 var response = await _adminApi.UpdateCategory(Model.Id, category, repored);
                 var json = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    _popUp.ShowToats($"Dany {Type.ToString()} został usunięty", "Success", CompomentsLibrary.Helper.PopupLevel.Level.Success);
+                    _popUp.ShowToats($"Dany {Type.ToString()} został przeniesiony", "Success", CompomentsLibrary.Helper.PopupLevel.Level.Success);
                     if (Fucn != null)
                     {
                         Fucn?.Invoke();
@@ -96,17 +147,16 @@ namespace PagesLibrary.Pages.AdminComponent
                 }
                 else
                 {
-                    _popUp.ShowToats($"Nie udało się usunąć {Type.ToString()} ", "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning);
+                    _popUp.ShowToats($"Nie udało się przenieść {Type.ToString()} ", "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning);
                     _popUp.ShowToats(json, "Warning", CompomentsLibrary.Helper.PopupLevel.Level.Warning, 10);
 
                     _logger.LogWarning(json);
                 }
 
             }
-            catch (Exception ex)
+            catch (Exception )
             {
-                _popUp.ShowToats(ex.Message, "Error", CompomentsLibrary.Helper.PopupLevel.Level.Error);
-                _logger.LogError(ex.Message);
+                throw;
             }
         }
 

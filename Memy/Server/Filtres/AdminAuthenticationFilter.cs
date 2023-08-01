@@ -9,7 +9,14 @@ namespace Memy.Server.Filtres
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            IAdminTokenManager? iAdminTokenManager = (IAdminTokenManager)context.HttpContext.RequestServices.GetService(typeof(IAdminTokenManager));
+
+            var adminTokenManagerObj = context.HttpContext.RequestServices.GetService(typeof(IAdminTokenManager));
+            IAdminTokenManager? adminTokenManager = null;
+            if (adminTokenManagerObj is IAdminTokenManager)
+            {
+                adminTokenManager = (IAdminTokenManager)adminTokenManagerObj;
+            }
+
 
             bool result = true;
             if (!context.HttpContext.Request.Headers.ContainsKey(Shared.Helper.Headers.Authorization))
@@ -25,10 +32,13 @@ namespace Memy.Server.Filtres
                 {
                     result = false;
                 }
-                bool CheckToken = iAdminTokenManager.VerifyToken(token);
-                if (!CheckToken)
+                if (adminTokenManager is not null)
                 {
-                    result = false;
+                    bool CheckToken = adminTokenManager.VerifyToken(token);
+                    if (!CheckToken)
+                    {
+                        result = false;
+                    }
                 }
             }
             if (!result)

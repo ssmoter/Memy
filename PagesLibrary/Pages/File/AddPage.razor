@@ -1,5 +1,4 @@
-﻿@using Data.File
-@using System.Net.Http.Headers;
+﻿@using System.Net.Http.Headers;
 
 @inject ILogger<AddPage> _logger
 @inject IFileManager _iFileManager
@@ -37,7 +36,7 @@
                 <InputTextArea class="bg-black text-white w-100" id="description" @bind-Value="@_fileAdd.Description" placeholder="Opis" />
             </div>
             <div class="form-group p-1">
-                <DropDownList Description="Wybór kategori" List="@CategoriesTable" @bind-Value="@_fileAdd.Categories" />
+                <DropDownList Description="Wybór kategori" List="@ListInDropDown.CategoriesTable" @bind-Value="@_fileAdd.Categories" />
                 <span>Wybrana kategoria: @_fileAdd.Categories.Item2</span>
             </div>
             <div>
@@ -149,20 +148,15 @@
 @code {
     FileAdd _fileAdd = new FileAdd();
     EditContext? _editContext;
-    private bool? _formInvalid = false;
+    bool? _formInvalid = false;
     List<string>? _error;
     List<FileUploadStatus?>? _fileUploadStatuses;
-    CancellationTokenSource cts;
+    CancellationTokenSource? cts;
     string[]? TagTable { get; set; }
     int _maingImg { get; set; } = 0;
-    string _moreText { get; set; }
-    string _ytText { get; set; }
+    string? _moreText { get; set; }
+    string? _ytText { get; set; }
 
-
-    (string, string)[] CategoriesTable = new (string, string)[]
-    {
-        (Memy.Shared.Helper.Categories.Waiting,"Brak"),
-    };
 
     int _objTyp = 0;
 }

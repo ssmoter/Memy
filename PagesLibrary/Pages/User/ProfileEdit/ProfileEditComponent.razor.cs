@@ -1,10 +1,6 @@
-﻿using Memy.Shared.Helper;
-
-using Microsoft.AspNetCore.Components.Forms;
+﻿using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Logging;
-
-using PagesLibrary.Data.File;
 
 namespace PagesLibrary.Pages.User.ProfileEdit
 {
@@ -14,7 +10,12 @@ namespace PagesLibrary.Pages.User.ProfileEdit
         {
             try
             {
-                _user.Nick = (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity.Name;
+                if (_user is not null)
+                {
+                    var identity = (await _authStateProvider.GetAuthenticationStateAsync()).User.Identity;
+                    if (identity is not null)
+                        _user.Nick = identity.Name;
+                }
             }
             catch (Exception ex)
             {
@@ -25,8 +26,8 @@ namespace PagesLibrary.Pages.User.ProfileEdit
         private async Task HandleValidSubmitName()
         {
             try
-            {                
-
+            {
+                ArgumentNullException.ThrowIfNull(_user);
                 var result = await _profileData.UpdateProfil(Memy.Shared.Helper.MyEnums.UpdateProfile.Name, _user.Nick);
                 var json = await result.Content.ReadAsStringAsync();
                 if (result.IsSuccessStatusCode)
@@ -112,12 +113,6 @@ namespace PagesLibrary.Pages.User.ProfileEdit
                 _logger.LogError(ex.Message);
             }
         }
-
-        private async Task HandleOnDrop(DragEventArgs args)
-        {
-            var files = args.DataTransfer.Files;
-        }
-
 
 
         public void Dispose()

@@ -1,5 +1,6 @@
 ﻿using Memy.Server.Data.Admin;
 using Memy.Server.Data.Comment;
+using Memy.Server.Data.Error;
 using Memy.Server.Data.File;
 using Memy.Server.Data.Reaction;
 using Memy.Server.Data.Reported;
@@ -15,20 +16,22 @@ namespace Memy.Server.Service
         //program.cs jest czytelniejszy
         public static IServiceCollection AddMyService(this IServiceCollection services)
         {
-            services.AddTransient<ISqlDataAccess, SqlDataAccess>();
-            services.AddTransient<ILoginData, LoginData>();
+            services.AddScoped<ISqlDataAccess, SqlDataAccess>();
+            services.AddScoped<ILoginData, LoginData>();
 
-            services.AddTransient<ITokenManager, TokenManager>();
-            services.AddTransient<IAdminTokenManager, AdminTokenManager>();
+            services.AddScoped<ITokenManager, TokenManager>();
+            services.AddScoped<IAdminTokenManager, AdminTokenManager>();
+            services.AddSingleton<TokenList>();
 
-            services.AddTransient<IAddNewFileModel, AddNewFileModel>();
-            services.AddTransient<IReactionDataBase, ReactionDataBase>();
-            services.AddTransient<ICommentData, CommentData>();
-            services.AddTransient<IUserData, UserData>();
-            services.AddTransient<IReportedDataBase, ReportedDataBase>();
-            services.AddTransient<IReportedMessagesData, ReportedMessagesData>();
-            services.AddTransient<IAdminData, AdminData>();
+            services.AddScoped<IAddNewFileModel, AddNewFileModel>();
+            services.AddScoped<IReactionDataBase, ReactionDataBase>();
+            services.AddScoped<ICommentData, CommentData>();
+            services.AddScoped<IUserData, UserData>();
+            services.AddScoped<IReportedDataBase, ReportedDataBase>();
+            services.AddScoped<IReportedMessagesData, ReportedMessagesData>();
+            services.AddScoped<IAdminData, AdminData>();
 
+            services.AddScoped<ILogData, LogData>();
 
             return services;
         }

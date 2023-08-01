@@ -1,9 +1,12 @@
 ﻿using CompomentsLibrary.Helper;
+using CompomentsLibrary.Model;
 
 using Memy.Shared.Model;
 
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Logging;
+
+using PagesLibrary.Helper;
 
 namespace PagesLibrary.Pages.File
 {
@@ -14,6 +17,14 @@ namespace PagesLibrary.Pages.File
         {
             try
             {
+                if (_error is null)
+                {
+                    _error = new List<string>();
+                }
+                if (_fileUploadStatuses is null)
+                {
+                    _fileUploadStatuses = new List<FileUploadStatus?>();
+                }
                 _popUp.ShowToats("Trwa wczytywanie plików", "Pliki", PopupLevel.Level.None);
 #if DEBUG
                 _logger.LogInformation("Initialized Preview");
@@ -39,15 +50,15 @@ namespace PagesLibrary.Pages.File
                     StateHasChanged();
 
                     var result = await Data.File.CheckingFile.CorrectData(inputFile.GetMultipleFiles()[i], status.Item1);
-                    if (_fileUploadStatuses[i] != null)
+                    if (_fileUploadStatuses[i] is not null)
                     {
                         _fileUploadStatuses[_fileUploadStatuses.Count - 1] = result;
                         _fileUploadStatuses[_fileUploadStatuses.Count - 1].ObjOrder = _fileUploadStatuses.Count;
-                    }
 
-                    _popUp.ShowToats($"{_fileUploadStatuses[i].ObjName} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
-                    _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].ObjName);
-                    StateHasChanged();
+                        _popUp.ShowToats($"{_fileUploadStatuses[i].ObjName} został dodany do listy", "Nowy plik", PopupLevel.Level.Info);
+                        _logger.LogInformation("Show new image {0}", _fileUploadStatuses[i].ObjName);
+                        StateHasChanged();
+                    }
                 }
             }
             catch (Exception ex)
@@ -57,8 +68,16 @@ namespace PagesLibrary.Pages.File
         }
         private void PreviewText(string text, int typ)
         {
+            if (_fileUploadStatuses is null)
+            {
+                _fileUploadStatuses = new List<FileUploadStatus?>();
+            }
             if (_fileUploadStatuses.Count > Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles)
             {
+                if (_error is null)
+                {
+                    _error = new List<string>();
+                }
                 _error.Add($"Przekroczyłeś dopuszczalną liczbę obkiektów {Environment.NewLine}Dopuszczalna liczba = {Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles}");
                 _logger.LogError("Too many object max {0}", Memy.Shared.Helper.FileRequirements.MaxNumberOfFiles);
                 return;
@@ -100,17 +119,20 @@ namespace PagesLibrary.Pages.File
         {
             try
             {
-                if (_fileUploadStatuses != null)
+                if (_fileUploadStatuses is not null)
                 {
-                    var name = _fileUploadStatuses[index].ObjName;
-                    _fileUploadStatuses.RemoveAt(index);
-                    StateHasChanged();
-                    _popUp.ShowToats($"{name} został usunięty", "Usunięty", PopupLevel.Level.Info);
-                    _logger.LogInformation("Remove item at {0}", index);
-
-                    if (index == _maingImg)
+                    if (_fileUploadStatuses[index] is not null)
                     {
-                        _maingImg = 0;
+                        var name = _fileUploadStatuses[index].ObjName;
+                        _fileUploadStatuses.RemoveAt(index);
+                        StateHasChanged();
+                        _popUp.ShowToats($"{name} został usunięty", "Usunięty", PopupLevel.Level.Info);
+                        _logger.LogInformation("Remove item at {0}", index);
+
+                        if (index == _maingImg)
+                        {
+                            _maingImg = 0;
+                        }
                     }
                 }
             }
@@ -142,6 +164,10 @@ namespace PagesLibrary.Pages.File
         }
         private void ImgLeft()
         {
+            if (_fileUploadStatuses is null)
+            {
+                return;
+            }
             if (_maingImg > 0)
             {
                 _maingImg--;
@@ -153,6 +179,11 @@ namespace PagesLibrary.Pages.File
         }
         private void ImgRight()
         {
+            if (_fileUploadStatuses is null)
+            {
+                return;
+            }
+
             if (_maingImg < _fileUploadStatuses.Count - 1)
             {
                 _maingImg++;
@@ -171,9 +202,12 @@ namespace PagesLibrary.Pages.File
             _editContext.OnFieldChanged += HandleFieldChanged;
 
             _fileUploadStatuses = new List<FileUploadStatus?>();
-            _error = new List<string?>();
+            if (_error is null)
+            {
+                _error = new List<string>();
+            }
             cts = new CancellationTokenSource();
-            _fileAdd.Categories = CategoriesTable[0];
+            _fileAdd.Categories = ListInDropDown.CategoriesTable[0];
 #if DEBUG
             _logger.LogInformation("Initialized page");
 #endif
@@ -193,12 +227,15 @@ namespace PagesLibrary.Pages.File
             _logger.LogInformation("Initialized async page");
 #endif
         }
-        public async void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+        public void HandleFieldChanged(object sender, FieldChangedEventArgs e)
         {
             if (_editContext != null)
             {
                 _formInvalid = !_editContext.Validate();
-                _error.Clear();
+                if (_error is not null)
+                {
+                    _error.Clear();
+                }
             }
             StateHasChanged();
         }
@@ -215,7 +252,10 @@ namespace PagesLibrary.Pages.File
                     {
                         return;
                     }
-                    if (!await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać pliki?", "Tak", "Nie"))
+                    bool modalValue = false;
+
+                    modalValue = await _modal.ShowPopup("Przesyłanie", "Czy na pewno chcesz przesłać pliki?", "Tak", "Nie");
+                    if (!modalValue)
                     {
                         return;
                     }
@@ -230,19 +270,26 @@ namespace PagesLibrary.Pages.File
                         request.Tag[i] = _fileAdd.Tag[i];
                     }
 
+                    if (_fileUploadStatuses is null)
+                    {
+                        _fileUploadStatuses = new List<FileUploadStatus?>();
+                    }
+
                     request.FileUploadStatuses = new FileUploadStatus[_fileUploadStatuses.Count];
 
                     for (int i = 0; i < _fileUploadStatuses.Count; i++)
                     {
                         request.FileUploadStatuses[i] = new FileUploadStatus();
+
                         request.FileUploadStatuses[i].ObjName = _fileUploadStatuses[i].ObjName;
                         request.FileUploadStatuses[i].ObjTyp = _fileUploadStatuses[i].ObjTyp;
                         request.FileUploadStatuses[i].ObjOrder = _fileUploadStatuses[i].ObjOrder;
-                        if (_fileUploadStatuses[i].Data != null)
+                        if (_fileUploadStatuses[i].Data is not null)
                         {
                             request.FileUploadStatuses[i].Data = new byte[_fileUploadStatuses[i].Data.Length];
                             request.FileUploadStatuses[i].Data = _fileUploadStatuses[i].Data;
                         }
+
                     }
 
                     var result = await _iFileManager.PostFileAsync(request);
@@ -253,7 +300,10 @@ namespace PagesLibrary.Pages.File
                         await Task.Run(async () =>
                         {
                             await Task.Delay(2 * 1000);
-                            _error.Clear();
+                            if (_error is not null)
+                            {
+                                _error.Clear();
+                            }
                             _fileAdd = new FileAdd();
                             _fileUploadStatuses.Clear();
                             StateHasChanged();
@@ -306,6 +356,10 @@ namespace PagesLibrary.Pages.File
                     if (_SimpleTag != value)
                     {
                         _SimpleTag = value;
+                        if (string.IsNullOrWhiteSpace(SimpleTag))
+                        {
+                            return;
+                        }
                         if (string.IsNullOrWhiteSpace(_SimpleTag))
                         {
                             return;
@@ -321,10 +375,11 @@ namespace PagesLibrary.Pages.File
             }
 
 
-            public (string, string) Categories { get; set; }
+            public ValueInDropDownList Categories { get; set; }
             public FileAdd()
             {
                 Tag = new List<string>();
+                Categories = ListInDropDown.CategoriesTable[0];
             }
         }
     }

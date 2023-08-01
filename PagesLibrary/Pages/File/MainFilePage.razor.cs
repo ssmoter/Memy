@@ -56,7 +56,9 @@ namespace PagesLibrary.Pages.File
                 if (result != null)
                 {
                     _popUp.ShowToats("Reakcja dodana", "Dodawanie reakcji", PopupLevel.Level.Success, 2);
+                    ArgumentNullException.ThrowIfNull(TaskModel);
                     TaskModel.Reaction = result;
+
                 }
                 else
                 {
@@ -98,6 +100,14 @@ namespace PagesLibrary.Pages.File
 
         private void ImgLeft()
         {
+            if (TaskModel is null)
+            {
+                return;
+            }
+            if (TaskModel.FileModel is null)
+            {
+                return;
+            }
             if (_maingImg > 0)
             {
                 _maingImg--;
@@ -109,6 +119,14 @@ namespace PagesLibrary.Pages.File
         }
         private void ImgRight()
         {
+            if (TaskModel is null)
+            {
+                return;
+            }
+            if (TaskModel.FileModel is null)
+            {
+                return;
+            }
             if (_maingImg < TaskModel.FileModel.Length - 1)
             {
                 _maingImg++;

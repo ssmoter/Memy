@@ -1,18 +1,14 @@
 ﻿using Memy.Server.Data.User;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Primitives;
-
 namespace Memy.Server.Service
 {
     public class ReportedMessagesService
     {
-        private readonly ILogger _logger;
         private readonly IReportedMessagesData _messages;
 
-        public ReportedMessagesService(ILogger logger, IReportedMessagesData messages)
+        public ReportedMessagesService(IReportedMessagesData messages)
         {
-            _logger = logger;
             _messages = messages;
         }
 
@@ -24,9 +20,8 @@ namespace Memy.Server.Service
 
                 return result.ToArray();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -39,9 +34,8 @@ namespace Memy.Server.Service
 
                 return result.ToArray();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }

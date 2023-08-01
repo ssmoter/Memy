@@ -1,21 +1,16 @@
 ﻿using Memy.Server.Data.Comment;
 using Memy.Shared.Model;
 
-using Microsoft.Extensions.Primitives;
-
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Memy.Server.Service
 {
     internal class CommentService
     {
-        private readonly ILogger _logger;
         private readonly ICommentData _commentData;
 
-        public CommentService(ILogger logger, ICommentData commentData)
+        public CommentService(ICommentData commentData)
         {
-            _logger = logger;
             _commentData = commentData;
         }
 
@@ -28,20 +23,13 @@ namespace Memy.Server.Service
                 var comment = new CommentModel[task.Length];
                 for (int i = 0; i < comment.Length; i++)
                 {
-                    comment[i] = new CommentModel();
-                    comment[i].Id = task[i].Id;
-                    comment[i].Description = task[i].Description;
-                    comment[i].Date = task[i].Date;
-                    comment[i].ObjectId = task[i].FileSimpleId;
-                    comment[i].User = GetTask.GetValue<User>(task[i].User);
-                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                    comment[i] = GetTask.ParseToComment(task[i]);
                 }
 
                 return comment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -54,20 +42,13 @@ namespace Memy.Server.Service
                 var comment = new CommentModel[task.Length];
                 for (int i = 0; i < comment.Length; i++)
                 {
-                    comment[i] = new CommentModel();
-                    comment[i].Id = task[i].Id;
-                    comment[i].Description = task[i].Description;
-                    comment[i].Date = task[i].Date;
-                    comment[i].ObjectId = task[i].FileSimpleId;
-                    comment[i].User = GetTask.GetValue<User>(task[i].User);
-                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                    comment[i] = GetTask.ParseToComment(task[i]);
                 }
 
                 return comment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -81,20 +62,13 @@ namespace Memy.Server.Service
                 var comment = new CommentModel[task.Length];
                 for (int i = 0; i < comment.Length; i++)
                 {
-                    comment[i] = new CommentModel();
-                    comment[i].Id = task[i].Id;
-                    comment[i].Description = task[i].Description;
-                    comment[i].Date = task[i].Date;
-                    comment[i].ObjectId = task[i].FileSimpleId;
-                    comment[i].User = GetTask.GetValue<User>(task[i].User);
-                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                    comment[i] = GetTask.ParseToComment(task[i]);
                 }
 
                 return comment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -108,20 +82,13 @@ namespace Memy.Server.Service
                 var comment = new CommentModel[task.Length];
                 for (int i = 0; i < comment.Length; i++)
                 {
-                    comment[i] = new CommentModel();
-                    comment[i].Id = task[i].Id;
-                    comment[i].Description = task[i].Description;
-                    comment[i].Date = task[i].Date;
-                    comment[i].ObjectId = task[i].FileSimpleId;
-                    comment[i].User = GetTask.GetValue<User>(task[i].User);
-                    comment[i].Reaction = GetTask.GetValue<ReactionModel>(task[i].Reaction);
+                    comment[i] = GetTask.ParseToComment(task[i]);
                 }
 
                 return comment;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
@@ -135,7 +102,7 @@ namespace Memy.Server.Service
             public string? User { get; set; }
             public string? Reaction { get; set; }
 
-            public static T? GetValue<T>(string value)
+            public static T? GetValue<T>(string? value)
             {
                 if (!string.IsNullOrWhiteSpace(value))
                 {
@@ -145,6 +112,32 @@ namespace Memy.Server.Service
                 {
                     return default(T?);
                 }
+            }
+
+
+            public static CommentModel ParseToComment(GetTask task)
+            {
+                var result = new CommentModel();
+                result.Id = task.Id;
+                if (!string.IsNullOrWhiteSpace(task.Description))
+                {
+                    result.Description = task.Description;
+                }
+                result.Date = task.Date;
+                result.ObjectId = task.FileSimpleId;
+                if (!string.IsNullOrWhiteSpace(task.User))
+                {
+                    var user = GetValue<User>(task.User);
+                    if (user is not null)
+                        result.User = user;
+                }
+                if (!string.IsNullOrWhiteSpace(task.Reaction))
+                {
+                    var reaction = GetValue<ReactionModel>(task.Reaction);
+                    if (reaction is not null)
+                        result.Reaction = reaction;
+                }
+                return result;
             }
         }
 

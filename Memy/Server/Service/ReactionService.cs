@@ -1,4 +1,5 @@
-﻿using Memy.Server.Data.Reaction;
+﻿using Memy.Server.Data;
+using Memy.Server.Data.Reaction;
 using Memy.Server.Helper;
 using Memy.Shared.Model;
 
@@ -7,11 +8,9 @@ namespace Memy.Server.Service
     public class ReactionService
     {
         private readonly IReactionDataBase _reactionData;
-        private readonly ILogger _logger;
-        public ReactionService(IReactionDataBase reactionData, ILogger logger)
+        public ReactionService(IReactionDataBase reactionData)
         {
             _reactionData = reactionData;
-            _logger = logger;
         }
 
         public async Task<string> SetReaction(ReactionModel reaction, string token)
@@ -41,9 +40,8 @@ namespace Memy.Server.Service
                 var json = await _reactionData.SetReaction(procedure, reaction.Id, reaction.Value, token);
                 return json;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex.Message);
                 throw;
             }
         }
