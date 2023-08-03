@@ -1,10 +1,11 @@
 ﻿@inject ILogger<UserMessagesComponent> _logger
 @inject IReportedMessagesApi _messagesApi
+@inject AuthenticationStateProvider _auth
 
 <AuthorizeView>
     <Authorized>
 
-        @{
+        @{            
             int number = 0;
             if (messages != null)
             {

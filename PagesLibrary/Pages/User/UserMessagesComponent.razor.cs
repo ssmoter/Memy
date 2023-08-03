@@ -8,7 +8,16 @@ namespace PagesLibrary.Pages.User
     {
         protected override async Task OnInitializedAsync()
         {
-            await GetMessages();
+            var user = await _auth.GetAuthenticationStateAsync();
+            if (user.User.Identity is null)
+            {
+                return;
+            }
+
+            if (user.User.Identity.Name is not null)
+            {
+                await GetMessages();
+            }
         }
         private async Task GetMessages()
         {
