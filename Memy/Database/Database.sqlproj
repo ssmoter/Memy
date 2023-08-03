@@ -130,5 +130,6 @@
   <ItemGroup>
     <None Include="View\Script1.sql" />
     <None Include="Database.publish.xml" />
+    <None Include="Database-Server2016.publish.xml" />
   </ItemGroup>
 </Project>
