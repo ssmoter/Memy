@@ -3,6 +3,7 @@
 
 @inject LoginPopUpService _loginPopUp
 @inject CategoriesPopUpServie _categoriesPopUp
+@inject NavigationManager _navigation
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -16,7 +17,7 @@
 <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All" >
                 <span class="oi oi-home" aria-hidden="true"></span> Home
             </NavLink>
         </div>
@@ -30,7 +31,7 @@
         </div>
         <div class="nav-item px-3">
             <NavLink class="nav-link" @onclick="_categoriesPopUp.ShowPopUp">
-                <span class="oi oi-list" aria-hidden="true"></span> Więcej kategorii
+                <span class="oi oi-list" aria-hidden="true"></span> Kategorie
             </NavLink>
         </div>
 
@@ -49,6 +50,7 @@
                 </div>
             </NotAuthorized>
             <Authorized>
+
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="add">
                         <span class="oi oi-file" aria-hidden="true"></span> Dodaj

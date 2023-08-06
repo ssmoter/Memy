@@ -14,21 +14,27 @@ namespace PagesLibrary.Pages.File
         private string? _date { get; set; }
         private int _maingImg { get; set; } = 0;
 
+        protected override async Task OnParametersSetAsync()
+        {
+            if (TaskModel is not null)
+            {
+                if (TaskModel.Id != Id && Id != 0)
+                {
+                    await InitializedTask();
+                }
+
+                if (TaskModel != null)
+                {
+                    _date = CompareDate.GetDate(TaskModel.CreatedDate);
+                }
+            }
+        }
 
         protected override async Task OnInitializedAsync()
         {
-            if (TaskModel == null)
+            if (TaskModel is null)
             {
-                var result = await _iFileManager.GetTaskModelAsync(Id);
-                var json = await result.Content.ReadAsStringAsync();
-                if (result.IsSuccessStatusCode)
-                {
-                    TaskModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskModel>(json);
-                }
-                else
-                {
-                    _logger.LogError(json);
-                }
+                await InitializedTask();
             }
 
             if (TaskModel != null)
@@ -45,6 +51,20 @@ namespace PagesLibrary.Pages.File
 
             _logger.LogInformation("InitializedAsync page {0}", number);
 #endif
+        }
+
+        private async Task InitializedTask()
+        {
+            var result = await _iFileManager.GetTaskModelAsync(Id);
+            var json = await result.Content.ReadAsStringAsync();
+            if (result.IsSuccessStatusCode)
+            {
+                TaskModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TaskModel>(json);
+            }
+            else
+            {
+                _logger.LogError(json);
+            }
         }
 
         private async Task SetReaction(int id, int value)

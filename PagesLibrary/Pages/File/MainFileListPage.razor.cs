@@ -8,9 +8,13 @@ namespace PagesLibrary.Pages.File
     {
         public TaskModel[]? TaskModels { get; set; }
 
-        protected override async Task OnInitializedAsync()
+        protected override async Task OnParametersSetAsync()
         {
             await GetTaskAsync();
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
 #if DEBUG
             _logger.LogInformation("Initialized page");
 #endif

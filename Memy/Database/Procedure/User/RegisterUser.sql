@@ -2,7 +2,7 @@
 @Email NVARCHAR(MAX),
 @Nick NVARCHAR(MAX),
 @Password NVARCHAR(MAX),
-@Role NVARCHAR(MAX)='user'
+@Role NVARCHAR(MAX)=NULL
 
 AS
 DECLARE @userId INT

@@ -76,15 +76,16 @@ namespace PagesLibrary.Pages.User.Register
         private class RegisterUser
         {
             [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Nazwa użytkownika jest wymagana")]
+            [System.ComponentModel.DataAnnotations.StringLength(32, MinimumLength = 3, ErrorMessage = "Nick jest za krótki wymagane jest minimum 3 znaki")]
             public string? Nick { get; set; }
             [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Email jest wymagany")]
             [System.ComponentModel.DataAnnotations.EmailAddress(ErrorMessage = "Email jest nieprawidłowy")]
             public string? Email { get; set; }
             [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Hasło jest wymagane")]
-            [System.ComponentModel.DataAnnotations.StringLength(1000, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie")]
+            [System.ComponentModel.DataAnnotations.StringLength(32, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie wymagane jest minimum 8 znaków")]
             public string? Password { get; set; }
             [System.ComponentModel.DataAnnotations.Required(ErrorMessage = "Hasło jest wymagane")]
-            [System.ComponentModel.DataAnnotations.StringLength(1000, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie")]
+            [System.ComponentModel.DataAnnotations.StringLength(32, MinimumLength = 8, ErrorMessage = "Hasło jest za krótkie")]
             [System.ComponentModel.DataAnnotations.Compare(nameof(Password), ErrorMessage = "Hasła się różnią")]
             public string? PasswordConfirm { get; set; }
             [System.ComponentModel.DataAnnotations.Compare(nameof(TrueBool), ErrorMessage = "Wymagane jest zatwierdzenie regulaminu")]
